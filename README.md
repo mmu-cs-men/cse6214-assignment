@@ -9,13 +9,9 @@ A second-hand book e-commerce site written in Django for this stupid assignment.
 
 2. Clone your fork.
 
-3. Create a virtual environment with `python -m venv env`.
+3. Launch PyCharm and open the project folder. It should prompt to create a virtual environment and install dependencies automatically. If it doesn't, you *somehow* fucked up already.
 
-4. Launch PyCharm and open the project folder. It should detect and use the virtual environment automatically.
-
-5. Open a terminal in PyCharm, and do `pip install -r requirements.txt`.
-
-6. Open your PyCharm settings, and navigate to _"Tools > Actions on Save"_. From here, ensure _"Reformat code"_, _"Optimize imports"_, and _"Run Black"_ are checked.
+4. Open your PyCharm settings, and navigate to _"Tools > Actions on Save"_. From here, ensure _"Reformat code"_, _"Optimize imports"_, and _"Run Black"_ are checked.
 
 ## Coding Guidelines
 1. Always make sure your code has been formatted with _Black_. A linter will run and check that you've formatted your code correctly when you send a pull request. If this linter fails, your code won't be merged.
