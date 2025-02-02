@@ -21,3 +21,9 @@ A second-hand book e-commerce site written in Django for this stupid assignment.
 3. A test runner will execute when you send a pull request. If there are any failing tests, your code won't be merged.
 
 4. Every class and/or method should have a detailed docstring describing its use. Function docstrings must have parameter hints, if any. Your docstrings should follow _reStructuredText_ format. PyCharm can help you out with this.
+
+## Project Structure
+
+1. All models live in `core/models` as separate files with at most one model class in each. Ensure you import your models in `core/models/__init__.py` after creating. For example, if you made a model class called `User` in a file named `user.py`, then make sure you add `from .user import User` in the `__init__.py` file. If this seems confusing to you, then you may read this [tutorial](https://realpython.com/python-modules-packages/) on packages to be less confused.
+
+2. There exists an app for each actor in the system (buyer, seller, admin, courier). Views and templates live in their corresponding actor's app. To be exact, views live in `<actor>/views` and templates live in `<actor>/templates/<actor>`. If the template part confuses you, then read the official Django [tutorial](https://docs.djangoproject.com/en/5.1/intro/tutorial03/).
