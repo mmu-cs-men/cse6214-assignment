@@ -34,7 +34,7 @@ class User(models.Model):
     ]
 
     email = models.EmailField(unique=True, null=False, blank=False)
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, blank=False)
     role = models.CharField(max_length=10, choices=ROLE_CHOICES, default="buyer")
 
     def __str__(self):
