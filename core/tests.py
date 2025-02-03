@@ -46,3 +46,21 @@ class UserModelTest(TestCase):
             User.objects.create(
                 email="testuser@example.com", name="Duplicate User", role="seller"
             )
+
+    def test_name_required(self):
+        """Test that a user must have a name."""
+        user = User(email="no_name@example.com", role="buyer")
+        with self.assertRaises(ValidationError):
+            user.full_clean()
+
+    def test_invalid_role(self):
+        """Test that an invalid role is not allowed."""
+        user = User(
+            email="invalid_role@example.com", name="Test User", role="invalid_role"
+        )
+        with self.assertRaises(ValidationError):
+            user.full_clean()
+
+    def test_user_str(self):
+        """Test the user string representation."""
+        self.assertEqual(str(self.user), self.user.email)
