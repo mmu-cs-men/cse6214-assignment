@@ -1,5 +1,6 @@
 from django.db import models
 
+from core.constants import RATING_CHOICES
 from core.models.shop import Shop
 from core.models.user import User
 
@@ -14,8 +15,6 @@ class Review(models.Model):
     :ivar comment: TextField for additional feedback or remarks.
     :ivar created_at: DateTimeField automatically set to the timestamp when the review is created.
     """
-
-    RATING_CHOICES = [(i, str(i)) for i in range(1, 6)]  # 1 to 5 rating scale
 
     shop = models.ForeignKey(Shop, on_delete=models.CASCADE, related_name="reviews")
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="reviews")
