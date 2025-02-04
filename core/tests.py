@@ -1,6 +1,7 @@
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 
+from core.models.BookListing import BookListing
 from core.models.cart import Cart
 from core.models.order import Order
 from core.models.shop import Shop
@@ -266,3 +267,73 @@ class UpgradeRequestModelTest(TestCase):
             UpgradeRequest.DoesNotExist
         ):  # The request should be gone
             UpgradeRequest.objects.get(id=request.id)
+
+
+class BookListingModelTest(TestCase):
+    """Tests for the BookListingModel functionality.
+
+    This test suite verifies the creation, validation, and deletion behavior of the
+    BookListing model in relation to shops. It ensures that listings are created
+    correctly, validations function as expected for required attributes, and cascading
+    deletions work as intended when a related shop is removed.
+
+    Test Cases:
+    - Book listing creation and proper linking to a shop.
+    - Required relation between book listings and shops.
+    - Validation of acceptable book condition values.
+    - Cascading deletion of book listings when their related shop is deleted.
+    """
+
+    def setUp(self):
+        """Create a sample shop for testing"""
+        self.user = User.objects.create(
+            email="seller@example.com", name="Seller", role="seller"
+        )
+        self.shop = Shop.objects.create(name="Book Haven", user=self.user)
+
+    def test_book_listing_creation(self):
+        """Test if a book listing is created successfully."""
+        listing = BookListing.objects.create(
+            shop=self.shop,
+            title="Django for Beginners",
+            author="William S. Vincent",
+            condition="good",
+            price=29.99,
+        )
+        self.assertEqual(listing.shop, self.shop)
+        self.assertEqual(listing.title, "Django for Beginners")
+        self.assertEqual(listing.condition, "good")
+
+    def test_book_listing_must_have_shop(self):
+        """Test that a book listing must be linked to a shop."""
+        listing = BookListing(
+            title="No Shop Book", author="Unknown", condition="fair", price=10.00
+        )
+        with self.assertRaises(ValidationError):
+            listing.full_clean()
+
+    def test_book_listing_must_have_valid_condition(self):
+        """Test that a book listing must have a valid condition."""
+        listing = BookListing(
+            shop=self.shop,
+            title="Invalid Condition Book",
+            author="Fake",
+            condition="bad",
+            price=5.00,
+        )
+        with self.assertRaises(ValidationError):
+            listing.full_clean()
+
+    def test_deleting_shop_deletes_book_listings(self):
+        """Test that deleting a shop also deletes its book listings (CASCADE)"""
+        listing = BookListing.objects.create(
+            shop=self.shop,
+            title="Python Basics",
+            author="John Doe",
+            condition="new",
+            price=19.99,
+        )
+        self.shop.delete()
+
+        with self.assertRaises(BookListing.DoesNotExist):  # The listing should be gone
+            BookListing.objects.get(id=listing.id)
