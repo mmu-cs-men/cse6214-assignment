@@ -33,6 +33,7 @@ class User(models.Model):
         ("courier", "Courier"),
     ]
 
+    user_id = models.AutoField(primary_key=True)
     email = models.EmailField(unique=True, null=False, blank=False)
     name = models.CharField(max_length=255, blank=False)
     role = models.CharField(max_length=10, choices=ROLE_CHOICES, default="buyer")
