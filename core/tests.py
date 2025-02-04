@@ -2,6 +2,7 @@ from django.core.exceptions import ValidationError
 from django.test import TestCase
 
 from core.models.cart import Cart
+from core.models.order import Order
 from core.models.shop import Shop
 from core.models.user import User
 
@@ -183,3 +184,47 @@ class CartModelTest(TestCase):
         """Test the cart string representation"""
         cart = Cart.objects.create(user=self.user)
         self.assertEqual(str(cart), f"Cart {cart.id} for {self.user.email}")
+
+
+class OrderModelTest(TestCase):
+    """
+    Test case suite for testing the `Order` model.
+
+    This class is designed to ensure that the `Order` model behaves as expected,
+    enforcing business rules, constraints, and relationships defined within the
+    model. Each test validates specific functionality and characteristics of
+    the `Order` model, such as default values, relationships, and persistence
+    of data. This is implemented using Django's TestCase framework.
+    """
+
+    def setUp(self):
+        """Create a sample user for testing"""
+        self.user = User.objects.create(
+            email="buyer@example.com", name="Buyer User", role="buyer"
+        )
+
+    def test_order_creation(self):
+        """Test if an order is created successfully."""
+        order = Order.objects.create(user=self.user, total_price=100.50)
+        self.assertEqual(order.user, self.user)
+        self.assertEqual(order.status, "pending")  # Default status
+        self.assertIsNotNone(order.placed_at)  # Ensure timestamp is set
+
+    def test_order_must_have_user(self):
+        """Test that an order must be linked to a user."""
+        order = Order(user=None, total_price=50.00)
+        with self.assertRaises(ValidationError):
+            order.full_clean()
+
+    def test_order_default_status(self):
+        """Test that the default order status is 'pending'."""
+        order = Order.objects.create(user=self.user, total_price=75.00)
+        self.assertEqual(order.status, "pending")
+
+    def test_deleting_user_deletes_order(self):
+        """Test that deleting a user also deletes their orders (CASCADE)"""
+        order = Order.objects.create(user=self.user, total_price=150.00)
+        self.user.delete()
+
+        with self.assertRaises(Order.DoesNotExist):  # The order should be gone
+            Order.objects.get(id=order.id)
