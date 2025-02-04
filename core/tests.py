@@ -3,6 +3,7 @@ from django.test import TestCase
 
 from core.models.book_listing import BookListing
 from core.models.cart import Cart
+from core.models.cart_item import CartItem
 from core.models.order import Order
 from core.models.review import Review
 from core.models.shop import Shop
@@ -411,3 +412,87 @@ class ReviewModelTest(TestCase):
 
         with self.assertRaises(Review.DoesNotExist):  # The review should be gone
             Review.objects.get(id=review.id)
+
+
+class CartItemModelTest(TestCase):
+    """Tests for the CartItemModel functionality.
+
+    This test suite verifies the creation, validation, and deletion behavior of the
+    CartItem model. It ensures that cart items are properly linked to both carts and
+    book listings, validates constraints such as required relationships and positive
+    quantities, and checks cascading deletion behavior for associated carts and book listings.
+
+    Test Cases:
+    - Successful creation of a cart item linked to a cart and book listing.
+    - Validation to ensure cart items are linked to both a cart and a book listing.
+    - Validation to ensure cart items have a positive quantity.
+    - Cascading deletion of cart items when their associated cart is deleted.
+    - Cascading deletion of cart items when their associated book listing is deleted.
+    """
+
+    def setUp(self):
+        """Create a sample cart and book listing for testing"""
+        self.user = User.objects.create(
+            email="buyer@example.com", name="Buyer User", role="buyer"
+        )
+        self.cart = Cart.objects.create(user=self.user)
+
+        self.shop = Shop.objects.create(name="Bookstore", user=self.user)
+        self.book_listing = BookListing.objects.create(
+            shop=self.shop,
+            title="Django for Beginners",
+            author="William S. Vincent",
+            condition="good",
+            price=29.99,
+        )
+
+    def test_cart_item_creation(self):
+        """Test if a cart item is created successfully."""
+        cart_item = CartItem.objects.create(
+            cart=self.cart, book_listing=self.book_listing, quantity=2
+        )
+        self.assertEqual(cart_item.cart, self.cart)
+        self.assertEqual(cart_item.book_listing, self.book_listing)
+        self.assertEqual(cart_item.quantity, 2)
+
+    def test_cart_item_must_have_cart_and_book_listing(self):
+        """Test that a cart item must be linked to a cart and a book listing."""
+        cart_item = CartItem(cart=None, book_listing=self.book_listing, quantity=1)
+        with self.assertRaises(ValidationError):
+            cart_item.full_clean()
+
+        cart_item = CartItem(cart=self.cart, book_listing=None, quantity=1)
+        with self.assertRaises(ValidationError):
+            cart_item.full_clean()
+
+    def test_cart_item_must_have_positive_quantity(self):
+        """Test that a cart item must have a positive quantity."""
+        cart_item = CartItem(
+            cart=self.cart, book_listing=self.book_listing, quantity=-1
+        )
+        with self.assertRaises(ValidationError):
+            cart_item.full_clean()
+
+        cart_item.quantity = 0
+        with self.assertRaises(ValidationError):
+            cart_item.full_clean()
+
+    def test_deleting_cart_deletes_cart_items(self):
+        """Test that deleting a cart also deletes its cart items (CASCADE)"""
+        cart_item = CartItem.objects.create(
+            cart=self.cart, book_listing=self.book_listing, quantity=1
+        )
+        self.cart.delete()
+
+        with self.assertRaises(CartItem.DoesNotExist):  # The cart item should be gone
+            CartItem.objects.get(id=cart_item.id)
+
+    def test_deleting_book_listing_deletes_cart_items(self):
+        """Test that deleting a book listing also deletes its cart items (CASCADE)"""
+        cart_item = CartItem.objects.create(
+            cart=self.cart, book_listing=self.book_listing, quantity=1
+        )
+        self.book_listing.delete()
+
+        with self.assertRaises(CartItem.DoesNotExist):  # The cart item should be gone
+            CartItem.objects.get(id=cart_item.id)
