@@ -1,6 +1,7 @@
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 
+from core.models.shop import Shop
 from core.models.user import User
 
 
@@ -64,3 +65,51 @@ class UserModelTest(TestCase):
     def test_user_str(self):
         """Test the user string representation."""
         self.assertEqual(str(self.user), self.user.email)
+
+
+class ShopModelTest(TestCase):
+    def setUp(self):
+        """Create a sample user for testing"""
+        self.user = User.objects.create(
+            email="seller@example.com", name="Seller User", role="seller"
+        )
+
+    def test_shop_creation(self):
+        """Test if a shop is created successfully."""
+        shop = Shop.objects.create(name="My Bookstore", user=self.user)
+        self.assertEqual(shop.name, "My Bookstore")
+        self.assertEqual(shop.user, self.user)
+
+    def test_name_required(self):
+        """Test that a shop must have a name."""
+        shop = Shop(user=self.user)
+        with self.assertRaises(ValidationError):
+            shop.full_clean()
+
+    def test_shop_must_have_user(self):
+        """Test that a shop must be linked to a user."""
+        shop = Shop(name="No Owner Shop", user=None)
+        with self.assertRaises(ValidationError):
+            shop.full_clean()
+
+    def test_shop_string_representation(self):
+        """Test the shop string representation."""
+        shop = Shop.objects.create(name="My Bookstore", user=self.user)
+        self.assertEqual(str(shop), "My Bookstore")  # FIXED: Matching actual name
+
+    def test_deleting_user_deletes_shop(self):
+        """Test that deleting a user also deletes their shop (CASCADE)"""
+        shop = Shop.objects.create(name="My Bookstore", user=self.user)
+        self.user.delete()
+
+        with self.assertRaises(Shop.DoesNotExist):  # The shop should be gone
+            Shop.objects.get(id=shop.id)  # FIXED: Use 'id' instead of 'shop_id'
+
+    def test_user_can_have_multiple_shops(self):
+        """Test that a user can own multiple shops"""
+        shop1 = Shop.objects.create(name="Shop 1", user=self.user)  # FIXED
+        shop2 = Shop.objects.create(name="Shop 2", user=self.user)  # FIXED
+
+        self.assertEqual(self.user.shops.count(), 2)  # Check total shops
+        self.assertIn(shop1, self.user.shops.all())  # Verify shop1 is in queryset
+        self.assertIn(shop2, self.user.shops.all())  # Verify shop2 is in queryset
