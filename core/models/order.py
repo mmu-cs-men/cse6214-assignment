@@ -4,7 +4,13 @@ from core.models.user import User
 
 
 class Order(models.Model):
-    """Model representing a user's order"""
+    """
+    Represents an order placed by a user in the system.
+
+    This class is used to store details about an order including the user who
+    placed it, its status, placement timestamp, and the total price. The status
+    can be one of predefined choices including pending, completed, or cancelled.
+    """
 
     STATUS_CHOICES = [
         ("pending", "Pending"),
