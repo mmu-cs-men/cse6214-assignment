@@ -9,12 +9,12 @@ from core.models.user import User
 
 class UserModelTest(TestCase):
     """
-    Create a sample user for testing.
+    Unit tests for the User model class.
 
-    Summary:
-    This method initializes a User instance to be used across
-    multiple test cases. The sample user contains predefined
-    values for email, name, and role attributes.
+    This test class provides a series of test cases to validate the behavior and integrity of the
+    User model in various scenarios. It checks for the creation of users, required fields,
+    default values, constraints on field uniqueness, and validation of allowed values. Additionally,
+    it verifies the string representation of the User object.
     """
 
     def setUp(self):
