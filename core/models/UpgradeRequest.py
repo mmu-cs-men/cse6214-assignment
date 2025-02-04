@@ -4,7 +4,15 @@ from core.models.user import User
 
 
 class UpgradeRequest(models.Model):
-    """Model representing a request to upgrade a user's role"""
+    """
+    Represents a request to upgrade a user's role within the system.
+
+    This model is designed to track user-initiated upgrade requests,
+    specifically capturing the user making the request, the role they
+    wish to upgrade to, and the timestamp of the request. It also includes
+    predefined role choices to categorize requests.
+
+    """
 
     ROLE_CHOICES = [
         ("buyer", "Buyer"),
