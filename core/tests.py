@@ -228,3 +228,40 @@ class OrderModelTest(TestCase):
 
         with self.assertRaises(Order.DoesNotExist):  # The order should be gone
             Order.objects.get(id=order.id)
+
+
+class UpgradeRequestModelTest(TestCase):
+    def setUp(self):
+        """Create a sample user for testing"""
+        self.user = User.objects.create(
+            email="user@example.com", name="Test User", role="buyer"
+        )
+
+    def test_upgrade_request_creation(self):
+        """Test if an upgrade request is created successfully."""
+        request = UpgradeRequest.objects.create(user=self.user, target_role="seller")
+        self.assertEqual(request.user, self.user)
+        self.assertEqual(request.target_role, "seller")
+        self.assertIsNotNone(request.requested_at)  # Ensure timestamp is set
+
+    def test_upgrade_request_must_have_user(self):
+        """Test that an upgrade request must be linked to a user."""
+        request = UpgradeRequest(user=None, target_role="seller")
+        with self.assertRaises(ValidationError):
+            request.full_clean()
+
+    def test_upgrade_request_must_have_valid_role(self):
+        """Test that an upgrade request must have a valid role."""
+        request = UpgradeRequest(user=self.user, target_role="invalid_role")
+        with self.assertRaises(ValidationError):
+            request.full_clean()
+
+    def test_deleting_user_deletes_upgrade_request(self):
+        """Test that deleting a user also deletes their upgrade requests (CASCADE)"""
+        request = UpgradeRequest.objects.create(user=self.user, target_role="seller")
+        self.user.delete()
+
+        with self.assertRaises(
+            UpgradeRequest.DoesNotExist
+        ):  # The request should be gone
+            UpgradeRequest.objects.get(id=request.id)
