@@ -10,10 +10,6 @@ class CartItem(models.Model):
     Represents an item in a shopping cart with associations to a cart and a book listing,
     along with a specified quantity.
 
-    This model links a `Cart` to a `BookListing` and records the quantity of the book
-    listing in the cart. It ensures data integrity by validating that the quantity is
-    greater than zero.
-
     :ivar cart: ForeignKey linking the item to a shopping cart.
     :ivar book_listing: ForeignKey linking the item to a book listing.
     :ivar quantity: The number of the specific book in the cart.

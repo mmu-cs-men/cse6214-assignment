@@ -16,7 +16,6 @@ class Order(models.Model):
     :ivar status: The status of the order (Pending, Completed, Cancelled).
     :ivar placed_at: The timestamp indicating when the order was placed.
     :ivar total_price: The total amount for the order.
-
     """
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="orders")

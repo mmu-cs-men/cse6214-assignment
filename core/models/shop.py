@@ -12,7 +12,6 @@ class Shop(models.Model):
 
     :ivar name: The name of the shop.
     :ivar user: ForeignKey linking the shop to its owner.
-
     """
 
     name = models.CharField(max_length=255, null=False, blank=False)

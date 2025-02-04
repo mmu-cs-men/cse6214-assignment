@@ -13,7 +13,6 @@ class DeliveryIssue(models.Model):
     :ivar order_assignment: ForeignKey linking the issue to an order assignment.
     :ivar issue_description: A detailed description of the delivery issue.
     :ivar reported_at: The timestamp indicating when the issue was reported.
-
     """
 
     order_assignment = models.OneToOneField(

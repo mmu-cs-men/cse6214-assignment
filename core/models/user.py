@@ -14,7 +14,6 @@ class User(models.Model):
     :ivar email: A unique email address used for authentication and identification.
     :ivar name: The full name of the user.
     :ivar role: The role of the user within the system, chosen from predefined options
-
     """
 
     email = models.EmailField(unique=True, null=False, blank=False)

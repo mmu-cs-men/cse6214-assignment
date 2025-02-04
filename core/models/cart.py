@@ -12,7 +12,6 @@ class Cart(models.Model):
 
     :ivar user: ForeignKey linking the cart to a user.
     :ivar created_at: The timestamp indicating when the cart was created.
-
     """
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="carts")
