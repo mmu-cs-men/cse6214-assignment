@@ -1,4 +1,5 @@
 from django.core.exceptions import ValidationError
+from django.db.utils import IntegrityError
 from django.test import TestCase
 
 from core.models.cart import Cart
@@ -12,13 +13,16 @@ from core.models.user import User
 
 
 class UserModelTest(TestCase):
-    """
-    Unit tests for the User model class.
+    """Tests for the User model
 
-    This test class provides a series of test cases to validate the behavior and integrity of the
-    User model in various scenarios. It checks for the creation of users, required fields,
-    default values, constraints on field uniqueness, and validation of allowed values. Additionally,
-    it verifies the string representation of the User object.
+    Test Cases:
+    - Successful creation of a user with an email, name, and role.
+    - Validation to ensure a user must have an email.
+    - Validation to ensure a user must have a name.
+    - Verification that the default role is 'buyer' when no role is specified.
+    - Constraint enforcement ensuring emails are unique.
+    - Validation to ensure that only allowed roles can be assigned to a user.
+    - String representation of a user should return the email.
     """
 
     def setUp(self):
@@ -46,7 +50,7 @@ class UserModelTest(TestCase):
 
     def test_unique_email(self):
         """Test that emails must be unique."""
-        with self.assertRaises(Exception):  # Should raise IntegrityError
+        with self.assertRaises(IntegrityError):
             User.objects.create(
                 email="testuser@example.com", name="Duplicate User", role="seller"
             )
@@ -72,13 +76,15 @@ class UserModelTest(TestCase):
 
 class ShopModelTest(TestCase):
     """
-    Test case class for testing the Shop model.
+    Test case for testing the Shop model.
 
-    This class contains unit tests to validate the functionality of the Shop model,
-    including shop creation, required attributes, constraints, string representations,
-    and relationships to ensure the model behaves as expected. It utilizes the Django
-    TestCase class for asserting the behavior of the Shop model.
-
+    Test Cases:
+    - Successful creation of a shop with a name and associated user.
+    - Validation to ensure a shop must have a name.
+    - Validation to ensure a shop must be linked to a user.
+    - Verification of the shop's string representation.
+    - Constraint enforcement to ensure that deleting a user also deletes their shop (CASCADE).
+    - Validation to ensure a user can own multiple shops.
     """
 
     def setUp(self):
@@ -132,10 +138,13 @@ class CartModelTest(TestCase):
     """
     A test case for validating the Cart model functionality in a Django application.
 
-    This class tests various aspects of the Cart model, ensuring proper behavior when creating, associating, and deleting
-    carts with regard to their relationship with a User model. It aims to cover the integrity constraints and cascading
-    deletion rules between Cart and User objects.
-
+    Test Cases:
+    - Successful creation of a cart associated with a user.
+    - Validation to ensure a cart must be linked to a user.
+    - Constraint enforcement to ensure that deleting a user also deletes their cart (CASCADE).
+    - Validation to ensure carts are retrieved in the order they were created.
+    - Verification that a user can have multiple carts.
+    - Verification of the cart's string representation.
     """
 
     def setUp(self):
@@ -191,11 +200,13 @@ class OrderModelTest(TestCase):
     """
     Test case suite for testing the `Order` model.
 
-    This class is designed to ensure that the `Order` model behaves as expected,
-    enforcing business rules, constraints, and relationships defined within the
-    model. Each test validates specific functionality and characteristics of
-    the `Order` model, such as default values, relationships, and persistence
-    of data. This is implemented using Django's TestCase framework.
+     Test Cases:
+    - Successful creation of an order with an associated user and total price.
+    - Validation to ensure an order must be linked to a user.
+    - Verification that the default status of an order is 'pending'.
+    - Constraint enforcement to ensure that deleting a user also deletes their orders (CASCADE).
+    - Verification that an order's timestamp is correctly set upon creation.
+
     """
 
     def setUp(self):
@@ -232,6 +243,16 @@ class OrderModelTest(TestCase):
 
 
 class UpgradeRequestModelTest(TestCase):
+    """Tests for the UpgradeRequestModel
+
+    Test Cases:
+    - Successful creation of an upgrade request with an associated user and target role.
+    - Validation to ensure an upgrade request must be linked to a user.
+    - Validation to ensure an upgrade request has a valid target role.
+    - Constraint enforcement to ensure that deleting a user also deletes their upgrade requests (CASCADE).
+    - Verification that an upgrade request's timestamp is correctly set upon creation.
+    """
+
     def setUp(self):
         """Create a sample user for testing"""
         self.user = User.objects.create(

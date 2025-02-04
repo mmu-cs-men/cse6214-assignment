@@ -5,12 +5,16 @@ from core.models.user import User
 
 class Shop(models.Model):
     """
-    Represents a shop entity within the system.
+    Represents a shop owned by a user.
 
-    This class is a Django model for storing and managing information about a shop. It includes
-    basic attributes such as the shop's name and the user associated with it. The `Shop` class
-    is tied to Django's ORM for database operations, providing functionalities to create, update,
-    and manage shop records in the database.
+    The `Shop` model stores information about a seller's shop, including
+    the shop's name and the user who owns it.
+
+    :ivar name: The name of the shop.
+    :vartype name: str
+
+    :ivar user: ForeignKey linking the shop to its owner.
+    :vartype user: User
     """
 
     name = models.CharField(max_length=255, null=False, blank=False)

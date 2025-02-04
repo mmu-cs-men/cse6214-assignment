@@ -5,11 +5,23 @@ from core.models.user import User
 
 class Order(models.Model):
     """
-    Represents an order placed by a user in the system.
+    Represents a purchase order made by a user.
 
-    This class is used to store details about an order including the user who
-    placed it, its status, placement timestamp, and the total price. The status
-    can be one of predefined choices including pending, completed, or cancelled.
+    The `Order` model stores details about transactions, including the
+    user who placed the order, its current status, the total price, and
+    the timestamp when it was placed.
+
+    :ivar user: ForeignKey linking the order to a user.
+    :vartype user: User
+
+    :ivar status: The status of the order (Pending, Completed, Cancelled).
+    :vartype status: str
+
+    :ivar placed_at: The timestamp indicating when the order was placed.
+    :vartype placed_at: datetime
+
+    :ivar total_price: The total amount for the order.
+    :vartype total_price: float
     """
 
     STATUS_CHOICES = [

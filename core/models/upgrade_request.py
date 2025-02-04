@@ -5,13 +5,20 @@ from core.models.user import User
 
 class UpgradeRequest(models.Model):
     """
-    Represents a request to upgrade a user's role within the system.
+    Represents a request by a user to upgrade their role.
 
-    This model is designed to track user-initiated upgrade requests,
-    specifically capturing the user making the request, the role they
-    wish to upgrade to, and the timestamp of the request. It also includes
-    predefined role choices to categorize requests.
+    The `UpgradeRequest` model stores upgrade requests submitted by users
+    who wish to change their roles (e.g., from buyer to seller). It tracks
+    the requested role and the timestamp of the request.
 
+    :ivar user: ForeignKey linking the upgrade request to the user making the request.
+    :vartype user: User
+
+    :ivar target_role: The role that the user is requesting to upgrade to.
+    :vartype target_role: str
+
+    :ivar requested_at: The timestamp indicating when the upgrade request was made.
+    :vartype requested_at: datetime
     """
 
     ROLE_CHOICES = [

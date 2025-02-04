@@ -7,17 +7,14 @@ class Cart(models.Model):
     """
     Represents a shopping cart associated with a user.
 
-    This class defines a cart model in the system that is linked to a specific user.
-    Each cart stores the user it is associated with and the time it was created.
-    This is typically used to manage a user's shopping process.
+    The cart model stores items that a user intends to purchase. Each cart
+    is linked to a specific user and tracks when it was created.
 
-    Attributes:
-        user (User): The user to whom the cart belongs.
-        created_at (datetime): The timestamp indicating when the cart was created.
+    :ivar user: ForeignKey linking the cart to a user.
+    :vartype user: User
 
-    Methods:
-        __str__(): Returns a string representation of the cart including its ID
-        and the email of the associated user.
+    :ivar created_at: The timestamp indicating when the cart was created.
+    :vartype created_at: datetime
     """
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="carts")
