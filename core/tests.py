@@ -13,6 +13,7 @@ from core.models.user import User
 from core.models.book_listing import BookListing
 from core.models.cart import Cart
 from core.models.order import Order
+from core.models.review import Review
 from core.models.shop import Shop
 from core.models.upgrade_request import UpgradeRequest
 from core.models.user import User
@@ -623,3 +624,76 @@ class BookListingModelTest(TestCase):
 
         with self.assertRaises(BookListing.DoesNotExist):  # The listing should be gone
             BookListing.objects.get(id=listing.id)
+
+
+class ReviewModelTest(TestCase):
+    """Tests for the ReviewModel functionality.
+
+    This test suite verifies the creation, validation, and deletion behavior of the
+    Review model. It ensures that reviews are created correctly, validations function
+    as expected for required attributes and constraints, and cascading deletions
+    work as intended when a related shop or user is removed.
+
+    Test Cases:
+    - Creation of a review and proper linking to a shop and user.
+    - Validation of the rating to ensure it falls between acceptable range (1-5).
+    - Validation that reviews are linked to both a shop and a user.
+    - Cascading deletion of reviews when their related shop is deleted.
+    - Cascading deletion of reviews when the associated user is deleted.
+    """
+
+    def setUp(self):
+        """Create a sample shop and user for testing"""
+        self.user = User.objects.create(
+            email="buyer@example.com", name="Buyer User", role="buyer"
+        )
+        self.shop = Shop.objects.create(name="Tech Haven", user=self.user)
+
+    def test_review_creation(self):
+        """Test if a review is created successfully."""
+        review = Review.objects.create(
+            shop=self.shop, user=self.user, rating=5, comment="Excellent service!"
+        )
+        self.assertEqual(review.shop, self.shop)
+        self.assertEqual(review.user, self.user)
+        self.assertEqual(review.rating, 5)
+
+    def test_review_must_have_valid_rating(self):
+        """Test that a review must have a rating between 1 and 5."""
+        review = Review(shop=self.shop, user=self.user, rating=6, comment="Too high")
+        with self.assertRaises(ValidationError):
+            review.full_clean()
+
+        review.rating = 0  # Too low
+        with self.assertRaises(ValidationError):
+            review.full_clean()
+
+    def test_review_must_have_shop_and_user(self):
+        """Test that a review must be linked to a shop and user."""
+        review = Review(shop=None, user=self.user, rating=3, comment="No shop linked")
+        with self.assertRaises(ValidationError):
+            review.full_clean()
+
+        review = Review(shop=self.shop, user=None, rating=3, comment="No user linked")
+        with self.assertRaises(ValidationError):
+            review.full_clean()
+
+    def test_deleting_shop_deletes_reviews(self):
+        """Test that deleting a shop also deletes its reviews (CASCADE)"""
+        review = Review.objects.create(
+            shop=self.shop, user=self.user, rating=4, comment="Great products!"
+        )
+        self.shop.delete()
+
+        with self.assertRaises(Review.DoesNotExist):  # The review should be gone
+            Review.objects.get(id=review.id)
+
+    def test_deleting_user_deletes_reviews(self):
+        """Test that deleting a user also deletes their reviews (CASCADE)"""
+        review = Review.objects.create(
+            shop=self.shop, user=self.user, rating=5, comment="Amazing!"
+        )
+        self.user.delete()
+
+        with self.assertRaises(Review.DoesNotExist):  # The review should be gone
+            Review.objects.get(id=review.id)
