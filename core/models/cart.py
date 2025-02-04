@@ -11,7 +11,6 @@ class Cart(models.Model):
     is linked to a specific user and tracks when it was created.
 
     :ivar user: ForeignKey linking the cart to a user.
-
     :ivar created_at: The timestamp indicating when the cart was created.
 
     """

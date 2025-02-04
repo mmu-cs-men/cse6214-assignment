@@ -12,11 +12,7 @@ class OrderAssignment(models.Model):
     the timestamp when the assignment was made.
 
     :ivar order: ForeignKey linking the assignment to an order.
-
-
     :ivar courier: ForeignKey linking the assignment to a courier user.
-
-
     :ivar assigned_at: The timestamp indicating when the order was assigned.
 
     """

@@ -11,11 +11,7 @@ class DeliveryIssue(models.Model):
     about the problem reported and the timestamp of when it was logged.
 
     :ivar order_assignment: ForeignKey linking the issue to an order assignment.
-
-
     :ivar issue_description: A detailed description of the delivery issue.
-
-
     :ivar reported_at: The timestamp indicating when the issue was reported.
 
     """

@@ -15,10 +15,7 @@ class CartItem(models.Model):
     greater than zero.
 
     :ivar cart: ForeignKey linking the item to a shopping cart.
-    cart: Cart
-
     :ivar book_listing: ForeignKey linking the item to a book listing.
-
     :ivar quantity: The number of the specific book in the cart.
     """
 

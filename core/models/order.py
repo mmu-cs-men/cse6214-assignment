@@ -13,14 +13,8 @@ class Order(models.Model):
     the timestamp when it was placed.
 
     :ivar user: ForeignKey linking the order to a user.
-
-
     :ivar status: The status of the order (Pending, Completed, Cancelled).
-
-
     :ivar placed_at: The timestamp indicating when the order was placed.
-
-
     :ivar total_price: The total amount for the order.
 
     """

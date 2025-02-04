@@ -14,11 +14,8 @@ class OrderItem(models.Model):
     they were bought.
 
     :ivar order: ForeignKey linking the order item to an order.
-
     :ivar book_listing: ForeignKey linking the order item to a book listing.
-
     :ivar quantity: The number of copies of the book in the order.
-
     :ivar purchase_price: The price at which the book was purchased.
 
     """
