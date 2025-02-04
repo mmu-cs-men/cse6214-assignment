@@ -47,7 +47,7 @@ class UserModelTest(TestCase):
         """Test that a user must have an email."""
         user = User(name="No Email", role="seller")
         with self.assertRaises(ValidationError):
-            user.full_clean()  # This explicitly triggers field validation
+            user.full_clean()
 
     def test_default_role(self):
         """Test that the default role is 'buyer'."""
@@ -120,20 +120,20 @@ class ShopModelTest(TestCase):
     def test_shop_string_representation(self):
         """Test the shop string representation."""
         shop = Shop.objects.create(name="My Bookstore", user=self.user)
-        self.assertEqual(str(shop), "My Bookstore")  # FIXED: Matching actual name
+        self.assertEqual(str(shop), "My Bookstore")
 
     def test_deleting_user_deletes_shop(self):
         """Test that deleting a user also deletes their shop (CASCADE)"""
         shop = Shop.objects.create(name="My Bookstore", user=self.user)
         self.user.delete()
 
-        with self.assertRaises(Shop.DoesNotExist):  # The shop should be gone
-            Shop.objects.get(id=shop.id)  # FIXED: Use 'id' instead of 'shop_id'
+        with self.assertRaises(Shop.DoesNotExist):
+            Shop.objects.get(id=shop.id)
 
     def test_user_can_have_multiple_shops(self):
         """Test that a user can own multiple shops"""
-        shop1 = Shop.objects.create(name="Shop 1", user=self.user)  # FIXED
-        shop2 = Shop.objects.create(name="Shop 2", user=self.user)  # FIXED
+        shop1 = Shop.objects.create(name="Shop 1", user=self.user)
+        shop2 = Shop.objects.create(name="Shop 2", user=self.user)
 
         self.assertEqual(self.user.shops.count(), 2)  # Check total shops
         self.assertIn(shop1, self.user.shops.all())  # Verify shop1 is in queryset
@@ -285,12 +285,12 @@ class UpgradeRequestModelTest(TestCase):
             request.full_clean()
 
     def test_deleting_user_deletes_upgrade_request(self):
-        """Test that deleting a user also deletes their upgrade requests (CASCADE)"""
+        """Test that deleting a user al so deletes their upgrade requests (CASCADE)"""
         request = UpgradeRequest.objects.create(user=self.user, target_role="seller")
         self.user.delete()
 
         with self.assertRaises(
-                UpgradeRequest.DoesNotExist
+            UpgradeRequest.DoesNotExist
         ):  # The request should be gone
             UpgradeRequest.objects.get(id=request.id)
 
@@ -642,11 +642,11 @@ class OrderItemModelTest(TestCase):
 class OrderAssignmentModelTest(TestCase):
     """Tests for the OrderAssignmentModel functionality.
 
-    This test suite validates the creation, constraints, and deletion behavior of the
-    OrderAssignment model. It ensures that order assignments are properly linked to
-    both an order and a courier, enforces constraints such as uniqueness of assignments
-    per order, and verifies cascading deletions of assignments when their related orders
-    or couriers are deleted.
+        This test suite validates the creation, constraints, and deletion behavior of the
+        OrderAssignment model. It ensures that order assignments are properly linked to
+        both an order and a courier, enforces constraints such as uniqueness of assignments
+        per order, and verifies cascading deletions of assignments when their related orders
+        or couriers are deleted.
 
     Test Cases:
     - Successful creation of an order assignment linked to an order and a courier.
@@ -703,7 +703,7 @@ class OrderAssignmentModelTest(TestCase):
         self.order.delete()
 
         with self.assertRaises(
-                OrderAssignment.DoesNotExist
+            OrderAssignment.DoesNotExist
         ):  # The assignment should be gone
             OrderAssignment.objects.get(id=assignment.id)
 
@@ -715,7 +715,7 @@ class OrderAssignmentModelTest(TestCase):
         self.courier.delete()
 
         with self.assertRaises(
-                OrderAssignment.DoesNotExist
+            OrderAssignment.DoesNotExist
         ):  # The assignment should be gone
             OrderAssignment.objects.get(id=assignment.id)
 

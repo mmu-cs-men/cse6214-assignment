@@ -20,7 +20,7 @@ class User(models.Model):
     :ivar role: The role of the user within the system, chosen from predefined options
         ('buyer', 'seller', 'admin', 'courier'). Defaults to 'buyer'.
     :vartype role: str
-       """
+    """
 
     email = models.EmailField(unique=True, null=False, blank=False)
     name = models.CharField(max_length=255)
