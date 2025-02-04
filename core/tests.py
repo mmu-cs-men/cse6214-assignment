@@ -1,7 +1,7 @@
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 
-from core.models.BookListing import BookListing
+from core.models.book_listing import BookListing
 from core.models.cart import Cart
 from core.models.order import Order
 from core.models.shop import Shop
