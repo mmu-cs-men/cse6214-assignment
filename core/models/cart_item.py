@@ -15,13 +15,13 @@ class CartItem(models.Model):
     greater than zero.
 
     :ivar cart: ForeignKey linking the item to a shopping cart.
-    :vartype cart: Cart
+    cart: Cart
 
     :ivar book_listing: ForeignKey linking the item to a book listing.
-    :vartype book_listing: BookListing
+    book_listing: BookListing
 
     :ivar quantity: The number of the specific book in the cart.
-    :vartype quantity: int
+    quantity: int
     """
 
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name="cart_items")

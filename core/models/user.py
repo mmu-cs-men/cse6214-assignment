@@ -12,14 +12,14 @@ class User(models.Model):
     and actions.
 
     :ivar email: A unique email address used for authentication and identification.
-    :vartype email: str
+     email: str
 
     :ivar name: The full name of the user.
-    :vartype name: str
+     name: str
 
     :ivar role: The role of the user within the system, chosen from predefined options
         ('buyer', 'seller', 'admin', 'courier'). Defaults to 'buyer'.
-    :vartype role: str
+    role: str
     """
 
     email = models.EmailField(unique=True, null=False, blank=False)

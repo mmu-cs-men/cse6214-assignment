@@ -17,13 +17,13 @@ class OrderItem(models.Model):
     :vartype order: Order
 
     :ivar book_listing: ForeignKey linking the order item to a book listing.
-    :vartype book_listing: BookListing
+     book_listing: BookListing
 
     :ivar quantity: The number of copies of the book in the order.
-    :vartype quantity: int
+    quantity: int
 
     :ivar purchase_price: The price at which the book was purchased.
-    :vartype purchase_price: float
+     purchase_price: float
     """
 
     order = models.ForeignKey(
