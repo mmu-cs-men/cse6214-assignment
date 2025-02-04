@@ -1,3 +1,4 @@
+from .book_listing import BookListing
 from .cart import Cart
 from .order import Order
 from .shop import Shop
