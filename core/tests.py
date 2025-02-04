@@ -1,6 +1,7 @@
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 
+from core.models.cart import Cart
 from core.models.shop import Shop
 from core.models.user import User
 
@@ -68,6 +69,16 @@ class UserModelTest(TestCase):
 
 
 class ShopModelTest(TestCase):
+    """
+    Test case class for testing the Shop model.
+
+    This class contains unit tests to validate the functionality of the Shop model,
+    including shop creation, required attributes, constraints, string representations,
+    and relationships to ensure the model behaves as expected. It utilizes the Django
+    TestCase class for asserting the behavior of the Shop model.
+
+    """
+
     def setUp(self):
         """Create a sample user for testing"""
         self.user = User.objects.create(
@@ -113,3 +124,62 @@ class ShopModelTest(TestCase):
         self.assertEqual(self.user.shops.count(), 2)  # Check total shops
         self.assertIn(shop1, self.user.shops.all())  # Verify shop1 is in queryset
         self.assertIn(shop2, self.user.shops.all())  # Verify shop2 is in queryset
+
+
+class CartModelTest(TestCase):
+    """
+    A test case for validating the Cart model functionality in a Django application.
+
+    This class tests various aspects of the Cart model, ensuring proper behavior when creating, associating, and deleting
+    carts with regard to their relationship with a User model. It aims to cover the integrity constraints and cascading
+    deletion rules between Cart and User objects.
+
+    """
+
+    def setUp(self):
+        """Create a sample user for testing"""
+        self.user = User.objects.create(
+            email="buyer@example.com", name="Buyer User", role="buyer"
+        )
+
+    def test_cart_creation(self):
+        """Test if a cart is created successfully."""
+        cart = Cart.objects.create(user=self.user)
+        self.assertEqual(cart.user, self.user)
+        self.assertIsNotNone(cart.created_at)  # Ensure timestamp is set
+
+    def test_cart_must_have_user(self):
+        """Test that a cart must be linked to a user."""
+        cart = Cart(user=None)
+        with self.assertRaises(ValidationError):
+            cart.full_clean()
+
+    def test_deleting_user_deletes_cart(self):
+        """Test that deleting a user also deletes their cart (CASCADE)"""
+        cart = Cart.objects.create(user=self.user)
+        self.user.delete()
+
+        with self.assertRaises(Cart.DoesNotExist):  # The cart should be gone
+            Cart.objects.get(id=cart.id)
+
+    def test_carts_are_ordered_by_creation_date(self):
+        """Test that carts are retrieved in the order they were created"""
+        cart1 = Cart.objects.create(user=self.user)
+        cart2 = Cart.objects.create(user=self.user)
+
+        carts = list(Cart.objects.filter(user=self.user).order_by("created_at"))
+        self.assertEqual(carts, [cart1, cart2])  # Verify correct order
+
+    def test_user_can_have_multiple_carts(self):
+        """Test that a user can have multiple carts"""
+        cart1 = Cart.objects.create(user=self.user)
+        cart2 = Cart.objects.create(user=self.user)
+
+        self.assertEqual(self.user.carts.count(), 2)  # Check total carts
+        self.assertIn(cart1, self.user.carts.all())  # Verify cart1 exists
+        self.assertIn(cart2, self.user.carts.all())  # Verify cart2 exists
+
+    def test_cart_str_representation(self):
+        """Test the cart string representation"""
+        cart = Cart.objects.create(user=self.user)
+        self.assertEqual(str(cart), f"Cart {cart.id} for {self.user.email}")
