@@ -1,10 +1,10 @@
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 
-from core.models.UpgradeRequest import UpgradeRequest
 from core.models.cart import Cart
 from core.models.order import Order
 from core.models.shop import Shop
+from core.models.upgrade_request import UpgradeRequest
 from core.models.user import User
 
 
