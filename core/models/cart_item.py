@@ -18,10 +18,8 @@ class CartItem(models.Model):
     cart: Cart
 
     :ivar book_listing: ForeignKey linking the item to a book listing.
-    book_listing: BookListing
 
     :ivar quantity: The number of the specific book in the cart.
-    quantity: int
     """
 
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name="cart_items")

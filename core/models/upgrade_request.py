@@ -13,13 +13,11 @@ class UpgradeRequest(models.Model):
     the requested role and the timestamp of the request.
 
     :ivar user: ForeignKey linking the upgrade request to the user making the request.
-     user: User
 
     :ivar target_role: The role that the user is requesting to upgrade to.
-    target_role: str
 
     :ivar requested_at: The timestamp indicating when the upgrade request was made.
-    requested_at: datetime
+
     """
 
     user = models.ForeignKey(

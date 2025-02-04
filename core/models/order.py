@@ -13,16 +13,16 @@ class Order(models.Model):
     the timestamp when it was placed.
 
     :ivar user: ForeignKey linking the order to a user.
-     user: User
+
 
     :ivar status: The status of the order (Pending, Completed, Cancelled).
-     status: str
+
 
     :ivar placed_at: The timestamp indicating when the order was placed.
-     placed_at: datetime
+
 
     :ivar total_price: The total amount for the order.
-    total_price: float
+
     """
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="orders")
