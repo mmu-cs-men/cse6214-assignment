@@ -14,6 +14,7 @@ from core.models.book_listing import BookListing
 from core.models.cart import Cart
 from core.models.cart_item import CartItem
 from core.models.order import Order
+from core.models.order_assignment import OrderAssignment
 from core.models.order_item import OrderItem
 from core.models.review import Review
 from core.models.shop import Shop
@@ -900,3 +901,84 @@ class OrderItemModelTest(TestCase):
 
         with self.assertRaises(OrderItem.DoesNotExist):  # The order item should be gone
             OrderItem.objects.get(id=order_item.id)
+
+
+class OrderAssignmentModelTest(TestCase):
+    """Tests for the OrderAssignmentModel functionality.
+
+    This test suite validates the creation, constraints, and deletion behavior of the
+    OrderAssignment model. It ensures that order assignments are properly linked to
+    both an order and a courier, enforces constraints such as uniqueness of assignments
+    per order, and verifies cascading deletions of assignments when their related orders
+    or couriers are deleted.
+
+    Test Cases:
+    - Successful creation of an order assignment linked to an order and a courier.
+    - Validation to ensure order assignments are linked to both an order and a courier.
+    - Validation to ensure that an order can have only one assignment.
+    - Verification of cascading deletion of assignments when their associated order is deleted.
+    - Verification of cascading deletion of assignments when their associated courier is deleted.
+    """
+
+    def setUp(self):
+        """Create a sample order and courier user for testing"""
+        self.courier = User.objects.create(
+            email="courier@example.com", name="Courier User", role="courier"
+        )
+        self.user = User.objects.create(
+            email="buyer@example.com", name="Buyer User", role="buyer"
+        )
+        self.order = Order.objects.create(user=self.user, total_price=150.00)
+
+    def test_order_assignment_creation(self):
+        """Test if an order assignment is created successfully."""
+        assignment = OrderAssignment.objects.create(
+            order=self.order, courier=self.courier
+        )
+        self.assertEqual(assignment.order, self.order)
+        self.assertEqual(assignment.courier, self.courier)
+        self.assertIsNotNone(assignment.assigned_at)
+
+    def test_order_assignment_must_have_order_and_courier(self):
+        """Test that an order assignment must be linked to an order and a courier."""
+        assignment = OrderAssignment(order=None, courier=self.courier)
+        with self.assertRaises(ValidationError):
+            assignment.full_clean()
+
+        assignment = OrderAssignment(order=self.order, courier=None)
+        with self.assertRaises(ValidationError):
+            assignment.full_clean()
+
+    def test_order_can_have_only_one_assignment(self):
+        """Test that an order can have only one assignment."""
+        OrderAssignment.objects.create(order=self.order, courier=self.courier)
+
+        with self.assertRaises(ValidationError):
+            duplicate_assignment = OrderAssignment(
+                order=self.order, courier=self.courier
+            )
+            duplicate_assignment.full_clean()
+
+    def test_deleting_order_deletes_assignment(self):
+        """Test that deleting an order also deletes its assignment (CASCADE)"""
+        assignment = OrderAssignment.objects.create(
+            order=self.order, courier=self.courier
+        )
+        self.order.delete()
+
+        with self.assertRaises(
+            OrderAssignment.DoesNotExist
+        ):  # The assignment should be gone
+            OrderAssignment.objects.get(id=assignment.id)
+
+    def test_deleting_courier_deletes_assignment(self):
+        """Test that deleting a courier also deletes their assignments (CASCADE)"""
+        assignment = OrderAssignment.objects.create(
+            order=self.order, courier=self.courier
+        )
+        self.courier.delete()
+
+        with self.assertRaises(
+            OrderAssignment.DoesNotExist
+        ):  # The assignment should be gone
+            OrderAssignment.objects.get(id=assignment.id)
