@@ -5,6 +5,7 @@ from core.models.book_listing import BookListing
 from core.models.cart import Cart
 from core.models.cart_item import CartItem
 from core.models.order import Order
+from core.models.order_item import OrderItem
 from core.models.review import Review
 from core.models.shop import Shop
 from core.models.upgrade_request import UpgradeRequest
@@ -496,3 +497,120 @@ class CartItemModelTest(TestCase):
 
         with self.assertRaises(CartItem.DoesNotExist):  # The cart item should be gone
             CartItem.objects.get(id=cart_item.id)
+
+
+class OrderItemModelTest(TestCase):
+    """Tests for the OrderItemModel functionality.
+
+    This test suite validates the creation, constraints, and deletion behavior of the
+    OrderItem model. It ensures that order items are properly linked to an order and
+    a book listing, enforces constraints such as positive quantities and purchase prices,
+    and verifies cascading deletions for related orders and book listings.
+
+    Test Cases:
+    - Successful creation of an order item linked to an order and a book listing.
+    - Validation to ensure order items are linked to both an order and a book listing.
+    - Validation to ensure order items have positive quantities.
+    - Validation to ensure order items have positive purchase prices.
+    - Verification of cascading deletion of order items when their associated order is deleted.
+    - Verification of cascading deletion of order items when their associated book listing is deleted.
+    """
+
+    def setUp(self):
+        """Create a sample order and book listing for testing"""
+        self.user = User.objects.create(
+            email="buyer@example.com", name="Buyer User", role="buyer"
+        )
+        self.order = Order.objects.create(user=self.user, total_price=100.00)
+
+        self.shop = Shop.objects.create(name="Bookstore", user=self.user)
+        self.book_listing = BookListing.objects.create(
+            shop=self.shop,
+            title="Django for Beginners",
+            author="William S. Vincent",
+            condition="good",
+            price=29.99,
+        )
+
+    def test_order_item_creation(self):
+        """Test if an order item is created successfully."""
+        order_item = OrderItem.objects.create(
+            order=self.order,
+            book_listing=self.book_listing,
+            quantity=2,
+            purchase_price=29.99,
+        )
+        self.assertEqual(order_item.order, self.order)
+        self.assertEqual(order_item.book_listing, self.book_listing)
+        self.assertEqual(order_item.quantity, 2)
+        self.assertEqual(order_item.purchase_price, 29.99)
+
+    def test_order_item_must_have_order_and_book_listing(self):
+        """Test that an order item must be linked to an order and a book listing."""
+        order_item = OrderItem(
+            order=None, book_listing=self.book_listing, quantity=1, purchase_price=20.00
+        )
+        with self.assertRaises(ValidationError):
+            order_item.full_clean()
+
+        order_item = OrderItem(
+            order=self.order, book_listing=None, quantity=1, purchase_price=20.00
+        )
+        with self.assertRaises(ValidationError):
+            order_item.full_clean()
+
+    def test_order_item_must_have_positive_quantity(self):
+        """Test that an order item must have a positive quantity."""
+        order_item = OrderItem(
+            order=self.order,
+            book_listing=self.book_listing,
+            quantity=-1,
+            purchase_price=20.00,
+        )
+        with self.assertRaises(ValidationError):
+            order_item.full_clean()
+
+        order_item.quantity = 0
+        with self.assertRaises(ValidationError):
+            order_item.full_clean()
+
+    def test_order_item_must_have_positive_purchase_price(self):
+        """Test that an order item must have a positive purchase price."""
+        order_item = OrderItem(
+            order=self.order,
+            book_listing=self.book_listing,
+            quantity=1,
+            purchase_price=-5.00,
+        )
+        with self.assertRaises(ValidationError):
+            order_item.full_clean()
+
+        order_item.purchase_price = 0
+        with self.assertRaises(ValidationError):
+            order_item.full_clean()
+
+    def test_deleting_order_deletes_order_items(self):
+        """Test that deleting an order also deletes its order items (CASCADE)"""
+        order_item = OrderItem.objects.create(
+            order=self.order,
+            book_listing=self.book_listing,
+            quantity=1,
+            purchase_price=29.99,
+        )
+        self.order.delete()
+
+        with self.assertRaises(OrderItem.DoesNotExist):  # The order item should be gone
+            OrderItem.objects.get(id=order_item.id)
+
+    def test_deleting_book_listing_deletes_order_items(self):
+        """Test that deleting a book listing also deletes its order items (CASCADE)"""
+        order_item = OrderItem.objects.create(
+            order=self.order,
+            book_listing=self.book_listing,
+            quantity=1,
+            purchase_price=29.99,
+        )
+        self.book_listing.delete()
+
+        with self.assertRaises(OrderItem.DoesNotExist):  # The order item should be gone
+            OrderItem.objects.get(id=order_item.id)
