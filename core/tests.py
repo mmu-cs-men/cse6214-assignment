@@ -13,6 +13,7 @@ from core.models.user import User
 from core.models.book_listing import BookListing
 from core.models.cart import Cart
 from core.models.cart_item import CartItem
+from core.models.delivery_issue import DeliveryIssue
 from core.models.order import Order
 from core.models.order_assignment import OrderAssignment
 from core.models.order_item import OrderItem
@@ -982,3 +983,76 @@ class OrderAssignmentModelTest(TestCase):
             OrderAssignment.DoesNotExist
         ):  # The assignment should be gone
             OrderAssignment.objects.get(id=assignment.id)
+
+
+class DeliveryIssueModelTest(TestCase):
+    """Tests for the DeliveryIssueModel functionality.
+
+    This test suite validates the creation, constraints, and deletion behavior of the
+    DeliveryIssue model. It ensures that delivery issues are properly linked to
+    order assignments, enforce constraints such as mandatory descriptions and assignments,
+    and verify cascading deletions of delivery issues when their related order assignments are deleted.
+
+    Test Cases:
+    - Successful creation of a delivery issue linked to an order assignment.
+    - Validation to ensure delivery issues are linked to an order assignment.
+    - Validation to ensure delivery issues have a mandatory description.
+    - Validation to ensure order assignments can have only one associated delivery issue.
+    - Verification of cascading deletion of a delivery issue when its related order assignment is deleted.
+    """
+
+    def setUp(self):
+        """Create a sample order, courier user, and order assignment for testing"""
+        self.courier = User.objects.create(
+            email="courier@example.com", name="Courier User", role="courier"
+        )
+        self.user = User.objects.create(
+            email="buyer@example.com", name="Buyer User", role="buyer"
+        )
+        self.order = Order.objects.create(user=self.user, total_price=150.00)
+        self.assignment = OrderAssignment.objects.create(
+            order=self.order, courier=self.courier
+        )
+
+    def test_delivery_issue_creation(self):
+        """Test if a delivery issue is created successfully."""
+        issue = DeliveryIssue.objects.create(
+            order_assignment=self.assignment, issue_description="Package was damaged"
+        )
+        self.assertEqual(issue.order_assignment, self.assignment)
+        self.assertEqual(issue.issue_description, "Package was damaged")
+        self.assertIsNotNone(issue.reported_at)
+
+    def test_delivery_issue_must_have_order_assignment(self):
+        """Test that a delivery issue must be linked to an order assignment."""
+        issue = DeliveryIssue(order_assignment=None, issue_description="Package lost")
+        with self.assertRaises(ValidationError):
+            issue.full_clean()
+
+    def test_delivery_issue_must_have_description(self):
+        """Test that a delivery issue must have a description."""
+        issue = DeliveryIssue(order_assignment=self.assignment, issue_description="")
+        with self.assertRaises(ValidationError):
+            issue.full_clean()
+
+    def test_order_assignment_can_have_only_one_issue(self):
+        """Test that an order assignment can have only one delivery issue."""
+        DeliveryIssue.objects.create(
+            order_assignment=self.assignment, issue_description="Delayed delivery"
+        )
+
+        with self.assertRaises(ValidationError):
+            duplicate_issue = DeliveryIssue(
+                order_assignment=self.assignment, issue_description="Another issue"
+            )
+            duplicate_issue.full_clean()
+
+    def test_deleting_order_assignment_deletes_delivery_issue(self):
+        """Test that deleting an order assignment also deletes its issue (CASCADE)"""
+        issue = DeliveryIssue.objects.create(
+            order_assignment=self.assignment, issue_description="Late delivery"
+        )
+        self.assignment.delete()
+
+        with self.assertRaises(DeliveryIssue.DoesNotExist):  # The issue should be gone
+            DeliveryIssue.objects.get(id=issue.id)

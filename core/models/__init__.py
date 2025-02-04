@@ -1,6 +1,7 @@
 from .book_listing import BookListing
 from .cart import Cart
 from .cart_item import CartItem
+from .delivery_issue import DeliveryIssue
 from .order import Order
 from .order_assignment import OrderAssignment
 from .order_item import OrderItem
