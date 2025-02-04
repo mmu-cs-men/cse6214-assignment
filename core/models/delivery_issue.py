@@ -27,10 +27,4 @@ class DeliveryIssue(models.Model):
     reported_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self) -> str:
-        """
-        Returns a string representation of the delivery issue.
-
-        :return: String representing the issue details.
-        :rtype: str
-        """
         return f"Issue for Order {self.order_assignment.order.id}: {self.issue_description[:50]}..."

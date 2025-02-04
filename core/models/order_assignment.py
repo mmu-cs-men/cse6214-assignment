@@ -30,10 +30,4 @@ class OrderAssignment(models.Model):
     assigned_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self) -> str:
-        """
-        Returns a string representation of the order assignment.
-
-        :return: String representing the assignment details.
-        :rtype: str
-        """
         return f"Order {self.order.id} assigned to {self.courier.email} on {self.assigned_at}"

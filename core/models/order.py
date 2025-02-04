@@ -1,5 +1,6 @@
 from django.db import models
 
+from core.constants import STATUS_CHOICES
 from core.models.user import User
 
 
@@ -23,12 +24,6 @@ class Order(models.Model):
     :ivar total_price: The total amount for the order.
     :vartype total_price: float
     """
-
-    STATUS_CHOICES = [
-        ("pending", "Pending"),
-        ("completed", "Completed"),
-        ("cancelled", "Cancelled"),
-    ]
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="orders")
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="pending")

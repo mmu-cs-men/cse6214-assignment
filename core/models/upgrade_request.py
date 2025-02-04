@@ -1,5 +1,6 @@
 from django.db import models
 
+from core.models.user import ROLE_CHOICES
 from core.models.user import User
 
 
@@ -20,13 +21,6 @@ class UpgradeRequest(models.Model):
     :ivar requested_at: The timestamp indicating when the upgrade request was made.
     :vartype requested_at: datetime
     """
-
-    ROLE_CHOICES = [
-        ("buyer", "Buyer"),
-        ("seller", "Seller"),
-        ("admin", "Admin"),
-        ("courier", "Courier"),
-    ]
 
     user = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="upgrade_requests"

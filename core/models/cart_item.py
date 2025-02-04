@@ -7,16 +7,21 @@ from core.models.cart import Cart
 
 class CartItem(models.Model):
     """
-    Represents an item within a cart, linking it to a specific book listing and quantity.
+    Represents an item in a shopping cart with associations to a cart and a book listing,
+    along with a specified quantity.
 
-    This model is used to manage the relationship between a cart and the book listings
-    added to it. It ensures that the quantity of items in the cart is positive and provides
-    methods for string representation and validation.
+    This model links a `Cart` to a `BookListing` and records the quantity of the book
+    listing in the cart. It ensures data integrity by validating that the quantity is
+    greater than zero.
 
-    Attributes:
-        cart (ForeignKey): The cart to which this item belongs.
-        book_listing (ForeignKey): The book listing associated with this cart item.
-        quantity (PositiveIntegerField): The number of this item in the cart; defaults to 1.
+    :ivar cart: ForeignKey linking the item to a shopping cart.
+    :vartype cart: Cart
+
+    :ivar book_listing: ForeignKey linking the item to a book listing.
+    :vartype book_listing: BookListing
+
+    :ivar quantity: The number of the specific book in the cart.
+    :vartype quantity: int
     """
 
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name="cart_items")
@@ -27,31 +32,26 @@ class CartItem(models.Model):
 
     def clean(self):
         """
-        Validates the `quantity` attribute of an instance. Ensures that the quantity
-        is greater than zero and raises a `ValidationError` if the condition is not met.
+        Validates the model's constraints before saving.
 
-        Raises:
-            ValidationError: Raised if the `quantity` attribute is less than or
-            equal to zero. The error provides details indicating that the quantity
-            must be greater than zero.
+        This method ensures that the quantity of an item is greater than zero.
+        If the quantity is zero or negative, a `ValidationError` is raised.
+
+        :raises ValidationError: If `quantity` is less than or equal to zero.
         """
         if self.quantity <= 0:
             raise ValidationError({"quantity": "Quantity must be greater than zero."})
 
     def save(self, *args, **kwargs):
         """
-        Summary:
-        Saves the current instance after performing validation. Any extra arguments
-        passed are forwarded to the parent class's `save` method.
+        Saves the model instance after validation.
 
-        Args:
-            args: Positional arguments passed to the save method. These are forwarded
-                  to the parent class's save implementation.
-            kwargs: Keyword arguments passed to the save method. These are forwarded
-                    to the parent class's save implementation.
+        This method overrides the default save behavior to ensure data integrity
+        by calling the `clean` method before saving. It ensures that all
+        validation checks are enforced before persisting the instance to the database.
 
-        Raises:
-            Any exception raised by the `clean` method if validation fails.
+        :param args: Positional arguments passed to the parent `save` method.
+        :param kwargs: Keyword arguments passed to the parent `save` method.
         """
         self.clean()
         super().save(*args, **kwargs)

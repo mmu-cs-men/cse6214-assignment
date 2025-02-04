@@ -37,9 +37,16 @@ class OrderItem(models.Model):
 
     def clean(self) -> None:
         """
-        Ensures that the quantity and purchase price are greater than zero.
+        Validates the model's constraints before saving.
 
-        :raises ValidationError: If the quantity or purchase price is less than or equal to zero.
+        This method ensures that both `quantity` and `purchase_price` have valid values.
+        - `quantity` must be greater than zero.
+        - `purchase_price` must be greater than zero.
+
+        If either value is invalid, a `ValidationError` is raised.
+
+        :raises ValidationError: If `quantity` is less than or equal to zero.
+        :raises ValidationError: If `purchase_price` is less than or equal to zero.
         """
         if self.quantity <= 0:
             raise ValidationError({"quantity": "Quantity must be greater than zero."})
@@ -50,16 +57,17 @@ class OrderItem(models.Model):
 
     def save(self, *args, **kwargs) -> None:
         """
-        Runs model validation before saving to the database.
+        Saves the model instance after validation.
+
+        This method overrides the default save behavior to ensure data integrity
+        by calling the `clean` method before saving. It ensures that all
+        validation checks are enforced before persisting the instance to the database.
+
+        :param args: Positional arguments passed to the parent `save` method.
+        :param kwargs: Keyword arguments passed to the parent `save` method.
         """
         self.clean()
         super().save(*args, **kwargs)
 
     def __str__(self) -> str:
-        """
-        Returns a string representation of the order item.
-
-        :return: String representing the order item details.
-        :rtype: str
-        """
         return f"{self.quantity}x {self.book_listing.title} in Order {self.order.id} - ${self.purchase_price}"

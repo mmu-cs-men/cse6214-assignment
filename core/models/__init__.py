@@ -9,9 +9,3 @@ from .review import Review
 from .shop import Shop
 from .upgrade_request import UpgradeRequest
 from .user import User
-from .BookListing import BookListing
-from .cart import Cart
-from .order import Order
-from .shop import Shop
-from .upgrade_request import UpgradeRequest
-from .user import User

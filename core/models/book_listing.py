@@ -1,5 +1,6 @@
 from django.db import models
 
+from core.constants import CONDITION_CHOICES
 from core.models.shop import Shop
 
 
@@ -14,12 +15,6 @@ class BookListing(models.Model):
     :ivar price: Price of the book listing.
     """
 
-    CONDITION_CHOICES = [
-        ("new", "New"),
-        ("good", "Good"),
-        ("fair", "Fair"),
-    ]
-
     shop = models.ForeignKey(
         Shop, on_delete=models.CASCADE, related_name="book_listings"
     )
@@ -29,9 +24,4 @@ class BookListing(models.Model):
     price = models.DecimalField(max_digits=10, decimal_places=2)
 
     def __str__(self):
-        """
-        Returns a string representation of this BookListing.
-
-        :return: The title of the book.
-        """
         return self.title
