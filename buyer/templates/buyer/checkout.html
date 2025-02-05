@@ -14,6 +14,20 @@
 </nav>
 
 <div class="container mt-5">
+    <div class="d-flex justify-content-end mb-3">
+        <a class="btn btn-outline-primary" href="{% url 'buyer-orders' %}">
+            View My Orders
+        </a>
+    </div>
+
+    {% if messages %}
+        {% for msg in messages %}
+            <div class="alert alert-info">
+                {{ msg }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
     <h1 class="mb-4">Checkout</h1>
 
     {% if cart_items %}
