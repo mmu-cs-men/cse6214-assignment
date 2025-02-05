@@ -13,6 +13,9 @@ from core.models.review import Review
 from core.models.shop import Shop
 from core.models.upgrade_request import UpgradeRequest
 from core.models.user import User
+from django.core.files.uploadedfile import SimpleUploadedFile
+from django.conf import settings
+import os
 
 
 # Create your tests here.
@@ -363,6 +366,37 @@ class BookListingModelTest(TestCase):
 
         with self.assertRaises(BookListing.DoesNotExist):  # The listing should be gone
             BookListing.objects.get(id=listing.id)
+
+    def test_book_listing_image_assignment(self):
+        """Test that a book listing can be created with an image file."""
+        with open(os.path.join(settings.MEDIA_ROOT, "test_img.jpg"), "rb") as f:
+            image_data = f.read()
+
+        image_file = SimpleUploadedFile(
+            "test_img.jpg", image_data, content_type="image/jpeg"
+        )
+        listing = BookListing.objects.create(
+            shop=self.shop,
+            title="Test Image Book",
+            author="Image Author",
+            condition="used",
+            price=15.00,
+            image=image_file,
+        )
+        self.assertIsNotNone(listing.image)
+        self.assertIn("test_img.jpg", listing.image.name)
+
+    def test_book_listing_without_image(self):
+        """Test that a book listing created without an image remains with an empty image field."""
+        listing = BookListing.objects.create(
+            shop=self.shop,
+            title="Test No Image Book",
+            author="No Image Author",
+            condition="tattered",
+            price=20.00,
+        )
+        # If no image is uploaded, the field should be empty (evaluates to False)
+        self.assertFalse(listing.image)
 
 
 class ReviewModelTest(TestCase):
