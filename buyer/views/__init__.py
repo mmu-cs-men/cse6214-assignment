@@ -2,4 +2,4 @@
 Expose buyer view functions.
 """
 
-from .checkout_view import checkout_page
+from .checkout import checkout_page
