@@ -383,10 +383,16 @@ class BookListingModelTest(TestCase):
             price=15.00,
             image=image_file,
         )
-        self.assertIsNotNone(listing.image)
-        # Check that the uploaded image file's name includes 'test_img' and ends with '.jpg'
-        self.assertIn("test_img", listing.image.name)
-        self.assertTrue(listing.image.name.endswith(".jpg"))
+
+        try:
+            self.assertIsNotNone(listing.image)
+            # Check that the uploaded image file's name includes 'test_img' and ends with '.jpg'
+            self.assertIn("test_img", listing.image.name)
+            self.assertTrue(listing.image.name.endswith(".jpg"))
+        finally:
+            # Clean up: Delete the uploaded image file from the file system
+            if listing.image and os.path.exists(listing.image.path):
+                os.remove(listing.image.path)
 
     def test_book_listing_without_image(self):
         """Test that a book listing created without an image remains with an empty image field."""
