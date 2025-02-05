@@ -4,7 +4,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from core.models.cart_item import CartItem
 
 
-@login_required(login_url="/login/")  # Redirect unauthenticated users to login
+@login_required
 def cart_page(request):
     """
     Displays the buyer's shopping cart and handles updates and deletions.
@@ -23,11 +23,9 @@ def cart_page(request):
     :return: Rendered cart page with context data.
     :rtype: HttpResponse
     """
-    if not request.user.is_authenticated:
-        return redirect("login")  # Redirect unauthenticated users
 
     cart_items = CartItem.objects.filter(cart__user_id=request.user.id).select_related(
-        "book_listing"
+        "book_listings"
     )
     total_price = sum(item.book_listing.price * item.quantity for item in cart_items)
 
