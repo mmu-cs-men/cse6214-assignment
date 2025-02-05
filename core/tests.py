@@ -384,7 +384,7 @@ class BookListingModelTest(TestCase):
             image=image_file,
         )
         self.assertIsNotNone(listing.image)
-        self.assertContains("test_img.jpg", listing.image.name)
+        self.assertIn("test_img.jpg", listing.image.name)
 
     def test_book_listing_without_image(self):
         """Test that a book listing created without an image remains with an empty image field."""
