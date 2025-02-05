@@ -45,7 +45,7 @@ def checkout_page(request):
     for item in cart_items:
         subtotal += item.book_listing.price * item.quantity
 
-    # Suppose we define a simple 6% tax rate for demonstration
+    # We define a simple 6% tax rate to match the bootstrap template
     tax_rate = Decimal("0.06")
     tax_amount = (subtotal * tax_rate).quantize(Decimal("0.01"))
     total_price = (subtotal + tax_amount).quantize(Decimal("0.01"))
