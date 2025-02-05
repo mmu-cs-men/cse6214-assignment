@@ -13,6 +13,7 @@ class BookListing(models.Model):
     :ivar author: Author of the book.
     :ivar condition: Condition of the book (NEW, GOOD, FAIR).
     :ivar price: Price of the book listing.
+    :ivar image: ImageField for storing raw image files.
     """
 
     shop = models.ForeignKey(
@@ -22,6 +23,7 @@ class BookListing(models.Model):
     author = models.CharField(max_length=255)
     condition = models.CharField(max_length=50, choices=CONDITION_CHOICES)
     price = models.DecimalField(max_digits=10, decimal_places=2)
+    image = models.ImageField(upload_to="book_images/", null=True, blank=True)
 
     def __str__(self):
         return self.title
