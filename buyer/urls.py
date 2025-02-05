@@ -12,7 +12,5 @@ urlpatterns = [
     path("orders/", orders_page, name="buyer-orders"),
     path("checkout/", checkout_page, name="buyer-checkout"),
     path("cart/", cart_page, name="buyer-cart"),
-
     path("landing/", landing_page, name="buyer-landing"),
-
 ]
