@@ -81,7 +81,15 @@
                             </li>
                         </ul>
 
-                        <form method="POST" class="text-center">
+                        <!-- Return to Cart button only if there are items in the cart -->
+                        <div class="d-flex justify-content-between mb-3">
+                            <a class="btn btn-secondary" href="{% url 'buyer-cart' %}">
+                                Return to Cart
+                            </a>
+                        </div>
+
+                        <!-- Checkout form -->
+                        <form method="POST">
                             {% csrf_token %}
                             <button type="submit" class="btn btn-success w-100">
                                 Confirm Checkout
