@@ -2,4 +2,4 @@
 Exposes buyer view functions.
 """
 
-from .orders_view import orders_page
+from .orders import orders_page
