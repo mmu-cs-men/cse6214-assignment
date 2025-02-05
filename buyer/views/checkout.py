@@ -4,6 +4,7 @@ Checkout view for the buyer application.
 
 from decimal import Decimal
 
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.urls import reverse
@@ -35,10 +36,14 @@ def checkout_page(request):
     # Attempt to fetch a Cart belonging to this user; if none, context remains empty
     try:
         cart = Cart.objects.get(user__email=current_user.email)
-        cart_items = CartItem.objects.select_related("book_listing").filter(cart=cart)
     except Cart.DoesNotExist:
         cart = None
-        cart_items = []
+
+    cart_items = (
+        CartItem.objects.select_related("book_listing").filter(cart=cart)
+        if cart
+        else []
+    )
 
     # Calculate subtotal
     subtotal = Decimal("0.00")
@@ -51,6 +56,14 @@ def checkout_page(request):
     total_price = (subtotal + tax_amount).quantize(Decimal("0.01"))
 
     if request.method == "POST":
+        # Double-check if the cart actually has items now
+        updated_cart_items = CartItem.objects.filter(cart=cart)
+        if not updated_cart_items:
+            messages.warning(
+                request, "Your cart was already emptied. Nothing to checkout."
+            )
+            return redirect(reverse("buyer-checkout"))
+
         # Create a new order
         order = Order.objects.create(
             user=User.objects.get(email=current_user.email),
@@ -59,7 +72,7 @@ def checkout_page(request):
         )
 
         # Move cart items to order items
-        for item in cart_items:
+        for item in updated_cart_items:
             OrderItem.objects.create(
                 order=order,
                 book_listing=item.book_listing,
@@ -68,11 +81,12 @@ def checkout_page(request):
             )
 
         # Clear the cart
-        cart_items.delete()
+        updated_cart_items.delete()
 
-        # Redirect to buyer_orders page
+        # Redirect to the orders page
         return redirect(reverse("buyer-orders"))
 
+    # Render the checkout page on GET
     context = {
         "cart_items": cart_items,
         "subtotal": subtotal,
