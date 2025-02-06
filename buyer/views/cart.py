@@ -20,7 +20,9 @@ def cart_page(request):
         return redirect("login")  # Redirect unauthenticated users
 
     # Fetch cart items belonging to the logged-in user
-    cart_items = CartItem.objects.filter(cart__user_id=request.user.id).select_related("book_listing")
+    cart_items = CartItem.objects.filter(cart__user_id=request.user.id).select_related(
+        "book_listing"
+    )
     total_price = sum(item.book_listing.price * item.quantity for item in cart_items)
 
     if request.method == "POST":
@@ -28,7 +30,9 @@ def cart_page(request):
         action = request.POST.get("action")
 
         # Fetch the specific cart item if it exists
-        cart_item = get_object_or_404(CartItem, id=item_id, cart__user_id=request.user.id)
+        cart_item = get_object_or_404(
+            CartItem, id=item_id, cart__user_id=request.user.id
+        )
 
         if action == "remove":
             cart_item.delete()
