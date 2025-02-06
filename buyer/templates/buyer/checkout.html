@@ -5,6 +5,17 @@
     <div class="container mt-5">
         <h1 class="mb-4">Checkout</h1>
 
+        <!-- Empty space below the header for proper alignment -->
+        <div class="mb-3"></div>
+
+        {% if messages %}
+            {% for msg in messages %}
+                <div class="alert alert-info">
+                    {{ msg }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
         {% if cart_items %}
             <div class="row">
                 <div class="col-md-8">
@@ -19,7 +30,7 @@
                                         <h6 class="my-0">{{ item.book_listing.title }}</h6>
                                         <small class="text-muted">by {{ item.book_listing.author }}</small>
                                     </div>
-                                    <span class="text-muted">${{ item.book_listing.price }}</span>
+                                    <span class="text-muted">RM{{ item.book_listing.price }}</span>
                                 </li>
                             {% endfor %}
                         </ul>
@@ -35,24 +46,30 @@
                             <ul class="list-group list-group-flush mb-3">
                                 <li class="list-group-item d-flex justify-content-between">
                                     <strong>Subtotal</strong>
-                                    <span>${{ subtotal }}</span>
+                                    <span>RM{{ subtotal }}</span>
                                 </li>
                                 <li class="list-group-item d-flex justify-content-between">
                                     <strong>Tax</strong>
-                                    <span>${{ tax_amount }}</span>
+                                    <span>RM{{ tax_amount }}</span>
                                 </li>
                                 <li class="list-group-item d-flex justify-content-between">
                                     <strong>Total</strong>
-                                    <span class="fw-bold">${{ total_price }}</span>
+                                    <span class="fw-bold">RM{{ total_price }}</span>
                                 </li>
                             </ul>
 
-                            <form method="POST" class="text-center">
+                            <!-- Checkout Button -->
+                            <form method="POST">
                                 {% csrf_token %}
-                                <button type="submit" class="btn btn-success w-100">
+                                <button type="submit" class="btn btn-success w-100 mb-2">
                                     Confirm Checkout
                                 </button>
                             </form>
+
+                            <!-- Return to Cart Button (Below and Full Width) -->
+                            <a class="btn btn-secondary w-100" href="{% url 'buyer-checkout' %}">
+                                Return to Cart
+                            </a>
                         </div>
                     </div>
                 </div>
