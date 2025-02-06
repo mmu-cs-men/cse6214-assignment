@@ -14,6 +14,7 @@ class BookListing(models.Model):
     :ivar condition: Condition of the book (NEW, GOOD, FAIR).
     :ivar price: Price of the book listing.
     :ivar image: ImageField for storing raw image files.
+    :ivar bought: Boolean indicating whether the book has been purchased.
     """
 
     shop = models.ForeignKey(
@@ -24,6 +25,7 @@ class BookListing(models.Model):
     condition = models.CharField(max_length=50, choices=CONDITION_CHOICES)
     price = models.DecimalField(max_digits=10, decimal_places=2)
     image = models.ImageField(upload_to="book_images/", null=True, blank=True)
+    bought = models.BooleanField(default=False)
 
     def __str__(self):
         return self.title
