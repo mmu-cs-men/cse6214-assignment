@@ -4,7 +4,6 @@ Checkout view for the buyer application.
 
 from decimal import Decimal
 
-from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.urls import reverse
@@ -30,26 +29,23 @@ def checkout_page(request):
     :return: Renders the checkout template on GET or redirects to the orders page on successful checkout.
     :rtype: django.http.HttpResponse
     """
+    # Get the logged-in user (Django's auth user is our 'User' or you might be bridging them)
     current_user = request.user
 
-    # Ensure the User instance exists
-    platform_user = User.objects.filter(email=current_user.email).first()
-    if not platform_user:
-        messages.error(request, "User account not found.")
-        return redirect("buyer-orders")
-
-    # Attempt to fetch a Cart belonging to this user
-    cart = Cart.objects.filter(user=platform_user).first()
-    cart_items = (
-        CartItem.objects.select_related("book_listing").filter(cart=cart)
-        if cart
-        else []
-    )
+    # Attempt to fetch a Cart belonging to this user; if none, context remains empty
+    try:
+        cart = Cart.objects.get(user__email=current_user.email)
+        cart_items = CartItem.objects.select_related("book_listing").filter(cart=cart)
+    except Cart.DoesNotExist:
+        cart = None
+        cart_items = []
 
     # Calculate subtotal
-    subtotal = sum(item.book_listing.price * item.quantity for item in cart_items)
+    subtotal = Decimal("0.00")
+    for item in cart_items:
+        subtotal += item.book_listing.price * item.quantity
 
-    # Apply tax
+    # We define a simple 6% tax rate to match the bootstrap template
     tax_rate = Decimal("0.06")
     tax_amount = (subtotal * tax_rate).quantize(Decimal("0.01"))
     total_price = (subtotal + tax_amount).quantize(Decimal("0.01"))
@@ -63,12 +59,12 @@ def checkout_page(request):
 
         # Create a new order
         order = Order.objects.create(
-            user=platform_user,
+            user=User.objects.get(email=current_user.email),
             status="pending",
             total_price=total_price,
         )
 
-        # Move cart items to order items and mark books as bought (for harris ocd)
+        ## Move cart items to order items and mark books as bought (for harris ocd)
         for item in updated_cart_items:
             OrderItem.objects.create(
                 order=order,
