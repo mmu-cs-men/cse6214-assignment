@@ -47,6 +47,15 @@
         .remove-btn:hover {
             color: darkred;
         }
+
+        .book-image {
+            max-width: 120px; /* Set a maximum width */
+            max-height: 160px; /* Set a maximum height */
+            object-fit: cover; /* Ensures the image is properly fitted */
+            border: 1px solid #ddd; /* Optional: Adds a light border around the image */
+            border-radius: 5px; /* Optional: Adds a slight rounded corner */
+        }
+
     </style>
 </head>
 
@@ -58,7 +67,7 @@
 </nav>
 
 <div class="container py-5">
-    <h1 class="mb-5">Your Shopping Cart</h1>
+    <h1 class="mb-5">Your Shopping Cart 🛒</h1>
     <div class="row">
         <div class="col-lg-8">
             <!-- Cart Items -->
@@ -67,8 +76,8 @@
                     {% for item in cart_items %}
                         <div class="row cart-item mb-3 align-items-center">
                             <div class="col-md-3">
-                                <img src="https://via.placeholder.com/100" alt="{{ item.book_listing.title }}"
-                                     class="img-fluid rounded">
+                                <img src="{{ item.book_listing.image.url }}" alt="{{ item.book_listing.title }}"
+                                     class="img-fluid rounded book-image">
                             </div>
                             <div class="col-md-5 book-info">
                                 <h5 class="card-title">{{ item.book_listing.title }}</h5>
