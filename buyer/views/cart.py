@@ -36,7 +36,9 @@ def cart_page(request):
         action = request.POST.get("action")
 
         # Ensure only the logged-in user's cart is affected
-        cart_item = get_object_or_404(CartItem, id=item_id, cart__user__email=current_user.email)
+        cart_item = get_object_or_404(
+            CartItem, id=item_id, cart__user__email=current_user.email
+        )
 
         if action == "remove":
             cart_item.delete()
