@@ -70,44 +70,42 @@
     <h1 class="mb-5">Your Shopping Cart 🛒</h1>
     <div class="row">
         <div class="col-lg-8">
+
             <!-- Cart Items -->
-            <div class="card mb-4">
-                <div class="card-body">
-                    {% for item in cart_items %}
-                        <div class="row cart-item mb-3 align-items-center">
-                            <div class="col-md-3">
-                                <img src="{{ item.book_listing.image.url }}" alt="{{ item.book_listing.title }}"
-                                     class="img-fluid rounded book-image">
-                            </div>
-                            <div class="col-md-5 book-info">
-                                <h5 class="card-title">{{ item.book_listing.title }}</h5>
-                                <p class="text-muted">Author: {{ item.book_listing.author }}</p>
-                            </div>
-                            <div class="col-md-2 price-container">
-                                <p class="price">RM{{ item.book_listing.price|floatformat:2 }}</p>
-                            </div>
-                            <div class="col-md-2 text-end">
-                                <form method="POST" action="{% url 'buyer-cart' %}">
-                                    {% csrf_token %}
-                                    <input type="hidden" name="item_id" value="{{ item.id }}">
-                                    <input type="hidden" name="action" value="remove">
-                                    <button class="remove-btn">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                </form>
-                            </div>
-                        </div>
-                        <hr>
-                    {% empty %}
-                        <p class="text-center">Your cart is empty.</p>
-                    {% endfor %}
+            {% for item in cart_items %}
+                <div class="row cart-item mb-3 align-items-center">
+                    <div class="col-md-3">
+                        <img src="{{ item.book_listing.image.url }}" alt="{{ item.book_listing.title }}"
+                             class="img-fluid rounded book-image">
+                    </div>
+                    <div class="col-md-5 book-info">
+                        <h5 class="card-title">{{ item.book_listing.title }}</h5>
+                        <p class="text-muted">Author: {{ item.book_listing.author }}</p>
+                    </div>
+                    <div class="col-md-2 price-container">
+                        <p class="price">RM{{ item.book_listing.price|floatformat:2 }}</p>
+                    </div>
+                    <div class="col-md-2 text-end">
+                        <form method="POST" action="{% url 'buyer-cart' %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="item_id" value="{{ item.id }}">
+                            <input type="hidden" name="action" value="remove">
+                            <button class="remove-btn">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </form>
+                    </div>
                 </div>
-            </div>
+                <hr>
+            {% empty %}
+                <div class="alert alert-info">
+                    You have no items in your cart.
+                </div>
+            {% endfor %}
+
             <!-- Continue Shopping & Proceed to Checkout Buttons -->
             <div class="d-flex justify-content-start gap-3 mb-4">
-                <a href="{% url "buyer-landing" %}" class="btn btn-primary">
-                    <i class="bi bi-arrow-left me-2"></i>Continue Shopping
-                </a>
+                <a href="{% url "buyer-landing" %}" class="btn btn-primary">Continue Shopping</a>
                 <a href="{% url 'buyer-checkout' %}" class="btn btn-success">Proceed to Checkout</a>
             </div>
         </div>
