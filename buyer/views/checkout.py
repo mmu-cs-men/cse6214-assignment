@@ -23,7 +23,7 @@ def checkout_page(request):
 
     This view retrieves the currently logged-in user's cart items, displays them for review,
     and upon POST request, creates an Order and corresponding OrderItems, clears the cart,
-    and redirects to the buyer's orders page.
+    updates the book listing to mark it as bought, and redirects to the buyer's orders page.
 
     :param request: The HTTP request object.
     :type request: django.http.HttpRequest
@@ -68,7 +68,7 @@ def checkout_page(request):
             total_price=total_price,
         )
 
-        # Move cart items to order items
+        # Move cart items to order items and mark books as bought (for harris ocd)
         for item in updated_cart_items:
             OrderItem.objects.create(
                 order=order,
@@ -76,6 +76,10 @@ def checkout_page(request):
                 quantity=item.quantity,
                 purchase_price=item.book_listing.price,
             )
+
+            # Mark book as bought
+            item.book_listing.bought = True
+            item.book_listing.save()
 
         # Clear the cart
         updated_cart_items.delete()
