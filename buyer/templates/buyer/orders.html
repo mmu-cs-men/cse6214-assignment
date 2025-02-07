@@ -26,7 +26,7 @@
                             <td>{{ order.id }}</td>
                             <td>{{ order.status|title }}</td>
                             <td>{{ order.placed_at }}</td>
-                            <td>${{ order.total_price }}</td>
+                            <td>RM{{ order.total_price }}</td>
                             <td>
                                 <a class="btn btn-success" href="{% url 'buyer-order-details' order.id %}">
                                     View Details
