@@ -1,0 +1,17 @@
+{% extends "courier/base.html" %}
+{% block title %}Report Issue{% endblock %}
+{% block content %}
+    <div class="container mt-5">
+        <h1 class="mb-4">Report Issue for Order #{{ assignment.order.id }}</h1>
+        <form method="POST">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="issue_description" class="form-label">Issue Description</label>
+                <textarea id="issue_description" name="issue_description" class="form-control" rows="4"
+                          required></textarea>
+            </div>
+            <button type="submit" class="btn btn-danger">Submit Issue Report</button>
+            <a href="{% url 'courier-deliveries' %}" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+{% endblock %}
