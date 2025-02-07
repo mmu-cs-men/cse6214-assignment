@@ -2,8 +2,10 @@
 Checkout view for the buyer application.
 """
 
+import re
 from decimal import Decimal
 
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.urls import reverse
@@ -51,6 +53,57 @@ def checkout_page(request):
     total_price = (subtotal + tax_amount).quantize(Decimal("0.01"))
 
     if request.method == "POST":
+        # --- Added Address and Payment Details Verification ---
+
+        # Retrieve the address details and payment fields from the POST data
+        address = request.POST.get("address", "").strip()
+        city = request.POST.get("city", "").strip()
+        state = request.POST.get("state", "").strip()
+        postal_code = request.POST.get("postal_code", "").strip()
+        country = request.POST.get("country", "").strip()
+        card_number = request.POST.get("card_number", "").strip()
+        expiry_date = request.POST.get("expiry_date", "").strip()
+        cvv = request.POST.get("cvv", "").strip()
+
+        # Prepare a context to re-render the checkout page on validation errors.
+        error_context = {
+            "cart_items": cart_items,
+            "subtotal": subtotal,
+            "tax_amount": tax_amount,
+            "total_price": total_price,
+        }
+
+        # Validate Address Details
+        if any(char.isdigit() for char in city):
+            messages.error(request, "City name should not contain numbers.")
+            return render(request, "buyer/checkout.html", error_context)
+
+        if any(char.isdigit() for char in state):
+            messages.error(request, "State name should not contain numbers.")
+            return render(request, "buyer/checkout.html", error_context)
+
+        if not postal_code.isdigit():
+            messages.error(request, "Postal Code must contain only digits.")
+            return render(request, "buyer/checkout.html", error_context)
+
+        if any(char.isdigit() for char in country):
+            messages.error(request, "Country name should not contain numbers.")
+            return render(request, "buyer/checkout.html", error_context)
+
+        # Validate Payment Details
+        if not card_number.isdigit() or len(card_number) != 16:
+            messages.error(request, "Card number must be 16 digits.")
+            return render(request, "buyer/checkout.html", error_context)
+
+        # Check for MM/YY format (with a valid month from 01 to 12)
+        if not re.match(r"^(0[1-9]|1[0-2])\/\d{2}$", expiry_date):
+            messages.error(request, "Expiration date must be in MM/YY format.")
+            return render(request, "buyer/checkout.html", error_context)
+
+        if not cvv.isdigit() or len(cvv) not in (3, 4):
+            messages.error(request, "CVV must be 3 or 4 digits.")
+            return render(request, "buyer/checkout.html", error_context)
+
         # Double-check if the cart still has items before processing
         updated_cart_items = CartItem.objects.filter(cart=cart)
         if not updated_cart_items:
