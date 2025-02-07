@@ -1,6 +1,7 @@
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 
+from core.models import User
 from core.models.book_listing import BookListing
 
 
@@ -9,21 +10,27 @@ def landing_page(request):
     """
     Renders the Buyer Landing Page with all available books.
 
-    This view retrieves all books listed for sale and displays them in a grid format.
+    This view retrieves all books that are not bought and displays them in a grid format.
 
     :param request: The HTTP request object.
     :type request: django.http.HttpRequest
     :return: Rendered landing page with books context.
     :rtype: django.http.HttpResponse
     """
-    # Get the logged-in user
+    # Get the logged-in user based on email authentication
     current_user = request.user
 
-    # Retrieve all books from the database
-    books = BookListing.objects.all()
+    try:
+        authenticated_user = User.objects.get(email=current_user.email)
+    except User.DoesNotExist:
+        return redirect("login")  # Redirect if no user is found
 
-    context = {
-        "books": books
-    }
+    search_query = request.GET.get("q", "").strip()  # Get search term from URL
 
-    return render(request, "buyer/landing.html", context)
+    # Filter books to only show those that are NOT bought
+    if search_query:
+        books = BookListing.objects.filter(title__icontains=search_query, bought=False)
+    else:
+        books = BookListing.objects.filter(bought=False)
+
+    return render(request, "buyer/landing.html", {"books": books})

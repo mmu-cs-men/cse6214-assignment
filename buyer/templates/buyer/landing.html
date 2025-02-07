@@ -14,15 +14,15 @@
         /* Search Bar Container */
         .search-container {
             width: 100%;
-            max-width: 600px;
+            max-width: 900px;
             margin-top: 20px;
+            margin-bottom: 20px;
         }
 
         .search-input {
             width: 100%;
             padding: 10px 20px;
             border: 2px solid #ccc;
-            font-family: "Bodoni MT Condensed", serif;
         }
 
         /* Aligns the search icon inside the input field */
@@ -36,12 +36,28 @@
 
         /* Ensure book images maintain aspect ratio inside their container */
         .book-card {
-            height: 600px; /* Fixed height for uniformity */
+            height: 570px; /* Fixed height for uniformity */
             width: 300px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
             border-radius: 10px;
+            transition: box-shadow 0.2s ease, transform 0.1s ease-in-out;
+            overflow: hidden;
+        }
+
+        /* Book Image Styling Inside the Card */
+        .book-card img {
+            width: 100%;
+            height: 300px; /* Adjust height to match original design */
+            object-fit: contain; /* Ensures image is fully visible without cropping */
+            /* Optional: adds a subtle divider */
+        }
+
+        /* Hover Effect */
+        .book-card:hover {
+            box-shadow: 50px 8px 16px rgba(0, 0, 0, 0.15);
+            transform: scale(1.05);
         }
 
         .book-img-container {
@@ -59,11 +75,10 @@
         }
 
         .book-img {
-            width: 100%;
-            height: 100%;
+            width: 105%;
+            height: 105%;
             object-fit: contain; /* Ensures full image is visible without cropping */
         }
-
 
     </style>
 
@@ -72,8 +87,11 @@
         <div class="row justify-content-center">
             <div class="col-md-6">
                 <div class="search-container position-relative">
-                    <input type="text" class="form-control search-input" placeholder="Search for books...">
-                    <i class="fas fa-search search-icon"></i>
+                    <form method="GET" action="{% url 'buyer-landing' %}" class="search-container">
+                        <input type="text" name="q" class="form-control search-input" placeholder="Search for books..."
+                               value="{{ request.GET.q }}">
+                        <i class="fas fa-search search-icon"></i>
+                    </form>
                 </div>
             </div>
         </div>
@@ -86,6 +104,7 @@
                 <div class="col-md-3 mb-4">
                     <a href="{% url 'buyer-book-details' book.id %}" class="text-decoration-none text-dark">
                         <div class="card book-card shadow-sm">
+                            <!-- Wrap the image in the book-img-container -->
                             <div class="book-img-container">
                                 <img src="{{ book.image.url }}" class="book-img" alt="{{ book.title }}">
                             </div>
@@ -93,9 +112,7 @@
                                 <h5 class="card-title">{{ book.title }}</h5>
                                 <p class="text-muted">by {{ book.author }}</p>
                                 <p class="fw-bold text-primary">RM{{ book.price }}</p>
-                                <p class="text-muted">
-                                    <small>Condition: {{ book.get_condition_display }}</small>
-                                </p>
+                                <p class="text-muted"><small>Condition: {{ book.get_condition_display }}</small></p>
                                 <p class="text-muted"><small>Seller: {{ book.shop.name }}</small></p>
                             </div>
                         </div>
