@@ -17,7 +17,19 @@
             {% for assignment in assignments %}
                 <tr>
                     <td>{{ assignment.order.id }}</td>
-                    <td>{{ assignment.status|title }}</td>
+                    <td>
+                        {% if assignment.status == 'pending' %}
+                            <span class="badge bg-warning">Pending</span>
+                        {% elif assignment.status == 'in_transit' %}
+                            <span class="badge bg-info">In_Transit</span>
+                        {% elif assignment.status == 'delivered' %}
+                            <span class="badge bg-success">Delivered</span>
+                        {% elif assignment.status == 'issue_reported' %}
+                            <span class="badge bg-danger">Issue_Reported</span>
+                        {% else %}
+                            <span class="badge bg-secondary">{{ assignment.status|title }}</span>
+                        {% endif %}
+                    </td>
                     <td>{{ assignment.updated_at }}</td>
                     <td>
                         <form method="POST" action="{% url 'courier-update-delivery' assignment.id %}">
@@ -28,14 +40,14 @@
                                         Pending
                                     </option>
                                     <option value="in_transit"
-                                            {% if assignment.status == 'in_transit' %}selected{% endif %}>In Transit
+                                            {% if assignment.status == 'in_transit' %}selected{% endif %}>In_Transit
                                     </option>
                                     <option value="delivered"
                                             {% if assignment.status == 'delivered' %}selected{% endif %}>Delivered
                                     </option>
                                     <option value="issue_reported"
-                                            {% if assignment.status == 'issue_reported' %}selected{% endif %}>Issue
-                                        Reported
+                                            {% if assignment.status == 'issue_reported' %}selected{% endif %}>
+                                        Issue_Reported
                                     </option>
                                 </select>
                                 <button type="submit" class="btn btn-primary">Update</button>
