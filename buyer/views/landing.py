@@ -1,5 +1,5 @@
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, redirect
+from django.shortcuts import render
 
 from core.models import User
 from core.models.book_listing import BookListing
@@ -20,10 +20,7 @@ def landing_page(request):
     # Get the logged-in user based on email authentication
     current_user = request.user
 
-    try:
-        authenticated_user = User.objects.get(email=current_user.email)
-    except User.DoesNotExist:
-        return redirect("login")  # Redirect if no user is found
+    authenticated_user = User.objects.get(email=current_user.email)
 
     search_query = request.GET.get("q", "").strip()  # Get search term from URL
 
