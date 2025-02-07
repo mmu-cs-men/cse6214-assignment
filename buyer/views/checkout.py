@@ -110,11 +110,16 @@ def checkout_page(request):
 
             return redirect(reverse("buyer-checkout"))
 
-        # Create a new order
+        # Create a new order with the address details included
         order = Order.objects.create(
             user=User.objects.get(email=current_user.email),
             status="pending",
             total_price=total_price,
+            address=address,
+            city=city,
+            state=state,
+            postal_code=postal_code,
+            country=country,
         )
 
         ## Move cart items to order items and mark books as bought (for harris ocd)
