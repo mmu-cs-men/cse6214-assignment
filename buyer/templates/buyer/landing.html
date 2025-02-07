@@ -1,11 +1,130 @@
-<!DOCTYPE html>
-<html lang="en" xmlns="http://www.w3.org/1999/html">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
-<h1>Just a placeholder page, change it later. Can you just do one small thing,turn around and suck your dick ....
-    haha...jkkkkkk </h1>
-</body>
-</html>
+{% extends "buyer/base.html" %}
+{% block title %}Book Store{% endblock %}
+{% block content %}
+
+    <!-- Search Bar Font -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+
+    <style>
+        /* Moves the empty books alert lower */
+        .alert.alert-info {
+            margin-top: 20px; /* Adjust this value to move it even lower */
+        }
+
+        /* Search Bar Container */
+        .search-container {
+            width: 100%;
+            max-width: 900px;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 10px 20px;
+            border: 2px solid #ccc;
+        }
+
+        /* Aligns the search icon inside the input field */
+        .search-icon {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: gray;
+        }
+
+        /* Ensure book images maintain aspect ratio inside their container */
+        .book-card {
+            height: 570px; /* Fixed height for uniformity */
+            width: 300px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            border-radius: 10px;
+            transition: box-shadow 0.2s ease, transform 0.1s ease-in-out;
+            overflow: hidden;
+        }
+
+        /* Book Image Styling Inside the Card */
+        .book-card img {
+            width: 100%;
+            height: 300px; /* Adjust height to match original design */
+            object-fit: contain; /* Ensures image is fully visible without cropping */
+            /* Optional: adds a subtle divider */
+        }
+
+        /* Hover Effect */
+        .book-card:hover {
+            box-shadow: 50px 8px 16px rgba(0, 0, 0, 0.15);
+            transform: scale(1.05);
+        }
+
+        .book-img-container {
+            width: 100%;
+            height: 350px; /* Adjust the height as needed */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            background-color: #f8f9fa;
+            padding: 10px;
+            margin: 0;
+            border-top-right-radius: 10px;
+            border-top-left-radius: 10px;
+        }
+
+        .book-img {
+            width: 105%;
+            height: 105%;
+            object-fit: contain; /* Ensures full image is visible without cropping */
+        }
+
+    </style>
+
+    <!-- Search Bar Centered -->
+    <div class="container mt-3">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="search-container position-relative">
+                    <form method="GET" action="{% url 'buyer-landing' %}" class="search-container">
+                        <input type="text" name="q" class="form-control search-input" placeholder="Search for books..."
+                               value="{{ request.GET.q }}">
+                        <i class="fas fa-search search-icon"></i>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Book Listings -->
+    <div class="container mt-4">
+        <div class="row">
+            {% for book in books %}
+                <div class="col-md-3 mb-4">
+                    <a href="{% url 'buyer-book-details' book.id %}" class="text-decoration-none text-dark">
+                        <div class="card book-card shadow-sm">
+                            <!-- Wrap the image in the book-img-container -->
+                            <div class="book-img-container">
+                                <img src="{{ book.image.url }}" class="book-img" alt="{{ book.title }}">
+                            </div>
+                            <div class="card-body">
+                                <h5 class="card-title">{{ book.title }}</h5>
+                                <p class="text-muted">by {{ book.author }}</p>
+                                <p class="fw-bold text-primary">RM{{ book.price }}</p>
+                                <p class="text-muted"><small>Condition: {{ book.get_condition_display }}</small></p>
+                                <p class="text-muted"><small>Seller: {{ book.shop.name }}</small></p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            {% empty %}
+                <div class="col-12 text-center">
+                    <div class="alert alert-info">No books available.</div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+
+{% endblock %}
