@@ -1,0 +1,60 @@
+{% extends "courier/base.html" %}
+{% block title %}Deliveries{% endblock %}
+{% block content %}
+    <div class="container mt-5">
+        <h1 class="mb-4">Deliveries</h1>
+        <table class="table table-bordered table-hover">
+            <thead class="table-light">
+            <tr>
+                <th>Order ID</th>
+                <th>Status</th>
+                <th>Last Updated</th>
+                <th>Update Status</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for assignment in assignments %}
+                <tr>
+                    <td>{{ assignment.order.id }}</td>
+                    <td>{{ assignment.status|title }}</td>
+                    <td>{{ assignment.updated_at }}</td>
+                    <td>
+                        <form method="POST" action="{% url 'courier-update-delivery' assignment.id %}">
+                            {% csrf_token %}
+                            <div class="input-group">
+                                <select name="status" class="form-select">
+                                    <option value="pending" {% if assignment.status == 'pending' %}selected{% endif %}>
+                                        Pending
+                                    </option>
+                                    <option value="in_transit"
+                                            {% if assignment.status == 'in_transit' %}selected{% endif %}>In Transit
+                                    </option>
+                                    <option value="delivered"
+                                            {% if assignment.status == 'delivered' %}selected{% endif %}>Delivered
+                                    </option>
+                                    <option value="issue_reported"
+                                            {% if assignment.status == 'issue_reported' %}selected{% endif %}>Issue
+                                        Reported
+                                    </option>
+                                </select>
+                                <button type="submit" class="btn btn-primary">Update</button>
+                            </div>
+                            {% if assignment.status == 'issue_reported' and assignment.delivery_issue %}
+                                <small class="text-danger">Issue: {{ assignment.delivery_issue.issue_description }}</small>
+                            {% endif %}
+                        </form>
+                    </td>
+                    <td>
+                        <a href="{% url 'courier-report-issue' assignment.id %}" class="btn btn-danger">Report Issue</a>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="5" class="text-center">No deliveries found.</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
