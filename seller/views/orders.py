@@ -21,6 +21,8 @@ def mark_order_ready(request, order_id):
         order = get_object_or_404(Order, id=order_id)
         order.status = "Ready for Courier"
         order.save()
-        return JsonResponse({"success": True, "order_id": order.id, "status": order.status})
+        return JsonResponse(
+            {"success": True, "order_id": order.id, "status": order.status}
+        )
 
     return JsonResponse({"success": False}, status=400)
