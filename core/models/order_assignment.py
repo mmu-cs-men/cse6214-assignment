@@ -1,14 +1,8 @@
 from django.db import models
 
+from core.constants import ORDER_ASSIGNMENT_STATUS_CHOICES
 from core.models.order import Order
 from core.models.user import User
-
-ORDER_ASSIGNMENT_STATUS_CHOICES = (
-    ("pending", "Pending"),
-    ("in_transit", "In Transit"),
-    ("delivered", "Delivered"),
-    ("issue_reported", "Issue Reported"),
-)
 
 
 class OrderAssignment(models.Model):
