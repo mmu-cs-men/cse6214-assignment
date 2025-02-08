@@ -43,6 +43,7 @@ def login_view(request):
 
     return render(request, "login.html")
 
+
 def register_view(request):
     if request.method == "POST":
         name = request.POST.get("name")
@@ -70,22 +71,16 @@ def register_view(request):
 
             # Create built-in user
             auth_user = User.objects.create_user(
-                username=username,
-                email=email,
-                password=password
+                username=username, email=email, password=password
             )
 
             # Create custom user
-            custom_user = CustomUser.objects.create(
-                email=email,
-                name=name,
-                role=role
-            )
+            custom_user = CustomUser.objects.create(email=email, name=name, role=role)
 
             user = authenticate(request, username=auth_user.username, password=password)
             if user is not None:
                 login(request, user)
-                
+
                 if role == "buyer":
                     return redirect(reverse("buyer-landing"))
                 elif role == "courier":
