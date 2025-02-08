@@ -384,7 +384,9 @@ class BookListingModelTest(TestCase):
 
     def test_create_book_with_description(self):
         """Test if a book listing is successfully created with a description."""
-        user = User.objects.create(email="seller2@example.com", name="Seller2", role="seller")
+        user = User.objects.create(
+            email="seller2@example.com", name="Seller2", role="seller"
+        )
         shop = Shop.objects.create(name="No Description Shop", user=user)
 
         book = BookListing.objects.create(
@@ -393,14 +395,16 @@ class BookListingModelTest(TestCase):
             author="John Doe",
             condition="NEW",
             price=25.00,
-            description="This is a sample book description."
+            description="This is a sample book description.",
         )
 
         self.assertEqual(book.description, "This is a sample book description.")
 
     def test_create_book_without_description(self):
         """Test if a book listing can be created without providing a description."""
-        user = User.objects.create(email="seller2@example.com", name="Seller2", role="seller")
+        user = User.objects.create(
+            email="seller2@example.com", name="Seller2", role="seller"
+        )
         shop = Shop.objects.create(name="No Description Shop", user=user)
 
         book = BookListing.objects.create(
@@ -408,14 +412,16 @@ class BookListingModelTest(TestCase):
             title="Book Without Description",
             author="Jane Doe",
             condition="GOOD",
-            price=20.00
+            price=20.00,
         )
 
         self.assertIsNone(book.description)  # Should be None if description is nullable
 
     def test_update_book_description(self):
         """Test if an existing book description can be updated successfully."""
-        user = User.objects.create(email="seller3@example.com", name="Seller3", role="seller")
+        user = User.objects.create(
+            email="seller3@example.com", name="Seller3", role="seller"
+        )
         shop = Shop.objects.create(name="Update Shop", user=user)
 
         book = BookListing.objects.create(
@@ -423,7 +429,7 @@ class BookListingModelTest(TestCase):
             title="Book To Update",
             author="Update Author",
             condition="FAIR",
-            price=30.00
+            price=30.00,
         )
 
         # Update the description
@@ -436,7 +442,9 @@ class BookListingModelTest(TestCase):
 
     def test_delete_book_and_check_description_removal(self):
         """Test if deleting a book removes its description along with it."""
-        user = User.objects.create(email="seller4@example.com", name="Seller4", role="seller")
+        user = User.objects.create(
+            email="seller4@example.com", name="Seller4", role="seller"
+        )
         shop = Shop.objects.create(name="Delete Shop", user=user)
 
         book = BookListing.objects.create(
@@ -445,7 +453,7 @@ class BookListingModelTest(TestCase):
             author="Delete Author",
             condition="TATTERED",
             price=10.00,
-            description="This book will be deleted."
+            description="This book will be deleted.",
         )
 
         book_id = book.id  # Store the book ID before deletion
@@ -456,7 +464,9 @@ class BookListingModelTest(TestCase):
 
     def test_string_representation(self):
         """Test if the `__str__` method returns the book title."""
-        user = User.objects.create(email="seller5@example.com", name="Seller5", role="seller")
+        user = User.objects.create(
+            email="seller5@example.com", name="Seller5", role="seller"
+        )
         shop = Shop.objects.create(name="String Test Shop", user=user)
 
         book = BookListing.objects.create(
@@ -465,7 +475,7 @@ class BookListingModelTest(TestCase):
             author="String Author",
             condition="NEW",
             price=45.00,
-            description="String representation test."
+            description="String representation test.",
         )
 
         self.assertEqual(str(book), "Test Book Title")
@@ -552,7 +562,9 @@ class ReviewModelTest(TestCase):
             condition="GOOD",
             price=40.00,
         )
-        self.assertIsNone(self.book_without_desc.description)  # Should be None if field allows null
+        self.assertIsNone(
+            self.book_without_desc.description
+        )  # Should be None if field allows null
 
 
 class CartItemModelTest(TestCase):
