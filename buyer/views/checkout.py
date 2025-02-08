@@ -15,9 +15,11 @@ from core.models.cart_item import CartItem
 from core.models.order import Order
 from core.models.order_item import OrderItem
 from core.models.user import User
+from core.utils.decorators import allowed_roles
 
 
 @login_required
+@allowed_roles(["buyer"])
 def checkout_page(request):
     """
     Renders a checkout page and handles order creation upon form submission.

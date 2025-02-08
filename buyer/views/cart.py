@@ -3,9 +3,11 @@ from django.shortcuts import render, redirect, get_object_or_404
 
 from core.models.cart import Cart
 from core.models.cart_item import CartItem
+from core.utils.decorators import allowed_roles
 
 
 @login_required
+@allowed_roles(["buyer"])
 def cart_page(request):
     """
     Displays the buyer's shopping cart and handles updates and deletions.

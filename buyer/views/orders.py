@@ -6,9 +6,11 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 
 from core.models.order import Order
+from core.utils.decorators import allowed_roles
 
 
 @login_required
+@allowed_roles(["buyer"])
 def orders_page(request):
     """
     Renders a page displaying all orders placed by the currently logged-in user.
