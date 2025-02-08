@@ -44,7 +44,7 @@
             <div class="card mb-4">
                 <div class="card-body">
                     <h4 class="card-title mb-4">Update Email</h4>
-                    <form method="POST">
+                    <form method="POST" action="{% url 'update_email' %}">
                         {% csrf_token %}
                         <div class="mb-3">
                             <label for="new_email" class="form-label">New Email Address</label>
@@ -60,7 +60,7 @@
             <div class="card mb-4">
                 <div class="card-body">
                     <h4 class="card-title mb-4">Change Password</h4>
-                    <form method="POST">
+                    <form method="POST" action="{% url 'change_password' %}">
                         {% csrf_token %}
                         <div class="mb-3">
                             <label for="current_password" class="form-label">Current Password</label>

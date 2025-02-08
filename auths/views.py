@@ -5,6 +5,7 @@ from django.contrib.auth.models import User
 from django.shortcuts import reverse
 from core.models.user import User as CustomUser
 from django.http import Http404
+from django.contrib.auth.decorators import login_required
 
 
 def _redirect_based_on_role(custom_user):
@@ -113,3 +114,70 @@ def register_view(request):
 def logout_view(request):
     logout(request)
     return redirect(reverse("login"))
+
+
+@login_required
+def update_email(request):
+    if request.method != "POST":
+        return redirect(reverse("profile"))
+
+    new_email = request.POST.get("new_email")
+
+    if not new_email:
+        messages.error(request, "Please provide a new email address")
+        return redirect(reverse("profile"))
+
+    # Check if email is already taken
+    if User.objects.filter(email=new_email, id__ne=request.user.id).exists():
+        messages.error(request, "This email is already registered")
+        return redirect(reverse("profile"))
+
+    try:
+        # Update Django auth user email
+        auth_user = request.user
+        auth_user.email = new_email
+        auth_user.save()
+
+        # Update custom user email
+        custom_user = CustomUser.objects.get(email=request.user.email)
+        custom_user.email = new_email
+        custom_user.save()
+
+        messages.success(request, "Email updated successfully")
+    except Exception as e:
+        messages.error(request, f"Failed to update email: {str(e)}")
+
+    return redirect(reverse("profile"))
+
+
+@login_required
+def change_password(request):
+    if request.method != "POST":
+        return redirect(reverse("profile"))
+
+    current_password = request.POST.get("current_password")
+    new_password = request.POST.get("new_password")
+    confirm_password = request.POST.get("confirm_password")
+
+    if not request.user.check_password(current_password):
+        messages.error(request, "Current password is incorrect")
+        return redirect(reverse("profile"))
+
+    if new_password != confirm_password:
+        messages.error(request, "New passwords do not match")
+        return redirect(reverse("profile"))
+
+    try:
+        request.user.set_password(new_password)
+        request.user.save()
+        # Re-authenticate user to prevent logout
+        user = authenticate(
+            request, username=request.user.username, password=new_password
+        )
+        if user is not None:
+            login(request, user)
+        messages.success(request, "Password changed successfully")
+    except Exception as e:
+        messages.error(request, f"Failed to change password: {str(e)}")
+
+    return redirect(reverse("profile"))
