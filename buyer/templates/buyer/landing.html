@@ -1,12 +1,10 @@
-{% extends "buyer/base.html" %}
+{% extends "base.html" %}
+{% block nav %}{% include "buyer/nav.html" %}{% endblock %}
 {% block title %}Book Store{% endblock %}
+
 {% block content %}
-
-    <!-- Search Bar Font -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-
-
     <style>
+
         /* Moves the empty books alert lower */
         .alert.alert-info {
             margin-top: 20px; /* Adjust this value to move it even lower */
@@ -126,6 +124,4 @@
             {% endfor %}
         </div>
     </div>
-
-
 {% endblock %}
