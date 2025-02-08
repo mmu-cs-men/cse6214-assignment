@@ -158,7 +158,8 @@
                 <div class="row mt-3">
                     <div class="col-md-10 mx-auto">
                         <p class="book-synopsis">
-                            {% comment %}{{ book.synopsis }}{% endcomment %}
+                            {#{{ book.description }}#}
+                            {# TODO: Confirm if this commented-out block should be removed. #}
                             I found these books in the hidden library of Alexandria. Giving them away for cheap. Didn’t
                             seem
                             useful to me...
@@ -210,7 +211,7 @@
 
         </div>
     </div>
-    </div>
+
 {% endblock %}
 
 <p class="text-muted">by {{ book.author }}</p>
