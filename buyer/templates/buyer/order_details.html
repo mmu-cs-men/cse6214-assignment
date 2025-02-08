@@ -1,42 +1,163 @@
-{% extends "buyer/base.html" %}
+{% extends "base.html" %}
 {% block title %}Order Details{% endblock %}
+{% block nav %}{% include "buyer/nav.html" %}{% endblock %}
+
 {% block content %}
+    <style>
+        .book-image-container {
+            width: 120px;
+            height: 160px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            overflow: hidden;
+            background: #fff; /* provides a neutral background */
+        }
+
+        .book-image {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+    </style>
 
     <div class="container mt-5">
-        <h1 class="mb-4">Order #{{ order.id }}</h1>
-
-        <div class="card mb-3">
-            <div class="card-header">
-                <h5 class="mb-0">Order Information</h5>
+        <div class="card shadow-sm">
+            <div class="card-header bg-white">
+                <h2 class="mb-0">Order #{{ order.id }}</h2>
             </div>
             <div class="card-body">
-                <p><strong>Status:</strong> {{ order.status|title }}</p>
-                <p><strong>Placed On:</strong> {{ order.placed_at }}</p>
-                <p><strong>Total Price:</strong> RM{{ order.total_price }}</p>
-            </div>
-        </div>
 
-        <div class="card">
-            <div class="card-header">
-                <h5 class="mb-0">Items in this Order</h5>
-            </div>
-            <table class="table table-bordered mb-0">
-                <thead class="table-light">
-                <tr>
-                    <th>Book</th>
-                    <th>Purchase Price</th>
-                </tr>
-                </thead>
-                <tbody>
-                {% for item in items %}
-                    <tr>
-                        <td>{{ item.book_listing.title }} (by {{ item.book_listing.author }})</td>
-                        <td>RM{{ item.purchase_price }}</td>
-                    </tr>
-                {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </div>
+                <!-- Order Progress Section (Loading Bar Style) -->
+                <div class="mb-4">
+                    <h5 class="mb-3">Order Progress</h5>
+                    {% if order.status == "pending" %}
+                        <div class="progress" style="height: 30px;">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated bg-warning"
+                                 role="progressbar" style="width: 33%;"
+                                 aria-valuenow="33" aria-valuemin="0" aria-valuemax="100">
+                                Order Placed
+                            </div>
+                        </div>
+                    {% elif order.status == "completed" %}
+                        <div class="progress" style="height: 30px;">
+                            <div class="progress-bar progress-bar-striped bg-success"
+                                 role="progressbar" style="width: 100%;"
+                                 aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">
+                                Delivered
+                            </div>
+                        </div>
+                    {% elif order.status == "cancelled" %}
+                        <div class="progress" style="height: 30px;">
+                            <div class="progress-bar progress-bar-striped bg-danger"
+                                 role="progressbar" style="width: 0%;"
+                                 aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                                Cancelled
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="progress" style="height: 30px;">
+                            <div class="progress-bar progress-bar-striped bg-secondary"
+                                 role="progressbar" style="width: 50%;"
+                                 aria-valuenow="50" aria-valuemin="0" aria-valuemax="100">
+                                In Progress
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
 
+                <div class="row">
+                    <!-- Left Column: Order Details, Shipping Address, and Items (each in its own card) -->
+                    <div class="col-md-8">
+                        <!-- Order Information Card -->
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h5 class="mb-0">Order Information</h5>
+                            </div>
+                            <div class="card-body">
+                                <p><strong>Placed On:</strong> {{ order.placed_at }}</p>
+                                <p><strong>Total Price:</strong> RM{{ order.total_price }}</p>
+                            </div>
+                        </div>
+
+                        <!-- Shipping Address Card -->
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h5 class="mb-0">Shipping Address</h5>
+                            </div>
+                            <div class="card-body">
+                                <p><strong>Street Address:</strong> {{ order.address }}</p>
+                                <p><strong>City:</strong> {{ order.city }}</p>
+                                <p><strong>State:</strong> {{ order.state }}</p>
+                                <p><strong>Postal Code:</strong> {{ order.postal_code }}</p>
+                                <p><strong>Country:</strong> {{ order.country }}</p>
+                            </div>
+                        </div>
+
+                        <!-- Order Items Card -->
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h5 class="mb-0">Items in this Order</h5>
+                            </div>
+                            <div class="card-body p-0">
+                                <ul class="list-group list-group-flush">
+                                    {% for item in items %}
+                                        <li class="list-group-item">
+                                            <div class="row align-items-center">
+                                                <!-- Image Column -->
+                                                <div class="col-md-3">
+                                                    <div class="book-image-container">
+                                                        <img src="{{ item.book_listing.image.url }}"
+                                                             alt="{{ item.book_listing.title }}"
+                                                             class="img-fluid rounded book-image">
+                                                    </div>
+                                                </div>
+                                                <!-- Book Details Column -->
+                                                <div class="col-md-6">
+                                                    <h6 class="my-0">{{ item.book_listing.title }}</h6>
+                                                    <small class="text-muted">by {{ item.book_listing.author }}</small>
+                                                </div>
+                                                <!-- Price Column -->
+                                                <div class="col-md-3 text-end">
+                                                    <span class="text-muted">RM{{ item.purchase_price }}</span>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Column: Order Summary -->
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0">Order Summary</h5>
+                            </div>
+                            <div class="card-body">
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item d-flex justify-content-between">
+                                        <span>Subtotal</span>
+                                        <strong>RM{{ subtotal }}</strong>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between">
+                                        <span>Tax</span>
+                                        <strong>RM{{ tax_amount }}</strong>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between">
+                                        <span>Total</span>
+                                        <strong>RM{{ order.total_price }}</strong>
+                                    </li>
+                                </ul>
+                                <a href="{% url 'buyer-orders' %}" class="btn btn-primary w-100 mt-3">Back to Orders</a>
+                            </div>
+                        </div>
+                    </div>
+                </div> <!-- end row -->
+            </div> <!-- end card-body -->
+        </div> <!-- end card -->
+    </div> <!-- end container -->
 {% endblock %}

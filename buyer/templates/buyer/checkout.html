@@ -1,7 +1,8 @@
-{% extends "buyer/base.html" %}
+{% extends "base.html" %}
 {% block title %}Checkout{% endblock %}
-{% block content %}
+{% block nav %}{% include "buyer/nav.html" %}{% endblock %}
 
+{% block content %}
     <div class="container mt-5">
         <h1 class="mb-4">Checkout 📦</h1>
 
@@ -17,68 +18,131 @@
         {% endif %}
 
         {% if cart_items %}
-            <div class="row">
-                <div class="col-md-8">
-                    <div class="card mb-4">
-                        <div class="card-header">
-                            <h5 class="mb-0">Your Cart Items</h5>
-                        </div>
-                        <ul class="list-group list-group-flush">
-                            {% for item in cart_items %}
-                                <li class="list-group-item d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <h6 class="my-0">{{ item.book_listing.title }}</h6>
-                                        <small class="text-muted">by {{ item.book_listing.author }}</small>
-                                    </div>
-                                    <span class="text-muted">RM{{ item.book_listing.price }}</span>
-                                </li>
-                            {% endfor %}
-                        </ul>
-                    </div>
-                </div>
-
-                <div class="col-md-4">
-                    <div class="card mb-4">
-                        <div class="card-header">
-                            <h5 class="mb-0">Order Summary</h5>
-                        </div>
-                        <div class="card-body">
-                            <ul class="list-group list-group-flush mb-3">
-                                <li class="list-group-item d-flex justify-content-between">
-                                    <strong>Subtotal</strong>
-                                    <span>RM{{ subtotal }}</span>
-                                </li>
-                                <li class="list-group-item d-flex justify-content-between">
-                                    <strong>Tax</strong>
-                                    <span>RM{{ tax_amount }}</span>
-                                </li>
-                                <li class="list-group-item d-flex justify-content-between">
-                                    <strong>Total</strong>
-                                    <span class="fw-bold">RM{{ total_price }}</span>
-                                </li>
+            <!-- Wrap the entire checkout page in one form -->
+            <form method="POST">
+                {% csrf_token %}
+                <div class="row">
+                    <!-- Left Column: Cart Items, Address, Payment -->
+                    <div class="col-md-8">
+                        <!-- Cart Items Section -->
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h5 class="mb-0">Your Cart Items</h5>
+                            </div>
+                            <ul class="list-group list-group-flush">
+                                {% for item in cart_items %}
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="my-0">{{ item.book_listing.title }}</h6>
+                                            <small class="text-muted">by {{ item.book_listing.author }}</small>
+                                        </div>
+                                        <span class="text-muted">RM{{ item.book_listing.price }}</span>
+                                    </li>
+                                {% endfor %}
                             </ul>
+                        </div>
 
-                            <!-- Checkout Button -->
-                            <form method="POST">
-                                {% csrf_token %}
+                        <!-- Address Details Section -->
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h5 class="mb-0">Shipping Address</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label for="address" class="form-label">Street Address</label>
+                                    <input type="text" class="form-control" id="address" name="address" required>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <label for="city" class="form-label">City</label>
+                                        <input type="text" class="form-control" id="city" name="city" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="state" class="form-label">State</label>
+                                        <input type="text" class="form-control" id="state" name="state" required>
+                                    </div>
+                                </div>
+                                <div class="row mt-3">
+                                    <div class="col-md-6">
+                                        <label for="postal_code" class="form-label">Postal Code</label>
+                                        <input type="text" class="form-control" id="postal_code" name="postal_code"
+                                               required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="country" class="form-label">Country</label>
+                                        <input type="text" class="form-control" id="country" name="country" required>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Payment Details Section -->
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h5 class="mb-0">Payment Details 💳</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label for="card_number" class="form-label">Card Number</label>
+                                    <input type="text" class="form-control" id="card_number" name="card_number"
+                                           placeholder="**** **** **** ****" required>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <label for="expiry_date" class="form-label">Expiration Date</label>
+                                        <input type="text" class="form-control" id="expiry_date" name="expiry_date"
+                                               placeholder="MM/YY" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="cvv" class="form-label">CVV</label>
+                                        <input type="text" class="form-control" id="cvv" name="cvv" placeholder="***"
+                                               required>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Column: Order Summary -->
+                    <div class="col-md-4">
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h5 class="mb-0">Order Summary</h5>
+                            </div>
+                            <div class="card-body">
+                                <ul class="list-group list-group-flush mb-3">
+                                    <li class="list-group-item d-flex justify-content-between">
+                                        <strong>Subtotal</strong>
+                                        <span>RM{{ subtotal }}</span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between">
+                                        <strong>Tax</strong>
+                                        <span>RM{{ tax_amount }}</span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between">
+                                        <strong>Total</strong>
+                                        <span class="fw-bold">RM{{ total_price }}</span>
+                                    </li>
+                                </ul>
+
+                                <!-- Checkout Button -->
                                 <button type="submit" class="btn btn-success w-100 mb-2">
                                     Confirm Checkout
                                 </button>
-                            </form>
 
-                            <!-- Return to Cart Button (Below and Full Width) -->
-                            <a class="btn btn-secondary w-100" href="{% url 'buyer-checkout' %}">
-                                Return to Cart
-                            </a>
+                                <!-- Return to Cart Button -->
+                                <a class="btn btn-secondary w-100" href="{% url 'buyer-checkout' %}">
+                                    Return to Cart
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            </form>
         {% else %}
             <div class="alert alert-info">
                 You have no items in your cart.
             </div>
         {% endif %}
     </div>
-
 {% endblock %}

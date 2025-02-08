@@ -1,0 +1,214 @@
+{% extends "base.html" %}
+{% block title %}Book Details{% endblock %}
+{% block nav %}{% include "buyer/nav.html" %}{% endblock %}
+
+{% block content %}
+    <style>
+        /* Book Image Container to Ensure Consistent Size */
+
+        .book-image-container {
+            width: 250px; /* Set a fixed width */
+            height: 400px; /* Set a fixed height */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden; /* Prevents overflow of large images */
+            background-color: #f8f9fa; /* Keeps it uniform */
+            border-radius: 10px;
+            margin-left: -150px;
+        }
+
+        .book-image {
+            width: 100%;
+            height: 100%;
+            object-fit: contain; /* Ensures full image is visible without cropping */
+            transition: transform 0.2s ease-in-out;
+            border-radius: 20px;
+        }
+
+        /* Hover Effect */
+        .book-image:hover {
+            transform: scale(1.05);
+        }
+
+        /* Book Details Styling */
+        .book-title {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-left: -105px;
+        }
+
+        .book-author {
+            font-size: 1.2rem;
+            color: #666;
+            margin-top: -10px;
+            margin-bottom: 15px;
+            margin-left: -105px;
+        }
+
+        .book-price {
+            font-size: 2rem;
+            margin-top: 20px;
+            margin-bottom: 15px;
+            margin-left: -105px;
+        }
+
+        .book-condition {
+            font-size: 1.2rem;
+            color: #444;
+            margin-top: 30px;
+            margin-left: -105px;
+        }
+
+        /* Add to Cart Button */
+        .btn-success {
+            font-size: 1.2rem;
+            padding: 10px;
+            width: 200px;
+            border-radius: 10px;
+            margin-top: 23px;
+            margin-left: -105px;
+        }
+
+        .btn-success:active {
+            transform: scale(0.95);
+        }
+
+        /* Book Synopsis */
+        .book-synopsis {
+            font-size: 1.1rem;
+            font-style: italic;
+            color: #555;
+            margin-top: 10px;
+            margin-left: -105px;
+        }
+
+        .success-message-container {
+            width: 100%;
+            margin-top: 15px;
+            margin-left: -105px;
+        }
+
+        .alert-success {
+            display: block;
+            width: 100%;
+            padding: 10px;
+        }
+
+        .button-group {
+            display: flex;
+            justify-content: left;
+            gap: 10px; /* Spaces out the buttons */
+            margin-top: 10px;
+        }
+
+        .button-group a {
+            padding: 8px 15px;
+        }
+
+        .add-to-cart-button {
+            display: block;
+            width: 200px;
+            margin-top: 15px;
+        }
+
+    </style>
+
+    <div class="container mt-5">
+        <div class="row d-flex align-items-start">
+
+            <div class="container mt-4">
+                <div class="row align-items-start">
+
+                    <!-- Book Image -->
+                    <div class="col-md-4 d-flex justify-content-center">
+                        <div class="book-image-container">
+                            <img src="{{ book.image.url }}" class="book-image" alt="{{ book.title }}">
+                        </div>
+                    </div>
+
+                    <!-- Book Details -->
+                    <div class="col-md-6 book-details">
+                        <div class="book-details-container">
+                            <h2 class="book-title">{{ book.title }}</h2>
+                            <p class="book-author">by <strong>{{ book.author }}</strong></p>
+                            <p class="book-price text-primary fw-bold">RM{{ book.price }}</p>
+                            <p class="book-condition"><strong>Condition:</strong> {{ book.get_condition_display }}</p>
+                        </div>
+                        <form method="POST">
+                            {% csrf_token %}
+                            {% if book_in_cart %}
+                                <div class="success-message-container">
+                                    <div class="alert alert-success text-center">
+                                        This book has been added to your cart.
+                                    </div>
+                                    <div class="button-group">
+                                        <a href="{% url 'buyer-landing' %}" class="btn btn-primary">Back to Home</a>
+                                        <a href="{% url 'buyer-cart' %}" class="btn btn-primary">Go to Cart</a>
+                                    </div>
+                                </div>
+                            {% else %}
+                                <button type="submit" class="btn btn-success add-to-cart-button">Add to Cart</button>
+                            {% endif %}
+                        </form>
+                    </div>
+                </div>
+
+
+                <!-- Book Synopsis -->
+                <div class="row mt-3">
+                    <div class="col-md-10 mx-auto">
+                        <p class="book-synopsis">
+                            {#{{ book.description }}#}
+                            {# TODO: Confirm if this commented-out block should be removed. #}
+                            I found these books in the hidden library of Alexandria. Giving them away for cheap. Didn’t
+                            seem
+                            useful to me...
+
+                            Anyway, Lorem ipsum dolor sit amet consectetur adipiscing elit Ut et massa mi. Aliquam in
+                            hendrerit urna. Pellentesque sit amet sapien fringilla, mattis ligula consectetur, ultrices
+                            mauris. Maecenas vitae mattis tellus. Nullam quis imperdiet augue. Vestibulum auctor ornare
+                            leo,
+                            non suscipit magna interdum eu. Curabitur pellentesque nibh nibh, at maximus ante.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <hr>
+            <!-- Shop Information (Without View More Button) -->
+            <div class="shop-info">
+                <h4>Sold by: <strong>{{ book.shop.name }}</strong></h4>
+                <p>Shop Rating:
+                    {% for _ in full_stars_list %}
+                        <span>⭐</span>
+                    {% endfor %}
+                    {% for _ in empty_stars_list %}
+                        <span>☆</span>
+                    {% endfor %}
+                    ({{ total_reviews }} Reviews)
+                </p>
+            </div>
+            <hr>
+
+
+            <!-- Reviews Section -->
+            <div class="reviews-section mt-4">
+                <h4>Customer Reviews</h4>
+                {% for review in book.shop.reviews.all %}
+                    <div class="review">
+                        <p class="text-muted"> {{ review.user.name }} ⭐ {{ review.rating }}/5</p>
+                        <p>{{ review.comment }}</p>
+                        <hr>
+                    </div>
+                {% empty %}
+                    <p>No reviews yet.</p>
+                {% endfor %}
+            </div>
+
+        </div>
+    </div>
+
+{% endblock %}
+
+

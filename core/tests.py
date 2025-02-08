@@ -1,4 +1,8 @@
+import os
+
+from django.conf import settings
 from django.core.exceptions import ValidationError
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db.utils import IntegrityError
 from django.test import TestCase
 
@@ -13,9 +17,6 @@ from core.models.review import Review
 from core.models.shop import Shop
 from core.models.upgrade_request import UpgradeRequest
 from core.models.user import User
-from django.core.files.uploadedfile import SimpleUploadedFile
-from django.conf import settings
-import os
 
 
 # Create your tests here.
@@ -224,12 +225,39 @@ class OrderModelTest(TestCase):
             email="buyer@example.com", name="Buyer User", role="buyer"
         )
 
-    def test_order_creation(self):
-        """Test if an order is created successfully."""
-        order = Order.objects.create(user=self.user, total_price=100.50)
+    def test_order_creation_with_address(self):
+        """Test if an order is created successfully with an address."""
+        order = Order.objects.create(
+            user=self.user,
+            total_price=100.50,
+            address="123 Bookstore street",
+            city="Ahhhh",
+            state="Kedah",
+            postal_code="80085",
+            country="Malaysia",
+        )
         self.assertEqual(order.user, self.user)
+        self.assertEqual(order.address, "123 Bookstore street")
+        self.assertEqual(order.city, "Ahhhh")
+        self.assertEqual(order.state, "Kedah")
+        self.assertEqual(order.postal_code, "80085")
+        self.assertEqual(order.country, "Malaysia")
         self.assertEqual(order.status, "pending")  # Default status
         self.assertIsNotNone(order.placed_at)  # Ensure timestamp is set
+
+        def test_order_must_have_address(self):
+            """Test that an order must have an address and related fields."""
+            order = Order(
+                user=self.user,
+                total_price=50.00,
+                address="",  # Empty address should fail
+                city="",
+                state="",
+                postal_code="",
+                country="",
+            )
+            with self.assertRaises(ValidationError):
+                order.full_clean()
 
     def test_order_must_have_user(self):
         """Test that an order must be linked to a user."""
@@ -239,12 +267,28 @@ class OrderModelTest(TestCase):
 
     def test_order_default_status(self):
         """Test that the default order status is 'pending'."""
-        order = Order.objects.create(user=self.user, total_price=75.00)
+        order = Order.objects.create(
+            user=self.user,
+            total_price=75.00,
+            address="Harris's house",
+            city="IDFK",
+            state="Putrajaya",
+            postal_code="420420",
+            country="Malaysia",
+        )
         self.assertEqual(order.status, "pending")
 
     def test_deleting_user_deletes_order(self):
         """Test that deleting a user also deletes their orders (CASCADE)"""
-        order = Order.objects.create(user=self.user, total_price=150.00)
+        order = Order.objects.create(
+            user=self.user,
+            total_price=150.00,
+            address="Another Harris's house",
+            city="FapCity",
+            state="Selangor",
+            postal_code="6969",
+            country="Malaysia",
+        )
         self.user.delete()
 
         with self.assertRaises(Order.DoesNotExist):  # The order should be gone
