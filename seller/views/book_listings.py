@@ -11,13 +11,18 @@ from core.models.shop import Shop
 def book_listings_page(request):
     """
     Displays all book listings (that are not bought) for the logged-in seller.
+    Also avoids duplicating the "No shop found..." message if it was already set.
     """
     current_user = request.user
     shop = Shop.objects.filter(user__email=current_user.email).first()
+
     if not shop:
-        messages.error(
-            request, "No shop found for this seller. Please set up your shop first."
-        )
+        # Check if "No shop found" was already in the messages queue
+        existing_msgs = [m.message for m in messages.get_messages(request)]
+        if not any("No shop found for this seller" in msg for msg in existing_msgs):
+            messages.error(
+                request, "No shop found for this seller. Please set up your shop first."
+            )
         listings = []
     else:
         listings = BookListing.objects.filter(shop=shop, bought=False)
@@ -64,7 +69,7 @@ def add_book_listing(request):
                 )
                 messages.success(request, "Book listing added successfully!")
                 return redirect("seller-book-listings")
-            except Exception as e:
+            except Exception:
                 messages.error(request, "Failed to add book listing. Please try again.")
 
     # On GET, render the add book listing page.
