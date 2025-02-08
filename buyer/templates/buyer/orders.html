@@ -35,19 +35,15 @@
                             <td>{{ order.id }}</td>
                             <td>
                                 {% if order.status == "completed" %}
-                                    <span class="badge bg-success">{{ order.status|title }}</span>
-                                    {% if request.session.reviewed_orders %}
-                                        {% if order.id in request.session.reviewed_orders %}
-                                            <br>
-                                            <span class="badge bg-primary">Reviewed</span>
-                                        {% endif %}
-                                    {% endif %}
+                                    <span class="badge bg-success">{{ order.get_status_display }}</span>
                                 {% elif order.status == "pending" %}
-                                    <span class="badge bg-warning">{{ order.status|title }}</span>
+                                    <span class="badge bg-warning">{{ order.get_status_display }}</span>
                                 {% elif order.status == "cancelled" %}
-                                    <span class="badge bg-danger">{{ order.status|title }}</span>
+                                    <span class="badge bg-danger">{{ order.get_status_display }}</span>
+                                {% elif order.status == "issue_reported" %}
+                                    <span class="badge bg-secondary">Processing</span>
                                 {% else %}
-                                    <span class="badge bg-secondary">{{ order.status|title }}</span>
+                                    <span class="badge bg-secondary">{{ order.get_status_display }}</span>
                                 {% endif %}
                             </td>
                             <td>{{ order.placed_at }}</td>
