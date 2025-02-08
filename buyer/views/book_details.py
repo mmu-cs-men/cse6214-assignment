@@ -8,7 +8,17 @@ from core.models import BookListing, Cart, CartItem, User, Review  # Ensure User
 @login_required
 def book_details_page(request, book_id):
     """
-    Displays book details and handles add-to-cart logic.
+    View function to display the book details page. This function manages the display of book
+    details, allows users to add the book to their shopping cart, calculates the shop's average
+    rating based on user reviews, and prepares data for rendering in the template.
+
+    :param request: The HTTP request object.
+    :type request: django.http.HttpRequest
+    :param book_id: The unique identifier of the book listing.
+    :type book_id: int
+    :return: Rendered book details page with book, cart, and review context.
+    :rtype: django.http.HttpResponse
+
     """
     current_user = request.user
     authenticated_user = User.objects.get(email=current_user.email)
