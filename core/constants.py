@@ -34,9 +34,9 @@ STATUS_CHOICES = [
 
 ORDER_ASSIGNMENT_STATUS_CHOICES = (
     ("pending", "Pending"),
-    ("in_transit", "In Transit"),
+    ("in transit", "In Transit"),
     ("delivered", "Delivered"),
-    ("issue_reported", "Issue Reported"),
+    ("issue reported", "Issue Reported"),
 )
 
 RATING_CHOICES = [(i, str(i)) for i in range(1, 6)]  # 1 to 5 rating scaler
