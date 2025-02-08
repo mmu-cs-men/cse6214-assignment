@@ -1,1 +1,1 @@
-from .deliveries import deliveries_page, update_delivery, report_issue
+from .deliveries import deliveries_page, accept_order, update_assignment, report_issue
