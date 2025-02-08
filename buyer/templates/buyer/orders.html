@@ -33,7 +33,17 @@
                     {% for order in orders %}
                         <tr>
                             <td>{{ order.id }}</td>
-                            <td>{{ order.status|title }}</td>
+                            <td>
+                                {% if order.status == "completed" %}
+                                    <span class="badge bg-success">{{ order.status|title }}</span>
+                                {% elif order.status == "pending" %}
+                                    <span class="badge bg-warning">{{ order.status|title }}</span>
+                                {% elif order.status == "cancelled" %}
+                                    <span class="badge bg-danger">{{ order.status|title }}</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">{{ order.status|title }}</span>
+                                {% endif %}
+                            </td>
                             <td>{{ order.placed_at }}</td>
                             <td>RM{{ order.total_price }}</td>
                             <td>
