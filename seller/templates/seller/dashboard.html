@@ -5,6 +5,13 @@
     <meta charset="UTF-8">
     <title>Seller Dashboard</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        /* Center align table headers and content */
+        .table th, .table td {
+            text-align: center;
+            vertical-align: middle;
+        }
+    </style>
 </head>
 <body class="bg-light">
 
@@ -21,7 +28,7 @@
     <div class="row g-3">
         <div class="col-md-3">
             <div class="card text-white bg-primary mb-3">
-                <div class="card-header"><strong>Total Orders</strong></div>
+                <div class="card-header">Total Orders</div>
                 <div class="card-body">
                     <h2 class="card-title fw-bold">{{ total_orders }}</h2>
                 </div>
@@ -29,16 +36,15 @@
         </div>
         <div class="col-md-3">
             <div class="card text-white bg-success mb-3">
-                <div class="card-header"><strong>Total Revenue</strong></div>
+                <div class="card-header">Total Revenue</div>
                 <div class="card-body">
                     <h2 class="card-title fw-bold">RM&nbsp;{{ total_revenue }}</h2>
-                    <!-- Added &nbsp; for spacing -->
                 </div>
             </div>
         </div>
         <div class="col-md-3">
             <div class="card text-white" style="background-color: #6f42c1;">
-                <div class="card-header"><strong>Pending Orders</strong></div>
+                <div class="card-header">Pending Orders</div>
                 <div class="card-body">
                     <h2 class="card-title fw-bold">{{ pending_orders }}</h2>
                 </div>
@@ -46,7 +52,7 @@
         </div>
         <div class="col-md-3">
             <div class="card text-white bg-danger mb-3">
-                <div class="card-header"><strong>Books Sold</strong></div>
+                <div class="card-header">Books Sold</div>
                 <div class="card-body">
                     <h2 class="card-title fw-bold">{{ books_sold }}</h2>
                 </div>
@@ -60,22 +66,21 @@
         <table class="table table-bordered mt-3">
             <thead class="table-light">
                 <tr>
-                    <th><strong>Order ID</strong></th>
-                    <th><strong>Buyer</strong></th>
-                    <th><strong>Status</strong></th>
-                    <th><strong>Placed At</strong></th>
-                    <th><strong>Total Price</strong></th>
+                    <th>Order ID</th>
+                    <th>Buyer</th>
+                    <th>Status</th>
+                    <th>Placed At</th>
+                    <th>Total Price</th>
                 </tr>
             </thead>
             <tbody>
                 {% for order in recent_orders %}
                     <tr>
-                        <td class="fw-bold">{{ order.id }}</td>
-                        <td class="fw-bold">{{ order.user.email }}</td>
-                        <td class="fw-bold">{{ order.status|title }}</td>
-                        <td class="fw-bold">{{ order.placed_at }}</td>
-                        <td class="fw-bold">RM&nbsp;{{ order.total_price }}</td>
-                        <!-- Added &nbsp; here too -->
+                        <td>{{ order.id }}</td>
+                        <td>{{ order.user.email }}</td>
+                        <td>{{ order.status|title }}</td>
+                        <td>{{ order.placed_at }}</td>
+                        <td>RM&nbsp;{{ order.total_price }}</td>
                     </tr>
                 {% endfor %}
             </tbody>

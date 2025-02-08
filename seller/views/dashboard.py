@@ -15,19 +15,19 @@ def seller_dashboard(request):
     """
     total_orders = Order.objects.count()
     total_revenue = (
-        Order.objects.filter(status="Completed").aggregate(Sum("total_price"))[
-            "total_price__sum"
-        ]
-        or 0
+            Order.objects.filter(status="Completed").aggregate(Sum("total_price"))[
+                "total_price__sum"
+            ]
+            or 0
     )
-    pending_orders = Order.objects.filter(status="Pending").count()
+    pending_orders = Order.objects.filter(status="pending").count()
 
     # Count total books sold (sum of all order items from completed orders)
     books_sold = (
-        OrderItem.objects.filter(order__status="Completed").aggregate(Sum("quantity"))[
-            "quantity__sum"
-        ]
-        or 0
+            OrderItem.objects.filter(order__status="Completed").aggregate(Sum("quantity"))[
+                "quantity__sum"
+            ]
+            or 0
     )
 
     recent_orders = Order.objects.order_by("-placed_at")[:5]
