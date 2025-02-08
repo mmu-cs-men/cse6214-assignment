@@ -14,14 +14,14 @@ def _redirect_based_on_role(custom_user):
         "buyer": "buyer-landing",
         "seller": "seller-dashboard",
         "courier": "courier-deliveries",
-        "admin": "admin"
+        "admin": "admin",
     }
-    
+
     if custom_user.role not in role_to_url:
         raise Http404(
             "Invalid user role. This shouldn't have happened. Find your nearest developer"
         )
-    
+
     return redirect(reverse(role_to_url[custom_user.role]))
 
 
