@@ -7,7 +7,34 @@ from core.models.user import User as CustomUser
 from django.http import Http404
 
 
+def _redirect_based_on_role(custom_user):
+    """Helper function to redirect users based on their role."""
+    if custom_user.role == "buyer":
+        return redirect(reverse("buyer-landing"))
+    elif custom_user.role == "seller":
+        return redirect(reverse("seller-dashboard"))
+    elif custom_user.role == "courier":
+        return redirect(reverse("courier-deliveries"))
+    elif custom_user.role == "admin":
+        return redirect("/admin")
+    else:
+        raise Http404(
+            "Invalid user role. This shouldn't have happened. Find your nearest developer"
+        )
+
+
 def login_view(request):
+    # If user is already authenticated, redirect them to their appropriate page
+    if request.user.is_authenticated:
+        try:
+            custom_user = CustomUser.objects.get(email=request.user.email)
+            return _redirect_based_on_role(custom_user)
+        except CustomUser.DoesNotExist:
+            messages.error(
+                request,
+                "Custom user does not exist. This is a logic error and shouldn't have happened. Find your nearest developer",
+            )
+
     if request.method == "POST":
         email = request.POST.get("email")
         password = request.POST.get("password")
@@ -18,19 +45,7 @@ def login_view(request):
             if user is not None:
                 login(request, user)
                 custom_user = CustomUser.objects.get(email=email)
-
-                if custom_user.role == "buyer":
-                    return redirect(reverse("buyer-landing"))
-                elif custom_user.role == "seller":
-                    return redirect(reverse("seller-dashboard"))
-                elif custom_user.role == "courier":
-                    return redirect(reverse("courier-deliveries"))
-                elif custom_user.role == "admin":
-                    return redirect("/admin")
-                else:
-                    raise Http404(
-                        "Invalid user role. This shouldn't have happened. Find your nearest developer"
-                    )
+                return _redirect_based_on_role(custom_user)
             else:
                 messages.error(request, "Invalid password")
         except User.DoesNotExist:
