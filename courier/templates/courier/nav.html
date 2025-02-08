@@ -12,7 +12,7 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container">
         <a class="navbar-brand" href="{% url 'courier-deliveries' %}">
-            <img src="/media/logo.png" alt="BooksLab Logo" height="40"> BooksLab📚
+            <img src="{% static 'logo.png' %}" alt="BooksLab Logo" height="40"> BooksLab📚
         </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
                 aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -27,6 +27,7 @@
                     <a class="nav-link" href="#">Manage Profile</a>
                 </li>
                 <li class="nav-item">
+                    <!-- Using the logout URL as defined elsewhere (e.g., in your login or core base) -->
                     <a class="nav-link btn btn-danger text-white" href="{% url 'logout' %}">Log out</a>
                 </li>
             </ul>
@@ -34,7 +35,7 @@
     </div>
 </nav>
 
-<!-- Page Content -->
+<!-- Page Content Container -->
 <div class="container mt-4">
     {% block content %}
     {% endblock %}
