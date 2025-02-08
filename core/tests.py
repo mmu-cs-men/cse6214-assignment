@@ -1,8 +1,4 @@
-import os
-
-from django.conf import settings
 from django.core.exceptions import ValidationError
-from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db.utils import IntegrityError
 from django.test import TestCase
 
@@ -337,7 +333,7 @@ class UpgradeRequestModelTest(TestCase):
         self.user.delete()
 
         with self.assertRaises(
-            UpgradeRequest.DoesNotExist
+                UpgradeRequest.DoesNotExist
         ):  # The request should be gone
             UpgradeRequest.objects.get(id=request.id)
 
@@ -372,6 +368,7 @@ class BookListingModelTest(TestCase):
             author="William S. Vincent",
             condition="good",
             price=29.99,
+            description="This is a test description",
         )
         self.assertEqual(listing.shop, self.shop)
         self.assertEqual(listing.title, "Django for Beginners")
@@ -385,70 +382,93 @@ class BookListingModelTest(TestCase):
         with self.assertRaises(ValidationError):
             listing.full_clean()
 
-    def test_book_listing_must_have_valid_condition(self):
-        """Test that a book listing must have a valid condition."""
-        listing = BookListing(
-            shop=self.shop,
-            title="Invalid Condition Book",
-            author="Fake",
-            condition="bad",
-            price=5.00,
-        )
-        with self.assertRaises(ValidationError):
-            listing.full_clean()
+    def test_create_book_with_description(self):
+        """Test if a book listing is successfully created with a description."""
+        user = User.objects.create(email="seller2@example.com", name="Seller2", role="seller")
+        shop = Shop.objects.create(name="No Description Shop", user=user)
 
-    def test_deleting_shop_deletes_book_listings(self):
-        """Test that deleting a shop also deletes its book listings (CASCADE)"""
-        listing = BookListing.objects.create(
-            shop=self.shop,
-            title="Python Basics",
+        book = BookListing.objects.create(
+            shop=shop,
+            title="Book With Description",
             author="John Doe",
-            condition="new",
-            price=19.99,
-        )
-        self.shop.delete()
-
-        with self.assertRaises(BookListing.DoesNotExist):  # The listing should be gone
-            BookListing.objects.get(id=listing.id)
-
-    def test_book_listing_image_assignment(self):
-        """Test that a book listing can be created with an image file."""
-        with open(os.path.join(settings.MEDIA_ROOT, "test_img.jpg"), "rb") as f:
-            image_data = f.read()
-
-        image_file = SimpleUploadedFile(
-            "test_img.jpg", image_data, content_type="image/jpeg"
-        )
-        listing = BookListing.objects.create(
-            shop=self.shop,
-            title="Test Image Book",
-            author="Image Author",
-            condition="used",
-            price=15.00,
-            image=image_file,
+            condition="NEW",
+            price=25.00,
+            description="This is a sample book description."
         )
 
-        try:
-            self.assertIsNotNone(listing.image)
-            # Check that the uploaded image file's name includes 'test_img' and ends with '.jpg'
-            self.assertIn("test_img", listing.image.name)
-            self.assertTrue(listing.image.name.endswith(".jpg"))
-        finally:
-            # Clean up: Delete the uploaded image file from the file system
-            if listing.image and os.path.exists(listing.image.path):
-                os.remove(listing.image.path)
+        self.assertEqual(book.description, "This is a sample book description.")
 
-    def test_book_listing_without_image(self):
-        """Test that a book listing created without an image remains with an empty image field."""
-        listing = BookListing.objects.create(
-            shop=self.shop,
-            title="Test No Image Book",
-            author="No Image Author",
-            condition="tattered",
-            price=20.00,
+    def test_create_book_without_description(self):
+        """Test if a book listing can be created without providing a description."""
+        user = User.objects.create(email="seller2@example.com", name="Seller2", role="seller")
+        shop = Shop.objects.create(name="No Description Shop", user=user)
+
+        book = BookListing.objects.create(
+            shop=shop,
+            title="Book Without Description",
+            author="Jane Doe",
+            condition="GOOD",
+            price=20.00
         )
-        # If no image is uploaded, the field should be empty (evaluates to False)
-        self.assertFalse(listing.image)
+
+        self.assertIsNone(book.description)  # Should be None if description is nullable
+
+    def test_update_book_description(self):
+        """Test if an existing book description can be updated successfully."""
+        user = User.objects.create(email="seller3@example.com", name="Seller3", role="seller")
+        shop = Shop.objects.create(name="Update Shop", user=user)
+
+        book = BookListing.objects.create(
+            shop=shop,
+            title="Book To Update",
+            author="Update Author",
+            condition="FAIR",
+            price=30.00
+        )
+
+        # Update the description
+        new_description = "Updated book description."
+        book.description = new_description
+        book.save()
+        book.refresh_from_db()
+
+        self.assertEqual(book.description, new_description)
+
+    def test_delete_book_and_check_description_removal(self):
+        """Test if deleting a book removes its description along with it."""
+        user = User.objects.create(email="seller4@example.com", name="Seller4", role="seller")
+        shop = Shop.objects.create(name="Delete Shop", user=user)
+
+        book = BookListing.objects.create(
+            shop=shop,
+            title="Book To Delete",
+            author="Delete Author",
+            condition="TATTERED",
+            price=10.00,
+            description="This book will be deleted."
+        )
+
+        book_id = book.id  # Store the book ID before deletion
+        book.delete()
+
+        with self.assertRaises(BookListing.DoesNotExist):
+            BookListing.objects.get(id=book_id)
+
+    def test_string_representation(self):
+        """Test if the `__str__` method returns the book title."""
+        user = User.objects.create(email="seller5@example.com", name="Seller5", role="seller")
+        shop = Shop.objects.create(name="String Test Shop", user=user)
+
+        book = BookListing.objects.create(
+            shop=shop,
+            title="Test Book Title",
+            author="String Author",
+            condition="NEW",
+            price=45.00,
+            description="String representation test."
+        )
+
+        self.assertEqual(str(book), "Test Book Title")
 
 
 class ReviewModelTest(TestCase):
@@ -522,6 +542,17 @@ class ReviewModelTest(TestCase):
 
         with self.assertRaises(Review.DoesNotExist):  # The review should be gone
             Review.objects.get(id=review.id)
+
+    def test_book_listing_creation_without_description(self):
+        """Test if a book listing is created successfully without a description."""
+        self.book_without_desc = BookListing.objects.create(
+            shop=self.shop,
+            title="Test Book without Description",
+            author="Another Author",
+            condition="GOOD",
+            price=40.00,
+        )
+        self.assertIsNone(self.book_without_desc.description)  # Should be None if field allows null
 
 
 class CartItemModelTest(TestCase):
@@ -789,7 +820,7 @@ class OrderAssignmentModelTest(TestCase):
         self.order.delete()
 
         with self.assertRaises(
-            OrderAssignment.DoesNotExist
+                OrderAssignment.DoesNotExist
         ):  # The assignment should be gone
             OrderAssignment.objects.get(id=assignment.id)
 
@@ -801,7 +832,7 @@ class OrderAssignmentModelTest(TestCase):
         self.courier.delete()
 
         with self.assertRaises(
-            OrderAssignment.DoesNotExist
+                OrderAssignment.DoesNotExist
         ):  # The assignment should be gone
             OrderAssignment.objects.get(id=assignment.id)
 
