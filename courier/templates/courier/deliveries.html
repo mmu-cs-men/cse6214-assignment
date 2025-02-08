@@ -2,63 +2,68 @@
 {% block title %}Deliveries{% endblock %}
 {% block content %}
     <div class="container mt-5">
-        <h1 class="mb-4">Deliveries</h1>
+        <!-- Enhanced Deliveries Header -->
+        <div class="py-3 mb-4 border-bottom">
+            <h1 class="fw-bold">Deliveries</h1>
+        </div>
+
+        <!-- Section: My Deliveries -->
+        <h2>My Deliveries</h2>
         <table class="table table-bordered table-hover">
             <thead class="table-light">
             <tr>
                 <th>Order ID</th>
                 <th>Status</th>
+                <th>Assigned At</th>
                 <th>Last Updated</th>
-                <th>Update Status</th>
                 <th>Actions</th>
             </tr>
             </thead>
             <tbody>
-            {% for assignment in assignments %}
+            {% for assignment in my_assignments %}
                 <tr>
                     <td>{{ assignment.order.id }}</td>
                     <td>
-                        {% if assignment.status == 'pending' %}
-                            <span class="badge bg-warning">{{ assignment.get_status_display }}</span>
-                        {% elif assignment.status == 'in_transit' %}
-                            <span class="badge bg-info">{{ assignment.get_status_display }}</span>
-                        {% elif assignment.status == 'delivered' %}
-                            <span class="badge bg-success">{{ assignment.get_status_display }}</span>
-                        {% elif assignment.status == 'issue_reported' %}
-                            <span class="badge bg-danger">{{ assignment.get_status_display }}</span>
-                        {% else %}
-                            <span class="badge bg-secondary">{{ assignment.get_status_display }}</span>
-                        {% endif %}
+                        {% with order=assignment.order %}
+                            {% if order.status == "pending" %}
+                                <span class="badge bg-warning">{{ order.get_status_display }}</span>
+                            {% elif order.status == "ready_to_ship" %}
+                                <span class="badge bg-info">{{ order.get_status_display }}</span>
+                            {% elif order.status == "shipped" %}
+                                <span class="badge bg-primary">{{ order.get_status_display }}</span>
+                            {% elif order.status == "completed" %}
+                                <span class="badge bg-success">{{ order.get_status_display }}</span>
+                            {% elif order.status == "issue_reported" %}
+                                <span class="badge bg-danger">Issue Reported</span>
+                            {% else %}
+                                <span class="badge bg-secondary">{{ order.get_status_display }}</span>
+                            {% endif %}
+                        {% endwith %}
                     </td>
+                    <td>{{ assignment.assigned_at }}</td>
                     <td>{{ assignment.updated_at }}</td>
                     <td>
-                        <form method="POST" action="{% url 'courier-update-delivery' assignment.id %}">
-                            {% csrf_token %}
-                            <div class="input-group">
-                                <select name="status" class="form-select">
-                                    <option value="pending" {% if assignment.status == 'pending' %}selected{% endif %}>
-                                        Pending
-                                    </option>
-                                    <option value="in_transit"
-                                            {% if assignment.status == 'in_transit' %}selected{% endif %}>In Transit
-                                    </option>
-                                    <option value="delivered"
-                                            {% if assignment.status == 'delivered' %}selected{% endif %}>Delivered
-                                    </option>
-                                    <option value="issue_reported"
-                                            {% if assignment.status == 'issue_reported' %}selected{% endif %}>Issue
-                                        Reported
-                                    </option>
+                        {% if assignment.order.status == "pending" or assignment.order.status == "ready_to_ship" %}
+                            <form method="POST" action="{% url 'courier-update-assignment' assignment.id %}"
+                                  style="display: inline-block;">
+                                {% csrf_token %}
+                                <select name="action" class="form-select" style="width: auto; display: inline-block;">
+                                    {% if assignment.order.status == "pending" %}
+                                        <option value="accept" selected>Accept Order</option>
+                                    {% elif assignment.order.status == "ready_to_ship" %}
+                                        <option value="unaccept">Unaccept Order</option>
+                                        <option value="complete">Mark as Completed</option>
+                                    {% endif %}
                                 </select>
-                                <button type="submit" class="btn btn-primary">Update</button>
-                            </div>
-                            {% if assignment.status == 'issue_reported' and assignment.delivery_issue %}
-                                <small class="text-danger">Issue: {{ assignment.delivery_issue.issue_description }}</small>
-                            {% endif %}
-                        </form>
-                    </td>
-                    <td>
-                        <a href="{% url 'courier-report-issue' assignment.id %}" class="btn btn-danger">Report Issue</a>
+                                <button type="submit" class="btn btn-primary btn-sm">Update</button>
+                            </form>
+                        {% endif %}
+                        {% if assignment.order.status == "completed" %}
+                            <button class="btn btn-secondary btn-sm" disabled>Report Issue</button>
+                        {% else %}
+                            <a href="{% url 'courier-report-issue' assignment.id %}" class="btn btn-danger btn-sm">Report
+                                Issue</a>
+                        {% endif %}
                     </td>
                 </tr>
             {% empty %}
@@ -68,5 +73,41 @@
             {% endfor %}
             </tbody>
         </table>
+
+        <!-- Section: Available Orders -->
+        <h2 class="mt-5">Available Orders</h2>
+        {% if pending_orders %}
+            <table class="table table-bordered table-hover">
+                <thead class="table-light">
+                <tr>
+                    <th>Order ID</th>
+                    <th>Placed At</th>
+                    <th>Total Price</th>
+                    <th>Action</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for order in pending_orders %}
+                    <tr>
+                        <td>{{ order.id }}</td>
+                        <td>{{ order.placed_at }}</td>
+                        <td>RM{{ order.total_price }}</td>
+                        <td>
+                            <form method="POST" action="{% url 'courier-accept-order' order.id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-success btn-sm">Accept Order</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="4" class="text-center">No available orders at this time.</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>No available orders at this time.</p>
+        {% endif %}
     </div>
 {% endblock %}
