@@ -40,6 +40,22 @@
                                 Order Placed
                             </div>
                         </div>
+                    {% elif order.status == "ready_to_ship" %}
+                        <div class="progress" style="height: 30px;">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated bg-info"
+                                 role="progressbar" style="width: 50%;"
+                                 aria-valuenow="50" aria-valuemin="0" aria-valuemax="100">
+                                Ready to Ship
+                            </div>
+                        </div>
+                    {% elif order.status == "shipped" %}
+                        <div class="progress" style="height: 30px;">
+                            <div class="progress-bar progress-bar-striped bg-primary"
+                                 role="progressbar" style="width: 75%;"
+                                 aria-valuenow="75" aria-valuemin="0" aria-valuemax="100">
+                                Shipped
+                            </div>
+                        </div>
                     {% elif order.status == "completed" %}
                         <div class="progress" style="height: 30px;">
                             <div class="progress-bar progress-bar-striped bg-success"
@@ -50,15 +66,15 @@
                         </div>
                     {% elif order.status == "cancelled" %}
                         <div class="progress" style="height: 30px;">
-                            <div class="progress-bar progress-bar-striped bg-danger"
-                                 role="progressbar" style="width: 0%;"
-                                 aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                            <div class="progress-bar bg-danger"
+                                 role="progressbar" style="width: 10%;"
+                                 aria-valuenow="10" aria-valuemin="0" aria-valuemax="100">
                                 Cancelled
                             </div>
                         </div>
                     {% else %}
                         <div class="progress" style="height: 30px;">
-                            <div class="progress-bar progress-bar-striped bg-secondary"
+                            <div class="progress-bar bg-secondary"
                                  role="progressbar" style="width: 50%;"
                                  aria-valuenow="50" aria-valuemin="0" aria-valuemax="100">
                                 In Progress
@@ -68,7 +84,7 @@
                 </div>
 
                 <div class="row">
-                    <!-- Left Column: Order Details, Shipping Address, and Items (each in its own card) -->
+                    <!-- Left Column: Order Details, Shipping Address, and Items -->
                     <div class="col-md-8">
                         <!-- Order Information Card -->
                         <div class="card mb-4">
@@ -130,9 +146,9 @@
                         </div>
                     </div>
 
-                    <!-- Right Column: Order Summary -->
+                    <!-- Right Column: Order Summary and Review Section -->
                     <div class="col-md-4">
-                        <div class="card">
+                        <div class="card mb-4">
                             <div class="card-header">
                                 <h5 class="mb-0">Order Summary</h5>
                             </div>
@@ -154,6 +170,30 @@
                                 <a href="{% url 'buyer-orders' %}" class="btn btn-primary w-100 mt-3">Back to Orders</a>
                             </div>
                         </div>
+
+                        {% if order.status == "completed" and review %}
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="mb-0">Your Review</h5>
+                                </div>
+                                <div class="card-body">
+                                    <p><strong>Rating:</strong>
+                                        {% for i in rating_range %}
+                                            {% if review.rating >= i %}
+                                                <span style="color:#ffc107;">&#9733;</span>
+                                            {% else %}
+                                                <span style="color:#ccc;">&#9733;</span>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </p>
+                                    <p><strong>Comment:</strong> {{ review.comment }}</p>
+                                    <p><small class="text-muted">Reviewed
+                                        on {{ review.created_at|date:"F j, Y, g:i a" }}</small></p>
+                                </div>
+                            </div>
+                        {% endif %}
+
+
                     </div>
                 </div> <!-- end row -->
             </div> <!-- end card-body -->
