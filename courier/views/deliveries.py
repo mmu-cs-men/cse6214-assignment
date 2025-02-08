@@ -60,7 +60,7 @@ def report_issue(request, assignment_id):
         )
         delivery_issue.issue_description = issue_description
         delivery_issue.save()
-        assignment.status = "issue reported"
+        assignment.status = "issue_reported"
         assignment.save()
         return redirect(reverse("courier-deliveries"))
     context = {
