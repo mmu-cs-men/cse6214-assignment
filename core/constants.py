@@ -28,6 +28,8 @@ CONDITION_CHOICES = [
 
 STATUS_CHOICES = [
     ("pending", "Pending"),
+    ("ready_to_ship", "Ready to Ship"),
+    ("shipped", "Shipped"),
     ("completed", "Completed"),
     ("cancelled", "Cancelled"),
 ]
