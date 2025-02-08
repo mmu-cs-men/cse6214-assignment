@@ -64,7 +64,7 @@
     <h2 class="mt-4">📦 Recent Orders</h2>
     {% if recent_orders %}
         <table class="table table-bordered mt-3">
-            <thead class="table-light">
+            <thead class="table-dark">
                 <tr>
                     <th>Order ID</th>
                     <th>Buyer</th>
@@ -78,7 +78,7 @@
                     <tr>
                         <td>{{ order.id }}</td>
                         <td>{{ order.user.email }}</td>
-                        <td>{{ order.status|title }}</td>
+                        <td>{{ order.get_status_display }}</td>
                         <td>{{ order.placed_at }}</td>
                         <td>RM&nbsp;{{ order.total_price }}</td>
                     </tr>
