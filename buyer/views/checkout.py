@@ -112,7 +112,9 @@ def checkout_page(request):
             return redirect(reverse("buyer-checkout"))
 
         #  Double-check if the cart still has items
-        updated_cart_items = CartItem.objects.select_related("book_listing").filter(cart=cart)
+        updated_cart_items = CartItem.objects.select_related("book_listing").filter(
+            cart=cart
+        )
         if not updated_cart_items:
             return redirect(reverse("buyer-checkout"))
 
@@ -121,7 +123,7 @@ def checkout_page(request):
             if item.book_listing.bought:
                 messages.error(
                     request,
-                    "One or more books in your cart have already been purchased by another user. Please review your cart."
+                    "One or more books in your cart have already been purchased by another user. Please review your cart.",
                 )
                 return redirect(reverse("buyer-checkout"))
 
