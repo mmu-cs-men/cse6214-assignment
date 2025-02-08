@@ -5,68 +5,68 @@ Views for handling review submissions by buyers.
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, get_object_or_404
-from django.urls import reverse
 
 from core.models.order import Order
-from core.models.order_item import OrderItem  # Ensure this model exists
 from core.models.review import Review
+from core.models.shop import Shop
 from core.models.user import User
 
 
 @login_required
-def submit_review(request, order_id):
+def submit_review(request, shop_id):
     """
-    Handles the submission of a review for a completed order.
 
-    The buyer submits a rating (via the star widget) and a comment.
-    The review is saved for the shop associated with the order (retrieved
-    from the order items). After successful submission, the order ID is stored
-    in the session to prevent additional reviews for that order.
-
-    :param request: Django HttpRequest object.
-    :param order_id: The ID of the order being reviewed.
-    :return: Redirects to the orders page.
+    Creates a Review for (user + shop) if none exists.
+    We also verify that the user has at least one COMPLETED order referencing this shop.
     """
     if request.method != "POST":
         messages.error(request, "Invalid request method.")
-        return redirect(reverse("buyer-orders"))
+        return redirect("buyer-orders")
 
-    # Retrieve the order for the current buyer using the buyer's email
-    order = get_object_or_404(Order, id=order_id, user__email=request.user.email)
+    # Convert the Django auth user to your custom user
+    current_user = get_object_or_404(User, email=request.user.email)
 
-    if order.status.lower() != "completed":
-        messages.error(request, "You can only review completed orders.")
-        return redirect(reverse("buyer-orders"))
+    shop = get_object_or_404(Shop, id=shop_id)
+    # Check if this user has at least one completed order for that shop
+    # We'll look for any Order with 'status=completed' that includes an item from this shop
+    completed_orders_for_shop = Order.objects.filter(
+        user=current_user,
+        status="completed",
+        order_items__book_listing__shop=shop,  # or book_listings__shop=shop if your relationships differ
+    ).distinct()
+
+    if not completed_orders_for_shop.exists():
+        messages.error(
+            request,
+            "You can only review a shop if you have at least one COMPLETED order with that seller.",
+        )
+        return redirect("buyer-orders")
+
+    rating_str = request.POST.get("rating")
+    comment = request.POST.get("comment", "").strip()
+
+    if not rating_str or not comment:
+        messages.error(request, "Please provide both rating and comment.")
+        return redirect("buyer-orders")
 
     try:
-        rating = int(request.POST.get("rating"))
-        comment = request.POST.get("comment", "").strip()
+        rating = int(rating_str)
+    except ValueError:
+        messages.error(request, "Invalid rating value.")
+        return redirect("buyer-orders")
 
-        # Retrieve the shop from the order items (assuming each order has at least one OrderItem)
-        order_items = OrderItem.objects.filter(order=order)
-        if not order_items.exists():
-            messages.error(
-                request, "This order has no associated items to determine the shop."
-            )
-            return redirect(reverse("buyer-orders"))
-        shop = order_items.first().book_listing.shop
+    # If we find any existing review row for this user+shop, block duplicates
+    already_rev = Review.objects.filter(shop=shop, user=current_user).exists()
+    if already_rev:
+        messages.info(request, "You have already reviewed this seller.")
+        return redirect("buyer-orders")
 
-        # Get a proper User instance using the buyer's email (as done in orders view)
-        user_instance = get_object_or_404(User, email=request.user.email)
-
-        # Create the review record in the database
-        Review.objects.create(
-            shop=shop, user=user_instance, rating=rating, comment=comment
-        )
-
-        # Mark this order as reviewed by storing its ID in session.
-        reviewed_orders = request.session.get("reviewed_orders", [])
-        if order.id not in reviewed_orders:
-            reviewed_orders.append(order.id)
-        request.session["reviewed_orders"] = reviewed_orders
-
-        messages.success(request, "Review submitted successfully!")
-    except Exception as e:
-        messages.error(request, "Failed to submit review. Please try again.")
-
-    return redirect(reverse("buyer-orders"))
+    # Otherwise, create a new row for user + shop
+    Review.objects.create(
+        shop=shop,
+        user=current_user,  # Because your Review model has 'user'
+        rating=rating,
+        comment=comment,
+    )
+    messages.success(request, f"Review for {shop.name} submitted successfully!")
+    return redirect("buyer-orders")
