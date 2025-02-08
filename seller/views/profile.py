@@ -10,7 +10,6 @@ def profile_page(request):
     custom_user = CustomUser.objects.get(email=request.user.email)
     shop = custom_user.shops.get()
 
-
     context = {
         "name": custom_user.name,
         "shop_name": shop.name,
