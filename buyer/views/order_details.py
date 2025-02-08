@@ -2,6 +2,8 @@
 Order details view for the buyer application.
 """
 
+from decimal import Decimal
+
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, get_object_or_404
 
@@ -25,5 +27,15 @@ def order_details_page(request, order_id):
     order = get_object_or_404(Order, id=order_id, user__email=request.user.email)
     items = OrderItem.objects.select_related("book_listing").filter(order=order)
 
-    context = {"order": order, "items": items}
+    # Calculate the subtotal from order items
+    subtotal = sum(item.purchase_price * item.quantity for item in items)
+    tax_rate = Decimal("0.06")
+    tax_amount = (subtotal * tax_rate).quantize(Decimal("0.01"))
+
+    context = {
+        "order": order,
+        "items": items,
+        "subtotal": subtotal,
+        "tax_amount": tax_amount,
+    }
     return render(request, "buyer/order_details.html", context)
