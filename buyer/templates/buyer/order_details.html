@@ -1,7 +1,8 @@
-{% extends "buyer/base.html" %}
+{% extends "base.html" %}
 {% block title %}Order Details{% endblock %}
-{% block content %}
+{% block nav %}{% include "buyer/nav.html" %}{% endblock %}
 
+{% block content %}
     <style>
         .book-image-container {
             width: 120px;
