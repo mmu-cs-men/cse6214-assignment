@@ -1,0 +1,59 @@
+{% extends "profile.html" %}
+
+<!-- TODO: Include seller nav when done -->
+
+{% block user_info %}
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="row mb-3">
+                <div class="col-sm-2">
+                    <h6 class="mb-0">Shop Name</h6>
+                </div>
+                <div class="col-sm-10 text-secondary">
+                    {{ shop_name }}
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-sm-2">
+                    <h6 class="mb-0">Full Name</h6>
+                </div>
+                <div class="col-sm-10 text-secondary">
+                    {{ name }}
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-sm-2">
+                    <h6 class="mb-0">Username</h6>
+                </div>
+                <div class="col-sm-10 text-secondary">
+                    {{ username }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-2">
+                    <h6 class="mb-0">Email</h6>
+                </div>
+                <div class="col-sm-10 text-secondary">
+                    {{ email }}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_content %}
+    <div class="card mb-4">
+        <div class="card-body">
+            <h4 class="card-title mb-4">Update Shop Name</h4>
+            <form method="POST" action="{% url 'update-shop-name' %}">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="new_shop_name" class="form-label">New Shop Name</label>
+                    <input type="text" class="form-control" id="new_shop_name" name="new_shop_name" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Update Shop Name</button>
+
+            </form>
+        </div>
+    </div>
+{% endblock %}
