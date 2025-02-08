@@ -42,3 +42,59 @@ def login_view(request):
             )
 
     return render(request, "login.html")
+
+def register_view(request):
+    if request.method == "POST":
+        name = request.POST.get("name")
+        email = request.POST.get("email")
+        password = request.POST.get("password")
+        confirm_password = request.POST.get("confirm_password")
+        role = request.POST.get("role")
+
+        if password != confirm_password:
+            messages.error(request, "Passwords do not match")
+            return render(request, "register.html")
+
+        if User.objects.filter(email=email).exists():
+            messages.error(request, "Email already registered")
+            return render(request, "register.html")
+
+        try:
+            # Create unique username using counter
+            username = email.split("@")[0]  # Use part before @ as username
+            base_username = username
+            counter = 1
+            while User.objects.filter(username=username).exists():
+                username = f"{base_username}{counter}"
+                counter += 1
+
+            # Create built-in user
+            auth_user = User.objects.create_user(
+                username=username,
+                email=email,
+                password=password
+            )
+
+            # Create custom user
+            custom_user = CustomUser.objects.create(
+                email=email,
+                name=name,
+                role=role
+            )
+
+            user = authenticate(request, username=auth_user.username, password=password)
+            if user is not None:
+                login(request, user)
+                
+                if role == "buyer":
+                    return redirect(reverse("buyer-landing"))
+                elif role == "courier":
+                    return redirect(reverse("courier-deliveries"))
+
+            return redirect(reverse("login"))
+
+        except Exception as e:
+            messages.error(request, f"Registration failed: {str(e)}")
+            return render(request, "register.html")
+
+    return render(request, "register.html")
