@@ -24,14 +24,10 @@ def book_details_page(request, book_id):
     shop_rating_value = shop_reviews.aggregate(Avg("rating"))["rating__avg"]
     if shop_rating_value:
         shop_rating = round(shop_rating_value, 1)
-        full_stars = int(shop_rating_value)
-        # Optionally show a half star if the remainder is 0.5 or greater
-        half_star = 1 if (shop_rating_value - full_stars) >= 0.5 else 0
-        empty_stars = 5 - full_stars - half_star
+        stars = int(shop_rating_value)
     else:
         shop_rating = 0
-        full_stars = 0
-        half_star = 0
+        stars = 0
         empty_stars = 5
 
     total_reviews = shop_reviews.count()
