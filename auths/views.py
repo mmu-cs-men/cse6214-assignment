@@ -12,7 +12,7 @@ def _redirect_based_on_role(custom_user):
     """Helper function to redirect users based on their role."""
     role_to_url = {
         "buyer": "buyer-landing",
-        "seller": "seller-dashboard",
+        "seller": "seller-profile",  # TODO: Change to seller-dashboard
         "courier": "courier-deliveries",
         "admin": "admin",
     }
