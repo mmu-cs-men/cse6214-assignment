@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     "seller",
     "courier",
     "core",
+    "auths",
 ]
 
 MIDDLEWARE = [
