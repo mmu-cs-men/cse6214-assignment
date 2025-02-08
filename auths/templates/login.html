@@ -1,64 +1,51 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "base.html" %}
+{% block title %}booklab - Login{% endblock %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
-        crossorigin="anonymous"></script>
-    <title>booklab - Login</title>
-</head>
+{% block content %}
+<div class="d-flex justify-content-center align-items-center vh-100">
+    <div class="card w-25">
 
-
-<body>
-    <div class="d-flex justify-content-center align-items-center vh-100">
-        <div class="card w-25">
-            <div class="card-body">
-                <h1 class="text-center m-5">booklab</h1>
-                {% if messages %}
-                {% for message in messages %}
-                <div class="alert alert-danger">
-                    {{ message }}
-                </div>
-                {% endfor %}
-                {% endif %}
-                <form method="POST">
-                    {% csrf_token %}
-                    <div class="form-floating mb-3">
-                        <input type="email" class="form-control" id="email" name="email" placeholder="" required>
-                        <label for="email">Email address</label>
-                    </div>
-                    <div class="form-floating mb-3">
-                        <input type="password" class="form-control" id="password" name="password" placeholder=""
-                            required>
-                        <label for="password">Password</label>
-                    </div>
-                    <div class="form-check mb-5">
-                        <input type="checkbox" class="form-check-input" id="showPassword" onclick="togglePassword()">
-                        <label class="form-check-label" for="showPassword">Show password</label>
-                    </div>
-                    <div class="vstack gap-2 mb-3">
-                        <button type="submit" class="btn btn-primary">Login</button>
-                        <a href="{% url 'register' %}" class="btn btn-secondary">Register</a>
-                    </div>
-                </form>
+        <div class="card-body">
+            <h1 class="text-center m-5">booklab</h1>
+            {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-danger">
+                {{ message }}
             </div>
+            {% endfor %}
+            {% endif %}
+            <form method="POST">
+                {% csrf_token %}
+                <div class="form-floating mb-3">
+                    <input type="email" class="form-control" id="email" name="email" placeholder="" required>
+                    <label for="email">Email address</label>
+                </div>
+                <div class="form-floating mb-3">
+                    <input type="password" class="form-control" id="password" name="password" placeholder=""
+                        required>
+                    <label for="password">Password</label>
+                </div>
+                <div class="form-check mb-5">
+                    <input type="checkbox" class="form-check-input" id="showPassword" onclick="togglePassword()">
+                    <label class="form-check-label" for="showPassword">Show password</label>
+                </div>
+                <div class="vstack gap-2 mb-3">
+                    <button type="submit" class="btn btn-primary">Login</button>
+                    <a href="{% url 'register' %}" class="btn btn-secondary">Register</a>
+                </div>
+            </form>
         </div>
     </div>
+</div>
 
-    <script>
-        function togglePassword() {
-            const passwordInput = document.getElementById('password');
-            if (passwordInput.type === 'password') {
-                passwordInput.type = 'text';
-            } else {
-                passwordInput.type = 'password';
-            }
+<script>
+    function togglePassword() {
+        const passwordInput = document.getElementById('password');
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+        } else {
+            passwordInput.type = 'password';
         }
-    </script>
-</body>
-
-</html>
+    }
+</script>
+{% endblock %}

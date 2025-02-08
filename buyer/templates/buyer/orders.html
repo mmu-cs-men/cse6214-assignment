@@ -1,7 +1,8 @@
-{% extends "buyer/base.html" %}
+{% extends "base.html" %}
 {% block title %}My Orders{% endblock %}
-{% block content %}
+{% block nav %}{% include "buyer/nav.html" %}{% endblock %}
 
+{% block content %}
     <div class="container mt-5">
         <h1 class="mb-4">My Orders</h1>
 
@@ -43,5 +44,4 @@
             </div>
         {% endif %}
     </div>
-
 {% endblock %}
