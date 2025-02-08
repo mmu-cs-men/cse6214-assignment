@@ -1,8 +1,9 @@
 from django.urls import path
 
-from seller.views import dashboard
-from seller.views.book_listings import (
+from seller.views import (
+    dashboard,
     book_listings_page,
+    add_book_listing,
     delete_book_listing,
     edit_book_listing,
 )
@@ -10,6 +11,7 @@ from seller.views.book_listings import (
 urlpatterns = [
     path("dashboard/", dashboard, name="seller-dashboard"),
     path("book-listings/", book_listings_page, name="seller-book-listings"),
+    path("book-listings/add/", add_book_listing, name="seller-add-book"),
     path(
         "book-listings/delete/<int:listing_id>/",
         delete_book_listing,
