@@ -59,14 +59,74 @@
                             </td>
                         </tr>
                         {% if order.status == "completed" %}
-                            {% if request.session.reviewed_orders and order.id in request.session.reviewed_orders %}
-                                <tr>
-                                    <td colspan="5">
-                                        <div class="alert alert-success" role="alert">
-                                            You have already submitted a review for this order.
-                                        </div>
-                                    </td>
-                                </tr>
+                            {% if request.session.reviewed_orders %}
+                                {% if not order.id in request.session.reviewed_orders %}
+                                    <tr>
+                                        <td colspan="5">
+                                            <div class="card mt-2">
+                                                <div class="card-body">
+                                                    <h6>Review Seller</h6>
+                                                    <!-- Star Rating Widget -->
+                                                    <style>
+                                                        .star-rating {
+                                                            direction: rtl;
+                                                            display: inline-block;
+                                                            font-size: 1.5rem;
+                                                        }
+
+                                                        .star-rating input[type="radio"] {
+                                                            display: none;
+                                                        }
+
+                                                        .star-rating label {
+                                                            color: #ccc;
+                                                            cursor: pointer;
+                                                        }
+
+                                                        .star-rating input[type="radio"]:checked ~ label {
+                                                            color: #ffc107;
+                                                        }
+
+                                                        .star-rating label:hover,
+                                                        .star-rating label:hover ~ label {
+                                                            color: #deb217;
+                                                        }
+                                                    </style>
+                                                    <form method="POST" action="{% url 'buyer-review' order.id %}">
+                                                        {% csrf_token %}
+                                                        <div class="mb-3">
+                                                            <div class="star-rating">
+                                                                <input id="star5-{{ order.id }}" type="radio"
+                                                                       name="rating" value="5">
+                                                                <label for="star5-{{ order.id }}">&#9733;</label>
+                                                                <input id="star4-{{ order.id }}" type="radio"
+                                                                       name="rating" value="4">
+                                                                <label for="star4-{{ order.id }}">&#9733;</label>
+                                                                <input id="star3-{{ order.id }}" type="radio"
+                                                                       name="rating" value="3">
+                                                                <label for="star3-{{ order.id }}">&#9733;</label>
+                                                                <input id="star2-{{ order.id }}" type="radio"
+                                                                       name="rating" value="2">
+                                                                <label for="star2-{{ order.id }}">&#9733;</label>
+                                                                <input id="star1-{{ order.id }}" type="radio"
+                                                                       name="rating" value="1">
+                                                                <label for="star1-{{ order.id }}">&#9733;</label>
+                                                            </div>
+                                                        </div>
+                                                        <div class="mb-3">
+                                                            <label for="comment-{{ order.id }}" class="form-label">Comment:</label>
+                                                            <textarea class="form-control" name="comment"
+                                                                      id="comment-{{ order.id }}" rows="3"
+                                                                      placeholder="Enter your feedback here..."></textarea>
+                                                        </div>
+                                                        <button type="submit" class="btn btn-success">Submit Review
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endif %}
                             {% else %}
                                 <tr>
                                     <td colspan="5">
