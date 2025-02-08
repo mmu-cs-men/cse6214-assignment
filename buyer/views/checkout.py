@@ -107,8 +107,21 @@ def checkout_page(request):
         # Double-check if the cart still has items before processing
         updated_cart_items = CartItem.objects.filter(cart=cart)
         if not updated_cart_items:
-
             return redirect(reverse("buyer-checkout"))
+
+        #  Double-check if the cart still has items
+        updated_cart_items = CartItem.objects.select_related("book_listing").filter(cart=cart)
+        if not updated_cart_items:
+            return redirect(reverse("buyer-checkout"))
+
+        # If any book is already marked as bought, alert the user and stop checkout.
+        for item in updated_cart_items:
+            if item.book_listing.bought:
+                messages.error(
+                    request,
+                    "One or more books in your cart have already been purchased by another user. Please review your cart."
+                )
+                return redirect(reverse("buyer-checkout"))
 
         # Create a new order with the address details included
         order = Order.objects.create(
