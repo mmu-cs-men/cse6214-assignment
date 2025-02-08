@@ -2,7 +2,13 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Avg
 from django.shortcuts import get_object_or_404, render, redirect
 
-from core.models import BookListing, Cart, CartItem, User, Review  # Ensure User is imported
+from core.models import (
+    BookListing,
+    Cart,
+    CartItem,
+    User,
+    Review,
+)  # Ensure User is imported
 
 
 @login_required
@@ -36,7 +42,9 @@ def book_details_page(request, book_id):
         # User clicked "Add to Cart"
         if not book_in_cart:
             CartItem.objects.create(cart=cart, book_listing=book)
-            return redirect("buyer-book-details", book_id=book.id)  # Refresh page after adding
+            return redirect(
+                "buyer-book-details", book_id=book.id
+            )  # Refresh page after adding
 
     context = {
         "book": book,
