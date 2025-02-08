@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}booklab - Login{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-center align-items-center vh-100">
+    <div class="card w-25">
+
+        <div class="card-body">
+            <h1 class="text-center m-5">booklab</h1>
+            {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-danger">
+                {{ message }}
+            </div>
+            {% endfor %}
+            {% endif %}
+            <form method="POST">
+                {% csrf_token %}
+                <div class="form-floating mb-3">
+                    <input type="email" class="form-control" id="email" name="email" placeholder="" required>
+                    <label for="email">Email address</label>
+                </div>
+                <div class="form-floating mb-3">
+                    <input type="password" class="form-control" id="password" name="password" placeholder=""
+                        required>
+                    <label for="password">Password</label>
+                </div>
+                <div class="form-check mb-5">
+                    <input type="checkbox" class="form-check-input" id="showPassword" onclick="togglePassword()">
+                    <label class="form-check-label" for="showPassword">Show password</label>
+                </div>
+                <div class="vstack gap-2 mb-3">
+                    <button type="submit" class="btn btn-primary">Login</button>
+                    <a href="{% url 'register' %}" class="btn btn-secondary">Register</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function togglePassword() {
+        const passwordInput = document.getElementById('password');
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+        } else {
+            passwordInput.type = 'password';
+        }
+    }
+</script>
+{% endblock %}
