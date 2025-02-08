@@ -2,9 +2,11 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from core.models.user import User as CustomUser
 from auths.views import _redirect_to_profile
+from core.utils.decorators import allowed_roles
 
 
 @login_required
+@allowed_roles(["seller"])
 def update_shop_name(request):
     custom_user = CustomUser.objects.get(email=request.user.email)
     shop = custom_user.shops.get()
