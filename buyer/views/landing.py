@@ -3,9 +3,11 @@ from django.shortcuts import render
 
 from core.models import User
 from core.models.book_listing import BookListing
+from core.utils.decorators import allowed_roles
 
 
 @login_required
+@allowed_roles(["buyer"])
 def landing_page(request):
     """
     Renders the Buyer Landing Page with all available books.

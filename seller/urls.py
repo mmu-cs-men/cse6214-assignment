@@ -1,12 +1,5 @@
 from django.urls import path
-
-from seller.views import (
-    dashboard,
-    book_listings_page,
-    add_book_listing,
-    delete_book_listing,
-    edit_book_listing,
-)
+from seller.views import *
 
 urlpatterns = [
     path("dashboard/", dashboard, name="seller-dashboard"),
@@ -22,4 +15,6 @@ urlpatterns = [
         edit_book_listing,
         name="seller-edit-book",
     ),
+    path("profile/", profile_page, name="seller-profile"),
+    path("update-shop-name/", update_shop_name, name="update-shop-name"),
 ]
