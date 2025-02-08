@@ -9,7 +9,9 @@ from core.models.order_assignment import OrderAssignment  # Import OrderAssignme
 def orders_page(request):
     """Renders a page displaying all orders placed by buyers."""
     all_orders = Order.objects.all().order_by("-placed_at")  # Fetch all orders
-    assigned_orders = OrderAssignment.objects.values_list("order_id", flat=True)  # Get assigned orders
+    assigned_orders = OrderAssignment.objects.values_list(
+        "order_id", flat=True
+    )  # Get assigned orders
 
     context = {"orders": all_orders, "assigned_orders": assigned_orders}
     return render(request, "seller/orders.html", context)
