@@ -1,5 +1,11 @@
-{% extends "courier/base.html" %}
+{% extends "base.html" %}
+
 {% block title %}Deliveries{% endblock %}
+
+{% block nav %}
+    {% include "courier/nav.html" %}
+{% endblock %}
+
 {% block content %}
     <div class="container mt-5">
         <!-- Enhanced Deliveries Header -->
@@ -61,8 +67,9 @@
                         {% if assignment.order.status == "completed" %}
                             <button class="btn btn-secondary btn-sm" disabled>Report Issue</button>
                         {% else %}
-                            <a href="{% url 'courier-report-issue' assignment.id %}" class="btn btn-danger btn-sm">Report
-                                Issue</a>
+                            <a href="{% url 'courier-report-issue' assignment.id %}" class="btn btn-danger btn-sm">
+                                Report Issue
+                            </a>
                         {% endif %}
                     </td>
                 </tr>
