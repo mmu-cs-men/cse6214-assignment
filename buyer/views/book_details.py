@@ -2,13 +2,7 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Avg
 from django.shortcuts import get_object_or_404, render, redirect
 
-from core.models import (
-    BookListing,
-    Cart,
-    CartItem,
-    User,
-    Review,
-)  # Ensure User is imported
+from core.models import BookListing, Cart, CartItem, User, Review  # Ensure User is imported
 
 
 @login_required
@@ -30,10 +24,11 @@ def book_details_page(request, book_id):
     shop_rating_value = shop_reviews.aggregate(Avg("rating"))["rating__avg"]
     if shop_rating_value:
         shop_rating = round(shop_rating_value, 1)
-        stars = int(shop_rating_value)
+        full_stars = int(shop_rating_value)
+        empty_stars = 5 - full_stars
     else:
         shop_rating = 0
-        stars = 0
+        full_stars = 0
         empty_stars = 5
 
     total_reviews = shop_reviews.count()
@@ -42,9 +37,7 @@ def book_details_page(request, book_id):
         # User clicked "Add to Cart"
         if not book_in_cart:
             CartItem.objects.create(cart=cart, book_listing=book)
-            return redirect(
-                "buyer-book-details", book_id=book.id
-            )  # Refresh page after adding
+            return redirect("buyer-book-details", book_id=book.id)  # Refresh page after adding
 
     context = {
         "book": book,
@@ -54,7 +47,6 @@ def book_details_page(request, book_id):
         "shop_reviews": shop_reviews,
         # Pass in ranges for iteration in the template:
         "full_stars_list": range(full_stars),
-        "half_star": half_star,  # This is an integer: 0 (no half star) or 1 (show one half star)
         "empty_stars_list": range(empty_stars),
     }
 
