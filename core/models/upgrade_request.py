@@ -15,6 +15,7 @@ class UpgradeRequest(models.Model):
     :ivar user: ForeignKey linking the upgrade request to the user making the request.
     :ivar target_role: The role that the user is requesting to upgrade to.
     :ivar requested_at: The timestamp indicating when the upgrade request was made.
+    :ivar approved: Boolean indicating whether the upgrade request has been approved.
     """
 
     user = models.ForeignKey(
@@ -22,6 +23,7 @@ class UpgradeRequest(models.Model):
     )
     target_role = models.CharField(max_length=10, choices=ROLE_CHOICES)
     requested_at = models.DateTimeField(auto_now_add=True)
+    approved = models.BooleanField(default=False)
 
     def __str__(self):
         return f"Upgrade Request by {self.user.email} to {self.target_role}"
