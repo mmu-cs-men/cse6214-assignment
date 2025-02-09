@@ -15,7 +15,7 @@ def seller_dashboard(request):
     """
     total_orders = Order.objects.count()
     total_revenue = (
-        Order.objects.filter(status="Completed").aggregate(Sum("total_price"))[
+        Order.objects.filter(status="completed").aggregate(Sum("total_price"))[
             "total_price__sum"
         ]
         or 0
@@ -24,7 +24,7 @@ def seller_dashboard(request):
 
     # Count total books sold (sum of all order items from completed orders)
     books_sold = (
-        OrderItem.objects.filter(order__status="Completed").aggregate(Sum("quantity"))[
+        OrderItem.objects.filter(order__status="completed").aggregate(Sum("quantity"))[
             "quantity__sum"
         ]
         or 0
