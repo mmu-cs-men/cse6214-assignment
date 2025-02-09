@@ -36,7 +36,10 @@ def login_view(request):
         try:
             custom_user = CustomUser.objects.get(email=request.user.email)
             if custom_user.role == "unassigned":
-                messages.info(request, "Your application is still pending approval. Please check back later.")
+                messages.info(
+                    request,
+                    "Your application is still pending approval. Please check back later.",
+                )
                 logout(request)
                 return render(request, "login.html")
             return _redirect_based_on_role(custom_user)
@@ -56,7 +59,10 @@ def login_view(request):
             if user is not None:
                 custom_user = CustomUser.objects.get(email=email)
                 if custom_user.role == "unassigned":
-                    messages.info(request, "Your application is still pending approval. Please check back later.")
+                    messages.info(
+                        request,
+                        "Your application is still pending approval. Please check back later.",
+                    )
                     return render(request, "login.html")
                 login(request, user)
                 return _redirect_based_on_role(custom_user)
@@ -106,15 +112,17 @@ def register_view(request):
             # Create custom user with role
             # If registering as courier, set role as unassigned and create upgrade request
             initial_role = "unassigned" if role == "courier" else role
-            custom_user = CustomUser.objects.create(email=email, name=name, role=initial_role)
+            custom_user = CustomUser.objects.create(
+                email=email, name=name, role=initial_role
+            )
 
             # Create upgrade request for courier
             if role == "courier":
-                UpgradeRequest.objects.create(
-                    user=custom_user,
-                    target_role="courier"
+                UpgradeRequest.objects.create(user=custom_user, target_role="courier")
+                messages.info(
+                    request,
+                    "Your courier account request has been submitted for review. Please check periodically for approval by signing in.",
                 )
-                messages.info(request, "Your courier account request has been submitted for review. Please check periodically for approval by signing in.")
                 return redirect(reverse("login"))
 
             user = authenticate(request, username=auth_user.username, password=password)
