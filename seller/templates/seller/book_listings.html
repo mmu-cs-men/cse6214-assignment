@@ -1,0 +1,168 @@
+{% extends "base.html" %}
+{% load static %}
+{% block nav %}
+    {% include "seller/nav.html" %}
+{% endblock %}
+{% block title %}My Book Listings{% endblock %}
+
+{% block content %}
+
+    <!-- Message Alerts at the Top, Color-Coded by Message Tag -->
+    {% if messages %}
+        <div class="alert-container">
+        {% for message in messages %}
+            {% if message.tags == "error" %}
+                <div class="alert alert-danger alert-dismissible fade show alert-flash" role="alert">
+            {% elif message.tags == "success" %}
+                <div class="alert alert-success alert-dismissible fade show alert-flash" role="alert">
+            {% elif message.tags == "warning" %}
+                <div class="alert alert-warning alert-dismissible fade show alert-flash" role="alert">
+            {% else %}
+                <!-- default to info -->
+                <div class="alert alert-info alert-dismissible fade show alert-flash" role="alert">
+            {% endif %}
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <style>
+        /* ALERT STYLING: simple "flash" animation (its kinda necessary) */
+        .alert-container {
+            max-width: 600px; /* limit alert width */
+            margin: 1rem auto; /* center horizontally */
+        }
+
+        @keyframes flashOnce {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .alert-flash {
+            animation: flashOnce 0.5s ease-in-out;
+        }
+
+        /* Standardize image container size */
+        .book-image-container {
+            width: 100%;
+            height: 250px; /* Fixed height */
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f8f9fa;
+        }
+
+        .book-img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        /* Style for the Add Book card */
+        .add-book-card {
+            border: 2px dashed #ccc;
+            border-radius: 0.25rem;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            height: 250px;
+        }
+
+        .add-book-card:hover {
+            background-color: #f0f0f0;
+        }
+
+        /* Center content inside the Add Book card */
+        .add-book-card .card-body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+        }
+
+        .add-book-icon {
+            font-size: 3rem;
+            color: #28a745; /* Green color */
+        }
+
+        .add-book-text {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #28a745;
+        }
+    </style>
+
+    <div class="container mt-5">
+        <!-- Common Top Header -->
+        <header class="mb-4 text-start">
+            <h1 class="display-4 fw-bold">Book Listings</h1>
+        </header>
+
+        <hr>
+
+        <!-- Header for the Actual List -->
+        <h2 class="mb-4">My Book Listings</h2>
+
+        <!-- Section: Existing Book Listings (with Add Book Card as first element) -->
+        <div class="row">
+            <!-- Add Book Card as the first element -->
+            <div class="col-md-3 mb-4">
+                <a href="{% url 'seller-add-book' %}" class="text-decoration-none">
+                    <div class="card h-100 shadow-sm add-book-card">
+                        <div class="card-body text-center">
+                            <div class="add-book-icon">+</div>
+                            <div class="add-book-text">Add Book</div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <!-- Loop for Existing Listings -->
+            {% for book in listings %}
+                <div class="col-md-3 mb-4">
+                    <div class="card h-100 shadow-sm">
+                        <div class="book-image-container">
+                            {% if book.image %}
+                                <img src="{{ book.image.url }}" class="book-img" alt="{{ book.title }}">
+                            {% else %}
+                                <img src="{% static 'images/placeholder.jpg' %}" class="book-img" alt="No Image">
+                            {% endif %}
+                        </div>
+                        <div class="card-body">
+                            <h5 class="card-title">{{ book.title }}</h5>
+                            <!-- Listing ID -->
+                            <p class="card-text"><small>Listing ID: #{{ book.id }}</small></p>
+                            <p class="card-text">by {{ book.author }}</p>
+                            <p class="card-text text-primary fw-bold">RM{{ book.price }}</p>
+                            <p class="card-text"><small>Condition: {{ book.get_condition_display }}</small></p>
+                            <p class="card-text"><small>Seller: {{ book.shop.name }}</small></p>
+                        </div>
+                        <div class="card-footer">
+                            <a href="{% url 'seller-edit-book' book.id %}" class="btn btn-primary btn-sm">Edit</a>
+                            <form method="POST" action="{% url 'seller-delete-book' book.id %}" class="d-inline">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger btn-sm"
+                                        onclick="return confirm('Are you sure you want to delete this listing?');">
+                                    Delete
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="col-12 text-center">
+                    <div class="alert alert-info">No book listings found.</div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}
