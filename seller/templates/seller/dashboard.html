@@ -68,7 +68,7 @@
                         <td>{{ order.get_status_display }}</td>
                         <td>{{ order.placed_at }}</td>
                         <td>RM&nbsp;{{ order.total_price }}</td>
-                        <td>RM&nbsp;{{ order.total_price|mul:"0.8"|floatformat:"2" }}</td>
+                        <td>RM&nbsp;{{ order.total_price|div:"1.06"|mul:"0.8"|floatformat:"2" }}</td>
                     </tr>
                 {% endfor %}
             </tbody>
