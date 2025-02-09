@@ -1,4 +1,5 @@
 import os
+import time
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
@@ -788,9 +789,7 @@ class OrderAssignmentModelTest(TestCase):
         )
         self.order.delete()
 
-        with self.assertRaises(
-            OrderAssignment.DoesNotExist
-        ):  # The assignment should be gone
+        with self.assertRaises(OrderAssignment.DoesNotExist):
             OrderAssignment.objects.get(id=assignment.id)
 
     def test_deleting_courier_deletes_assignment(self):
@@ -800,10 +799,44 @@ class OrderAssignmentModelTest(TestCase):
         )
         self.courier.delete()
 
-        with self.assertRaises(
-            OrderAssignment.DoesNotExist
-        ):  # The assignment should be gone
+        with self.assertRaises(OrderAssignment.DoesNotExist):
             OrderAssignment.objects.get(id=assignment.id)
+
+    # --- Add the following tests for the `updated_at` field below ---
+
+    def test_updated_at_auto_set_on_creation(self):
+        """
+        Test that `updated_at` is automatically set upon creation.
+        Because `auto_now` is used, on creation `updated_at` should have a value,
+        and it should be almost identical to `assigned_at` (the difference being negligible).
+        """
+        assignment = OrderAssignment.objects.create(
+            order=self.order, courier=self.courier
+        )
+        self.assertIsNotNone(assignment.updated_at)
+        # Check that assigned_at and updated_at are almost the same at creation time.
+        self.assertAlmostEqual(
+            assignment.assigned_at.timestamp(),
+            assignment.updated_at.timestamp(),
+            delta=1,  # Allowing a one-second difference
+        )
+
+    def test_updated_at_auto_update_on_save(self):
+        """
+        Test that `updated_at` is automatically updated when the model is saved.
+        We simulate an update by waiting briefly and then saving the instance again.
+        """
+        assignment = OrderAssignment.objects.create(
+            order=self.order, courier=self.courier
+        )
+        old_updated_at = assignment.updated_at
+        # Pause for a second to ensure a timestamp difference.
+        time.sleep(1)
+        # Save the instance to trigger the auto_now update.
+        assignment.save()
+        assignment.refresh_from_db()
+        new_updated_at = assignment.updated_at
+        self.assertGreater(new_updated_at, old_updated_at)
 
 
 class DeliveryIssueModelTest(TestCase):
