@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load static %}
 {% block title %}Book Details{% endblock %}
 {% block nav %}{% include "buyer/nav.html" %}{% endblock %}
 
@@ -167,7 +168,12 @@
                     <!-- Book Image -->
                     <div class="col-md-4 d-flex justify-content-center">
                         <div class="book-image-container">
-                            <img src="{{ book.image.url }}" class="book-image" alt="{{ book.title }}">
+                            {% if book.image and book.image.url %}
+                                <img src="{{ book.image.url }}" class="book-image" alt="{{ book.title }}">
+                            {% else %}
+                                <img src="{% static 'images/placeholder.jpg' %}" class="book-image"
+                                     alt="No image for this book">
+                            {% endif %}
                         </div>
                     </div>
 

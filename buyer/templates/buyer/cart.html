@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load static %}
 {% block title %}Checkout{% endblock %}
 {% block nav %}{% include "buyer/nav.html" %}{% endblock %}
 
@@ -88,8 +89,13 @@
                     {% for item in cart_items %}
                         <div class="row cart-item mb-3 align-items-center">
                             <div class="col-md-3">
-                                <img src="{{ item.book_listing.image.url }}" alt="{{ item.book_listing.title }}"
-                                     class="img-fluid rounded book-image">
+                                {% if item.book_listing.image and item.book_listing.image.url %}
+                                    <img src="{{ item.book_listing.image.url }}" alt="{{ item.book_listing.title }}"
+                                         class="img-fluid rounded book-image">
+                                {% else %}
+                                    <img src="{% static "images/placeholder.jpg" %}" alt="No image for this book"
+                                         class="img-fluid rounded book-image">
+                                {% endif %}
                             </div>
                             <div class="col-md-5 book-info">
                                 <h5 class="card-title">{{ item.book_listing.title }}</h5>
