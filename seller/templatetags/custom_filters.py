@@ -18,3 +18,12 @@ def mul(value, arg):
         return float(value) * float(arg)
     except (ValueError, TypeError):
         return ""
+
+
+@register.filter
+def div(value, arg):
+    """Divides the given value by an argument and returns the result as a float."""
+    try:
+        return float(value) / float(arg)
+    except (ValueError, TypeError, ZeroDivisionError):
+        return ""
