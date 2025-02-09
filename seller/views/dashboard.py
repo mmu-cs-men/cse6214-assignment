@@ -7,7 +7,6 @@ from core.models.order_item import (
     OrderItem,
 )  # Assuming this model tracks books in orders
 
-#fix
 @login_required
 def seller_dashboard(request):
     """
