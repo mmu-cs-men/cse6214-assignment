@@ -31,7 +31,8 @@ def cart_page(request):
         cart_items = []
 
     # **NEW: Remove books that have already been bought**
-    cart_items = cart_items.exclude(book_listing__bought=True)
+    if not cart_items:
+        cart_items = cart_items.exclude(book_listing__bought=True)
 
     # If cart is empty after filtering, set it to an empty list
     if not cart_items.exists():
