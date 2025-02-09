@@ -103,10 +103,46 @@ def delete_book_listing(request, listing_id):
 @login_required
 def edit_book_listing(request, listing_id):
     """
-    Placeholder view for editing a book listing.
-    Redirects back to the Seller Book Listings page with a query parameter.
+    Displays a form pre-populated with the details of the specified book listing.
+    On POST, updates the book listing in the database.
     """
-    from django.urls import reverse
+    current_user = request.user
+    shop = Shop.objects.filter(user__email=current_user.email).first()
+    if not shop:
+        messages.error(
+            request, "No shop found for this seller. Please set up your shop first."
+        )
+        return redirect("seller-book-listings")
 
-    url = f"{reverse('seller-book-listings')}?edit=1"
-    return redirect(url)
+    listing = get_object_or_404(BookListing, id=listing_id, shop=shop)
+
+    if request.method == "POST":
+        title = request.POST.get("title", "").strip()
+        author = request.POST.get("author", "").strip()
+        condition = request.POST.get("condition")
+        price = request.POST.get("price")
+        image = request.FILES.get("image")  # may be None
+
+        if not (title and author and condition and price):
+            messages.error(request, "Please fill in all required fields.")
+        else:
+            try:
+                listing.title = title
+                listing.author = author
+                listing.condition = condition
+                listing.price = price
+                if image:
+                    listing.image = image  # update image only if a new one is provided
+                listing.save()
+                messages.success(request, "Book listing updated successfully!")
+                return redirect("seller-book-listings")
+            except Exception:
+                messages.error(
+                    request, "Failed to update book listing. Please try again."
+                )
+
+    context = {
+        "listing": listing,
+        "CONDITION_CHOICES": CONDITION_CHOICES,
+    }
+    return render(request, "seller/edit_book_listing.html", context)
