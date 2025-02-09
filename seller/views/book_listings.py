@@ -95,6 +95,7 @@ def delete_book_listing(request, listing_id):
     return redirect("seller-book-listings")
 
 
+@login_required
 def edit_book_listing(request, listing_id):
     """
     Placeholder view for editing a book listing.
