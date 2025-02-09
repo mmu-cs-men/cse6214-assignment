@@ -2,6 +2,7 @@
 Order details view for the buyer application.
 """
 
+from decimal import Decimal
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, get_object_or_404
 
@@ -31,7 +32,11 @@ def order_details_page(request, order_id):
     order = get_object_or_404(Order, id=order_id, user=current_user)
 
     items = OrderItem.objects.filter(order=order)
+    
     # Subtotal, tax, etc.
+    subtotal = sum(item.purchase_price * item.quantity for item in items)
+    tax_rate = Decimal("0.06")
+    tax_amount = (subtotal * tax_rate).quantize(Decimal("0.01"))
 
     # Distinct shops in this order
     shops_qs = Shop.objects.filter(book_listings__order_items__order=order).distinct()
@@ -53,5 +58,7 @@ def order_details_page(request, order_id):
         "items": items,
         "shops_with_reviews": shops_with_reviews,
         "rating_range": [1, 2, 3, 4, 5],
+        "subtotal": subtotal,
+        "tax_amount": tax_amount,
     }
     return render(request, "buyer/order_details.html", context)
