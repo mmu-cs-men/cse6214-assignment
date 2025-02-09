@@ -53,6 +53,18 @@ def book_details_page(request, book_id):
 
     if request.method == "POST":
         # User clicked "Add to Cart"
+        #  Check if cart already has items from a different shop
+        cart_items = CartItem.objects.filter(cart=cart)
+        if cart_items.exists():
+            existing_shop = cart_items.first().book_listing.shop
+            if existing_shop != book.shop:
+                from django.contrib import messages
+
+                messages.error(
+                    request, "You can only add books from the same shop to the cart."
+                )
+                return redirect("buyer-book-details", book_id=book.id)
+
         if not book_in_cart:
             CartItem.objects.create(cart=cart, book_listing=book)
             return redirect(
