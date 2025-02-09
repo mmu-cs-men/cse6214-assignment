@@ -15,7 +15,7 @@ from core.models.user import User
 @login_required
 def deliveries_page(request):
     """
-    Renders a page showing available orders (pending with no assignment)
+    Renders a page showing available orders (ready to ship with no assignment)
     and the logged-in courier's assignments.
     """
     # Try to get the email from request.user; if not present, assume request.user is the email string.
@@ -27,9 +27,9 @@ def deliveries_page(request):
     # Retrieve the proper User instance using the email.
     current_user = get_object_or_404(User, email=user_email)
 
-    # Available orders: orders that are pending and have no assignment.
-    pending_orders = Order.objects.filter(
-        status="pending", order_assignment__isnull=True
+    # Available orders: orders that are ready_to_ship and have no assignment.
+    available_orders = Order.objects.filter(
+        status="ready_to_ship", order_assignment__isnull=True
     ).order_by("-placed_at")
 
     # My deliveries: order assignments for which the courier is the logged-in user.
@@ -38,7 +38,7 @@ def deliveries_page(request):
     )
 
     context = {
-        "pending_orders": pending_orders,
+        "pending_orders": available_orders,  # Keep the template variable name for now
         "my_assignments": my_assignments,
     }
     return render(request, "courier/deliveries.html", context)
@@ -48,10 +48,10 @@ def deliveries_page(request):
 def accept_order(request, order_id):
     """
     Handles accepting an order. Creates an OrderAssignment for the order
-    and updates its status to 'ready_to_ship'.
+    and updates its status to 'shipped'.
     """
     order = get_object_or_404(
-        Order, id=order_id, status="pending", order_assignment__isnull=True
+        Order, id=order_id, status="ready_to_ship", order_assignment__isnull=True
     )
 
     # Retrieve a proper User instance using the email from request.user
@@ -62,7 +62,7 @@ def accept_order(request, order_id):
     current_user = get_object_or_404(User, email=user_email)
 
     OrderAssignment.objects.create(order=order, courier=current_user)
-    order.status = "ready_to_ship"
+    order.status = "shipped"
     order.save()
     return redirect(reverse("courier-deliveries"))
 
@@ -71,7 +71,7 @@ def accept_order(request, order_id):
 def update_assignment(request, assignment_id):
     """
     Handles updating an existing assignment.
-    If the action is 'unaccept', it deletes the assignment and sets the order status to 'pending'.
+    If the action is 'unaccept', it deletes the assignment and sets the order status to 'ready_to_ship'.
     If the action is 'complete', it updates the order status to 'completed'.
     """
     # Retrieve a proper User instance using request.user.email, similar to the buyer view
@@ -92,7 +92,7 @@ def update_assignment(request, assignment_id):
         order = assignment.order
         if action == "unaccept":
             assignment.delete()
-            order.status = "pending"
+            order.status = "ready_to_ship"
             order.save()
         elif action == "complete":
             order.status = "completed"
@@ -104,7 +104,7 @@ def update_assignment(request, assignment_id):
 def report_issue(request, assignment_id):
     """
     Renders a form for a courier to report an issue with an order assignment.
-    On POST, creates or updates the DeliveryIssue and marks the assignment as 'issue_reported'.
+    On POST, creates or updates the DeliveryIssue.
     Displays a success message when the issue is reported.
 
     :param request: Django HttpRequest object.
@@ -135,10 +135,6 @@ def report_issue(request, assignment_id):
         )
         delivery_issue.issue_description = issue_description
         delivery_issue.save()
-
-        # Mark the order as having an issue.
-        assignment.order.status = "issue_reported"
-        assignment.order.save()
 
         messages.success(request, "Issue reported successfully!")
         return redirect(reverse("courier-deliveries"))
