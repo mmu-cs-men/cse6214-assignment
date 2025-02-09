@@ -1,11 +1,82 @@
 {% extends "base.html" %}
+{% load custom_filters %}
 {% block nav %}
     {% include "seller/nav.html" %}
 {% endblock %}
 {% block title %}Seller Dashboard{% endblock %}
+
 {% block content %}
-    <div class="container mt-5">
-        <h1>Seller Dashboard</h1>
-        <p>This is a dummy dashboard. Siva should add his functionality here.</p>
+<!-- Dashboard Content -->
+<div class="container mt-5">
+    <h1 class="mb-4">📊 Seller Dashboard</h1>
+
+    <!-- Statistics Section -->
+    <div class="row g-3">
+        <div class="col-md-3">
+            <div class="card text-white bg-primary mb-3">
+                <div class="card-header">Total Orders</div>
+                <div class="card-body">
+                    <h2 class="card-title fw-bold">{{ total_orders }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-success mb-3">
+                <div class="card-header">Total Revenue</div>
+                <div class="card-body">
+                    <h2 class="card-title fw-bold">RM&nbsp;{{ total_revenue|floatformat:2 }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white" style="background-color: #6f42c1;">
+                <div class="card-header">Pending Orders</div>
+                <div class="card-body">
+                    <h2 class="card-title fw-bold">{{ pending_orders }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-danger mb-3">
+                <div class="card-header">Books Sold</div>
+                <div class="card-body">
+                    <h2 class="card-title fw-bold">{{ books_sold }}</h2>
+                </div>
+            </div>
+        </div>
     </div>
+
+    <!-- Recent Orders Table -->
+    <h2 class="mt-4">📦 Recent Orders</h2>
+    {% if recent_orders %}
+        <table class="table table-bordered mt-3">
+            <thead class="table-dark">
+                <tr>
+                    <th>Order ID</th>
+                    <th>Buyer</th>
+                    <th>Status</th>
+                    <th>Placed At</th>
+                    <th>Total Price</th>
+                    <th>Revenue</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in recent_orders %}
+                    <tr>
+                        <td>{{ order.id }}</td>
+                        <td>{{ order.user.email }}</td>
+                        <td>{{ order.get_status_display }}</td>
+                        <td>{{ order.placed_at }}</td>
+                        <td>RM&nbsp;{{ order.total_price }}</td>
+                        <td>RM&nbsp;{{ order.total_price|mul:"0.8"|floatformat:"2" }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <div class="alert alert-info mt-3">
+            No recent orders available.
+        </div>
+    {% endif %}
+</div>
 {% endblock %}

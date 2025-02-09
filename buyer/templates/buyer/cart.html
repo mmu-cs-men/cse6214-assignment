@@ -1,84 +1,79 @@
 {% extends "base.html" %}
+{% load static %}
 {% block title %}Checkout{% endblock %}
 {% block nav %}{% include "buyer/nav.html" %}{% endblock %}
 
 {% block content %}
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <title>Cart</title>
+    <style>
+        .cart-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 0;
+        }
 
-        <style>
-            .cart-item {
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-                padding: 10px 0;
-            }
+        .book-info {
+            padding-left: 25px; /* Move text slightly to the right */
+        }
 
-            .book-info {
-                padding-left: 25px; /* Move text slightly to the right */
-            }
+        .price-container {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            width: 120px; /* Consistent width */
+        }
 
-            .price-container {
-                display: flex;
-                align-items: center;
-                justify-content: flex-end;
-                width: 120px; /* Consistent width */
-            }
+        .price {
+            font-size: 1.5rem; /* Large Price */
+            font-weight: bold;
+            color: #000;
+            margin: 0;
+        }
 
-            .price {
-                font-size: 1.5rem; /* Large Price */
-                font-weight: bold;
-                color: #000;
-                margin: 0;
-            }
+        .remove-btn {
+            border: none;
+            background: none;
+            color: red;
+            font-size: 1.5rem;
+            cursor: pointer;
+            margin-left: 15px; /* Adjusted for better alignment */
+            display: flex;
+            align-items: center;
+        }
 
-            .remove-btn {
-                border: none;
-                background: none;
-                color: red;
-                font-size: 1.5rem;
-                cursor: pointer;
-                margin-left: 15px; /* Adjusted for better alignment */
-                display: flex;
-                align-items: center;
-            }
+        .remove-btn:hover {
+            color: darkred;
+        }
 
-            .remove-btn:hover {
-                color: darkred;
-            }
+        .book-image {
+            width: 100%; /* Set a maximum width */
+            height: 250px; /* Set a maximum height */
+            object-fit: contain; /* Scale the image to fit within the container without cropping */
+            border: 1px solid #ddd; /* Adds a light border */
+            border-radius: 5px; /* Slight rounded corners */
+        }
 
-            .book-image {
-                max-width: 5000px; /* Set a maximum width */
-                max-height: 250px; /* Set a maximum height */
-                object-fit: cover; /* Ensures the image is properly fitted */
-                border: 1px solid #ddd; /* Optional: Adds a light border around the image */
-                border-radius: 5px; /* Optional: Adds a slight rounded corner */
-            }
+        .btn-success {
+            padding: 10px;
+            width: 200px;
+            border-radius: 10px;
+        }
 
-            .btn-success {
-                padding: 10px;
-                width: 200px;
-                border-radius: 10px;
-            }
+        .btn-success:active {
+            transform: scale(0.95);
+        }
 
-            .btn-success:active {
-                transform: scale(0.95);
-            }
+        .btn-primary {
+            padding: 10px;
+            width: 200px;
+            border-radius: 10px;
+        }
 
-            .btn-primary {
-                padding: 10px;
-                width: 200px;
-                border-radius: 10px;
-            }
+        .btn-primary:active {
+            transform: scale(0.95);
+        }
+    </style>
 
-            .btn-primary:active {
-                transform: scale(0.95);
-            }
-
-        </style>
-    </head>
     <div class="container py-5">
         <h1 class="mb-5">Your Shopping Cart 🛒</h1>
         <div class="row">
@@ -88,8 +83,17 @@
                     {% for item in cart_items %}
                         <div class="row cart-item mb-3 align-items-center">
                             <div class="col-md-3">
-                                <img src="{{ item.book_listing.image.url }}" alt="{{ item.book_listing.title }}"
-                                     class="img-fluid rounded book-image">
+                                {% if item.book_listing.image and item.book_listing.image.url %}
+                                    <a href="{{ item.book_listing.image.url }}" target="_blank">
+                                        <img src="{{ item.book_listing.image.url }}" alt="{{ item.book_listing.title }}"
+                                             class="img-fluid rounded book-image">
+                                    </a>
+                                {% else %}
+                                    <a href="{% static "images/placeholder.jpg" %}" target="_blank">
+                                        <img src="{% static "images/placeholder.jpg" %}" alt="No image for this book"
+                                             class="img-fluid rounded book-image">
+                                    </a>
+                                {% endif %}
                             </div>
                             <div class="col-md-5 book-info">
                                 <h5 class="card-title">{{ item.book_listing.title }}</h5>
@@ -127,5 +131,4 @@
             </div>
         </div>
     </div>
-    </html>
 {% endblock %}

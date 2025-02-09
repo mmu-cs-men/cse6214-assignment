@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load static %}
 {% block title %}booklab - Login{% endblock %}
 
 {% block content %}
@@ -6,7 +7,9 @@
     <div class="card w-25">
 
         <div class="card-body">
-            <h1 class="text-center m-5">booklab</h1>
+            <div class="text-center m-5">
+                <img src="{% static 'images/logo_black.png' %}" alt="booklab logo" class="img-fluid" style="max-height: 150px;">
+            </div>
             {% if messages %}
             {% for message in messages %}
             <div class="alert alert-danger">
