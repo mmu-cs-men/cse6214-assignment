@@ -22,9 +22,10 @@ from django.urls import path, include
 
 urlpatterns = [
     path("", include("auths.urls")),
-    path("admin/", admin.site.urls),
+    path("admin/", admin.site.urls, name="admin"),
     path("buyer/", include("buyer.urls")),
     path("seller/", include("seller.urls")),
+    path("courier/", include("courier.urls")),
 ]
 
 if settings.DEBUG:
