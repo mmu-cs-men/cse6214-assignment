@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load static %}
 {% block title %}Book Store{% endblock %}
 {% block nav %}{% include "buyer/nav.html" %}{% endblock %}
 
@@ -105,7 +106,12 @@
                         <div class="card book-card shadow-sm">
                             <!-- Wrap the image in the book-img-container -->
                             <div class="book-img-container">
-                                <img src="{{ book.image.url }}" class="book-img" alt="{{ book.title }}">
+                                {% if book.image %}
+                                    <img src="{{ book.image.url }}" class="book-img" alt="{{ book.title }}">
+                                {% else %}
+                                    <img src="{% static "placeholder.png" %}" class="book-img"
+                                         alt="No image for this book">
+                                {% endif %}
                             </div>
                             <div class="card-body">
                                 <h5 class="card-title">{{ book.title }}</h5>
