@@ -13,7 +13,7 @@ from core.utils.decorators import allowed_roles
 
 
 @login_required
-@allowed_roles(["buyer"])
+@allowed_roles(["buyer", "seller"])
 def book_details_page(request, book_id):
     """
     View function to display the book details page. This function manages the display of book

@@ -5,7 +5,7 @@ from core.utils.decorators import allowed_roles
 
 
 @login_required
-@allowed_roles(["buyer"])
+@allowed_roles(["buyer", "seller"])
 def profile_page(request):
     custom_user = CustomUser.objects.get(email=request.user.email)
 

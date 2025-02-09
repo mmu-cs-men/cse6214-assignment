@@ -15,7 +15,7 @@ from core.models.user import User
 
 
 @login_required
-@allowed_roles(["buyer"])
+@allowed_roles(["buyer", "seller"])
 def order_details_page(request, order_id):
     """
     Displays detailed information about a specific order, including its items

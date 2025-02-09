@@ -10,9 +10,11 @@ from core.models.order import Order
 from core.models.review import Review
 from core.models.shop import Shop
 from core.models.user import User
+from core.utils.decorators import allowed_roles
 
 
 @login_required
+@allowed_roles(["buyer", "seller"])
 def submit_review(request, shop_id):
     """
 

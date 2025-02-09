@@ -13,7 +13,7 @@ from core.models.user import User
 
 
 @login_required
-@allowed_roles(["buyer"])
+@allowed_roles(["buyer", "seller"])
 def orders_page(request):
     current_user = get_object_or_404(User, email=request.user.email)
     user_orders = Order.objects.filter(user=current_user).order_by("-placed_at")

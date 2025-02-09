@@ -7,7 +7,7 @@ from core.utils.decorators import allowed_roles
 
 
 @login_required
-@allowed_roles(["buyer"])
+@allowed_roles(["buyer", "seller"])
 def cart_page(request):
     """
     Displays the buyer's shopping cart and handles updates and deletions.
