@@ -2,7 +2,9 @@
 {% load custom_filters %}
 {% block title %}All Orders - Seller{% endblock %}
 
-<!-- TODO: Include seller nav when done -->
+{% block nav %}
+    {% include "seller/nav.html" %}
+{% endblock %}
 
 {% block content %}
     <div class="container mt-5">
