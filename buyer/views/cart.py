@@ -28,11 +28,10 @@ def cart_page(request):
         cart_items = CartItem.objects.filter(cart=cart).select_related("book_listing")
     except Cart.DoesNotExist:
         cart = None
-        cart_items = []
+        cart_items = CartItem.objects.none()
 
     # **NEW: Remove books that have already been bought**
-    if not cart_items:
-        cart_items = cart_items.exclude(book_listing__bought=True)
+    cart_items = cart_items.exclude(book_listing__bought=True)
 
     # If cart is empty after filtering, set it to an empty list
     if not cart_items.exists():
