@@ -19,7 +19,7 @@
                     {% if custom_user.role == 'seller' %}
                         <a class="nav-link" href="{% url 'seller-dashboard' %}">Switch to Seller</a>
                     {% else %}
-                        <a class="nav-link" href="#">Switch to Seller</a> <!-- TODO: Add page to request seller upgrade -->
+                        <a class="nav-link" href="{% url 'buyer-upgrade-to-seller' %}">Switch to Seller</a>
                     {% endif %}
                 </li>
                 <li class="nav-item">

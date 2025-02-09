@@ -10,6 +10,7 @@ from buyer.views import landing_page
 from buyer.views import orders_page, checkout_page, order_details_page
 from buyer.views import profile_page
 from buyer.views.review import submit_review
+from buyer.views import upgrade_to_seller
 
 urlpatterns = [
     path("orders/", orders_page, name="buyer-orders"),
@@ -20,4 +21,5 @@ urlpatterns = [
     path("book/<int:book_id>/", book_details_page, name="buyer-book-details"),
     path("profile/", profile_page, name="buyer-profile"),
     path("review/<int:shop_id>/", submit_review, name="buyer-review"),
+    path("upgrade-to-seller/", upgrade_to_seller, name="buyer-upgrade-to-seller"),
 ]
