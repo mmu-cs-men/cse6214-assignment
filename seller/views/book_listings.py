@@ -5,8 +5,10 @@ from django.shortcuts import render, redirect, get_object_or_404
 from core.constants import CONDITION_CHOICES
 from core.models.book_listing import BookListing
 from core.models.shop import Shop
+from core.utils.decorators import allowed_roles
 
 
+@allowed_roles(["seller"])
 @login_required
 def book_listings_page(request):
     """
@@ -34,6 +36,7 @@ def book_listings_page(request):
     return render(request, "seller/book_listings.html", context)
 
 
+@allowed_roles(["seller"])
 @login_required
 def add_book_listing(request):
     """
@@ -79,6 +82,7 @@ def add_book_listing(request):
     return render(request, "seller/add_book_listing.html", context)
 
 
+@allowed_roles(["seller"])
 @login_required
 def delete_book_listing(request, listing_id):
     """
@@ -95,6 +99,7 @@ def delete_book_listing(request, listing_id):
     return redirect("seller-book-listings")
 
 
+@allowed_roles(["seller"])
 @login_required
 def edit_book_listing(request, listing_id):
     """
