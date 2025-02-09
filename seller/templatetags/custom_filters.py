@@ -9,3 +9,12 @@ def replace_underscores(value):
     if isinstance(value, str):
         return value.replace("_", " ")
     return value
+
+
+@register.filter
+def mul(value, arg):
+    """Multiplies the given value by an argument and returns the result as a float."""
+    try:
+        return float(value) * float(arg)
+    except (ValueError, TypeError):
+        return ""

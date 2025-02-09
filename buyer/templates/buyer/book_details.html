@@ -4,7 +4,51 @@
 {% block nav %}{% include "buyer/nav.html" %}{% endblock %}
 
 {% block content %}
+    <!-- Flashing Alerts Container -->
+    {% if messages %}
+        <div class="alert-container">
+        {% for message in messages %}
+            {% if "error" in message.tags %}
+                <div class="alert alert-danger alert-dismissible fade show alert-flash" role="alert">
+            {% elif "success" in message.tags %}
+                <div class="alert alert-success alert-dismissible fade show alert-flash" role="alert">
+            {% elif "warning" in message.tags %}
+                <div class="alert alert-warning alert-dismissible fade show alert-flash" role="alert">
+            {% else %}
+                <div class="alert alert-info alert-dismissible fade show alert-flash" role="alert">
+            {% endif %}
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
     <style>
+        /* Alert container: limit width and center alerts */
+        .alert-container {
+            max-width: 600px;
+            margin: 1rem auto;
+        }
+
+        /* Flash animation keyframes */
+        @keyframes flashOnce {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        /* Apply flash animation to alerts */
+        .alert-flash {
+            animation: flashOnce 0.5s ease-in-out;
+        }
+
         /* Book Image Container to Ensure Consistent Size */
 
         .book-image-container {
