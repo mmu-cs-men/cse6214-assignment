@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load static %}
 {% block title %}Order Details{% endblock %}
 {% block nav %}{% include "buyer/nav.html" %}{% endblock %}
 
@@ -29,49 +30,51 @@
                 <h2 class="mb-0">Order #{{ order.id }}</h2>
             </div>
             <div class="card-body">
-
-                <!-- Order Progress Section (Loading Bar Style) -->
+                <!-- Order Progress Section -->
                 <div class="mb-4">
                     <h5 class="mb-3">Order Progress</h5>
                     {% if order.status == "pending" %}
                         <div class="progress" style="height: 30px;">
                             <div class="progress-bar progress-bar-striped progress-bar-animated bg-warning"
-                                 role="progressbar" style="width: 33%;"
-                                 aria-valuenow="33" aria-valuemin="0" aria-valuemax="100">
-                                Order Placed
+                                 style="width: 33%;">Order Placed
+                            </div>
+                        </div>
+                    {% elif order.status == "ready_to_ship" %}
+                        <div class="progress" style="height: 30px;">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated bg-info"
+                                 style="width: 50%;">Ready to Ship
+                            </div>
+                        </div>
+                    {% elif order.status == "shipped" %}
+                        <div class="progress" style="height: 30px;">
+                            <div class="progress-bar progress-bar-striped bg-primary"
+                                 style="width: 75%;">Shipped
                             </div>
                         </div>
                     {% elif order.status == "completed" %}
                         <div class="progress" style="height: 30px;">
                             <div class="progress-bar progress-bar-striped bg-success"
-                                 role="progressbar" style="width: 100%;"
-                                 aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">
-                                Delivered
+                                 style="width: 100%;">Delivered
                             </div>
                         </div>
                     {% elif order.status == "cancelled" %}
                         <div class="progress" style="height: 30px;">
-                            <div class="progress-bar progress-bar-striped bg-danger"
-                                 role="progressbar" style="width: 0%;"
-                                 aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
-                                Cancelled
+                            <div class="progress-bar bg-danger"
+                                 style="width: 10%;">Cancelled
                             </div>
                         </div>
                     {% else %}
                         <div class="progress" style="height: 30px;">
-                            <div class="progress-bar progress-bar-striped bg-secondary"
-                                 role="progressbar" style="width: 50%;"
-                                 aria-valuenow="50" aria-valuemin="0" aria-valuemax="100">
-                                In Progress
+                            <div class="progress-bar bg-secondary"
+                                 style="width: 50%;">In Progress
                             </div>
                         </div>
                     {% endif %}
                 </div>
 
                 <div class="row">
-                    <!-- Left Column: Order Details, Shipping Address, and Items (each in its own card) -->
+                    <!-- Left Column: Order Info, Shipping, Items -->
                     <div class="col-md-8">
-                        <!-- Order Information Card -->
                         <div class="card mb-4">
                             <div class="card-header">
                                 <h5 class="mb-0">Order Information</h5>
@@ -82,7 +85,6 @@
                             </div>
                         </div>
 
-                        <!-- Shipping Address Card -->
                         <div class="card mb-4">
                             <div class="card-header">
                                 <h5 class="mb-0">Shipping Address</h5>
@@ -96,7 +98,6 @@
                             </div>
                         </div>
 
-                        <!-- Order Items Card -->
                         <div class="card mb-4">
                             <div class="card-header">
                                 <h5 class="mb-0">Items in this Order</h5>
@@ -106,20 +107,17 @@
                                     {% for item in items %}
                                         <li class="list-group-item">
                                             <div class="row align-items-center">
-                                                <!-- Image Column -->
                                                 <div class="col-md-3">
                                                     <div class="book-image-container">
                                                         <img src="{{ item.book_listing.image.url }}"
                                                              alt="{{ item.book_listing.title }}"
-                                                             class="img-fluid rounded book-image">
+                                                             class="book-image">
                                                     </div>
                                                 </div>
-                                                <!-- Book Details Column -->
                                                 <div class="col-md-6">
                                                     <h6 class="my-0">{{ item.book_listing.title }}</h6>
                                                     <small class="text-muted">by {{ item.book_listing.author }}</small>
                                                 </div>
-                                                <!-- Price Column -->
                                                 <div class="col-md-3 text-end">
                                                     <span class="text-muted">RM{{ item.purchase_price }}</span>
                                                 </div>
@@ -131,9 +129,9 @@
                         </div>
                     </div>
 
-                    <!-- Right Column: Order Summary -->
+                    <!-- Right Column: Summary + Seller Reviews -->
                     <div class="col-md-4">
-                        <div class="card">
+                        <div class="card mb-4">
                             <div class="card-header">
                                 <h5 class="mb-0">Order Summary</h5>
                             </div>
@@ -152,12 +150,51 @@
                                         <strong>RM{{ order.total_price }}</strong>
                                     </li>
                                 </ul>
-                                <a href="{% url 'buyer-orders' %}" class="btn btn-primary w-100 mt-3">Back to Orders</a>
+                                <a href="{% url 'buyer-orders' %}" class="btn btn-primary w-100 mt-3">
+                                    Back to Orders
+                                </a>
                             </div>
                         </div>
+
+                        {% if shops_with_reviews %}
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="mb-0">Seller Reviews</h5>
+                                </div>
+                                <div class="card-body">
+                                    {% for shop, review in shops_with_reviews %}
+                                        <div class="mb-3">
+                                            <h6 class="mb-1">Seller: {{ shop.name }}</h6>
+                                            {% if review %}
+                                                <p><strong>Rating:</strong>
+                                                    {% for i in rating_range %}
+                                                        {% if review.rating >= i %}
+                                                            <span style="color:#ffc107;">&#9733;</span>
+                                                        {% else %}
+                                                            <span style="color:#ccc;">&#9733;</span>
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                </p>
+                                                <p><strong>Comment:</strong> {{ review.comment }}</p>
+                                                <p><small class="text-muted">
+                                                    Reviewed on {{ review.created_at|date:"F j, Y, g:i a" }}
+                                                </small></p>
+                                            {% else %}
+                                                <p class="text-muted">
+                                                    No review yet for this seller.
+                                                </p>
+                                            {% endif %}
+                                        </div>
+                                        <hr>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        {% endif %}
+
+
                     </div>
-                </div> <!-- end row -->
-            </div> <!-- end card-body -->
-        </div> <!-- end card -->
-    </div> <!-- end container -->
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}

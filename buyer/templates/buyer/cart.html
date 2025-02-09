@@ -50,11 +50,31 @@
             }
 
             .book-image {
-                max-width: 120px; /* Set a maximum width */
-                max-height: 160px; /* Set a maximum height */
+                max-width: 5000px; /* Set a maximum width */
+                max-height: 250px; /* Set a maximum height */
                 object-fit: cover; /* Ensures the image is properly fitted */
                 border: 1px solid #ddd; /* Optional: Adds a light border around the image */
                 border-radius: 5px; /* Optional: Adds a slight rounded corner */
+            }
+
+            .btn-success {
+                padding: 10px;
+                width: 200px;
+                border-radius: 10px;
+            }
+
+            .btn-success:active {
+                transform: scale(0.95);
+            }
+
+            .btn-primary {
+                padding: 10px;
+                width: 200px;
+                border-radius: 10px;
+            }
+
+            .btn-primary:active {
+                transform: scale(0.95);
             }
 
         </style>
@@ -64,37 +84,40 @@
         <div class="row">
             <div class="col-lg-8">
 
-                <!-- Cart Items -->
-                {% for item in cart_items %}
-                    <div class="row cart-item mb-3 align-items-center">
-                        <div class="col-md-3">
-                            <img src="{{ item.book_listing.image.url }}" alt="{{ item.book_listing.title }}"
-                                 class="img-fluid rounded book-image">
+                {% if cart_items %}
+                    {% for item in cart_items %}
+                        <div class="row cart-item mb-3 align-items-center">
+                            <div class="col-md-3">
+                                <img src="{{ item.book_listing.image.url }}" alt="{{ item.book_listing.title }}"
+                                     class="img-fluid rounded book-image">
+                            </div>
+                            <div class="col-md-5 book-info">
+                                <h5 class="card-title">{{ item.book_listing.title }}</h5>
+                                <p class="text-muted">Author: {{ item.book_listing.author }}</p>
+                            </div>
+                            <div class="col-md-2 price-container">
+                                <p class="price">RM{{ item.book_listing.price|floatformat:2 }}</p>
+                            </div>
+                            <div class="col-md-2 text-end">
+                                <form method="POST" action="{% url 'buyer-cart' %}">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="item_id" value="{{ item.id }}">
+                                    <input type="hidden" name="action" value="remove">
+                                    <button class="remove-btn">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
                         </div>
-                        <div class="col-md-5 book-info">
-                            <h5 class="card-title">{{ item.book_listing.title }}</h5>
-                            <p class="text-muted">Author: {{ item.book_listing.author }}</p>
-                        </div>
-                        <div class="col-md-2 price-container">
-                            <p class="price">RM{{ item.book_listing.price|floatformat:2 }}</p>
-                        </div>
-                        <div class="col-md-2 text-end">
-                            <form method="POST" action="{% url 'buyer-cart' %}">
-                                {% csrf_token %}
-                                <input type="hidden" name="item_id" value="{{ item.id }}">
-                                <input type="hidden" name="action" value="remove">
-                                <button class="remove-btn">
-                                    <i class="bi bi-trash"></i>
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-                    <hr>
-                {% empty %}
+                        <hr>
+                    {% endfor %}
+                {% else %}
+                    <!-- If no items are in the cart, show alert -->
                     <div class="alert alert-info">
                         You have no items in your cart.
                     </div>
-                {% endfor %}
+                {% endif %}
+
 
                 <!-- Continue Shopping & Proceed to Checkout Buttons -->
                 <div class="d-flex justify-content-start gap-3 mb-4">
