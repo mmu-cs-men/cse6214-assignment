@@ -150,8 +150,5 @@ def report_issue(request, assignment_id):
     except DeliveryIssue.DoesNotExist:
         existing_description = ""
 
-    context = {
-        "assignment": assignment,
-        "existing_description": existing_description
-    }
+    context = {"assignment": assignment, "existing_description": existing_description}
     return render(request, "courier/report_issue.html", context)
