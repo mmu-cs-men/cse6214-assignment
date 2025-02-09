@@ -6,6 +6,7 @@ from django.shortcuts import reverse
 from core.models.user import User as CustomUser
 from django.http import Http404
 from django.contrib.auth.decorators import login_required
+from core.models.upgrade_request import UpgradeRequest
 
 
 def _redirect_based_on_role(custom_user):
@@ -91,8 +92,19 @@ def register_view(request):
                 username=username, email=email, password=password
             )
 
-            # Create custom user
-            custom_user = CustomUser.objects.create(email=email, name=name, role=role)
+            # Create custom user with role
+            # If registering as courier, set role as unassigned and create upgrade request
+            initial_role = "unassigned" if role == "courier" else role
+            custom_user = CustomUser.objects.create(email=email, name=name, role=initial_role)
+
+            # Create upgrade request for courier
+            if role == "courier":
+                UpgradeRequest.objects.create(
+                    user=custom_user,
+                    target_role="courier"
+                )
+                messages.info(request, "Your courier account request has been submitted for review. Please check periodically for approval by signing in.")
+                return redirect(reverse("login"))
 
             user = authenticate(request, username=auth_user.username, password=password)
             if user is not None:
@@ -100,8 +112,6 @@ def register_view(request):
 
                 if role == "buyer":
                     return redirect(reverse("buyer-landing"))
-                elif role == "courier":
-                    return redirect(reverse("courier-deliveries"))
 
             return redirect(reverse("login"))
 

@@ -16,6 +16,7 @@ ROLE_CHOICES = [
     ("seller", "Seller"),
     ("admin", "Admin"),
     ("courier", "Courier"),
+    ("unassigned", "Unassigned"),
 ]
 
 CONDITION_CHOICES = [
