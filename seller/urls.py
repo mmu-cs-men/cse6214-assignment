@@ -1,10 +1,8 @@
 from django.urls import path
 from seller.views import *
-from .views.dashboard import seller_dashboard
 from .views.orders import orders_page, mark_order_ready
 
 urlpatterns = [
-    path("dashboard/", dashboard, name="seller-dashboard"),
     path("book-listings/", book_listings_page, name="seller-book-listings"),
     path("book-listings/add/", add_book_listing, name="seller-add-book"),
     path(
