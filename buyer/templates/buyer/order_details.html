@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load static %}
 {% block title %}Order Details{% endblock %}
 {% block nav %}{% include "buyer/nav.html" %}{% endblock %}
 
@@ -109,9 +110,15 @@
                                                 <!-- Image Column -->
                                                 <div class="col-md-3">
                                                     <div class="book-image-container">
-                                                        <img src="{{ item.book_listing.image.url }}"
-                                                             alt="{{ item.book_listing.title }}"
-                                                             class="img-fluid rounded book-image">
+                                                        {% if item.book_listing.image and item.book_listing.image.url %}
+                                                            <img src="{{ item.book_listing.image.url }}"
+                                                                 alt="{{ item.book_listing.title }}"
+                                                                 class="img-fluid rounded book-image">
+                                                        {% else %}
+                                                            <img src="{% static "placeholder.png" %}"
+                                                                 alt="No image for this book"
+                                                                 class="img-fluid rounded book-image">
+                                                        {% endif %}
                                                     </div>
                                                 </div>
                                                 <!-- Book Details Column -->
