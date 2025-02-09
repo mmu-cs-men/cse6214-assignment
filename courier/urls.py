@@ -3,7 +3,7 @@ from .views import deliveries_page, accept_order, update_assignment, report_issu
 from courier.views.profile import profile_page
 
 urlpatterns = [
-    path("", deliveries_page, name="courier-deliveries"),
+    path("deliveries/", deliveries_page, name="courier-deliveries"),
     path("accept/<int:order_id>/", accept_order, name="courier-accept-order"),
     path(
         "update/<int:assignment_id>/",
