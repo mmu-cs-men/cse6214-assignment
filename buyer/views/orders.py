@@ -6,12 +6,14 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, get_object_or_404
 
 from core.models.order import Order
+from core.utils.decorators import allowed_roles
 from core.models.review import Review
 from core.models.shop import Shop
 from core.models.user import User
 
 
 @login_required
+@allowed_roles(["buyer"])
 def orders_page(request):
     current_user = get_object_or_404(User, email=request.user.email)
     user_orders = Order.objects.filter(user=current_user).order_by("-placed_at")

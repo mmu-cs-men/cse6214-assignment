@@ -7,12 +7,14 @@ from django.shortcuts import render, get_object_or_404
 
 from core.models.order import Order
 from core.models.order_item import OrderItem
+from core.utils.decorators import allowed_roles
 from core.models.review import Review
 from core.models.shop import Shop
 from core.models.user import User
 
 
 @login_required
+@allowed_roles(["buyer"])
 def order_details_page(request, order_id):
     """
     Displays detailed information about a specific order, including its items

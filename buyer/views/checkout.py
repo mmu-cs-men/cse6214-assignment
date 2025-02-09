@@ -15,9 +15,11 @@ from core.models.cart_item import CartItem
 from core.models.order import Order
 from core.models.order_item import OrderItem
 from core.models.user import User
+from core.utils.decorators import allowed_roles
 
 
 @login_required
+@allowed_roles(["buyer"])
 def checkout_page(request):
     """
     Renders a checkout page and handles order creation upon form submission.
@@ -107,8 +109,23 @@ def checkout_page(request):
         # Double-check if the cart still has items before processing
         updated_cart_items = CartItem.objects.filter(cart=cart)
         if not updated_cart_items:
-
             return redirect(reverse("buyer-checkout"))
+
+        #  Double-check if the cart still has items
+        updated_cart_items = CartItem.objects.select_related("book_listing").filter(
+            cart=cart
+        )
+        if not updated_cart_items:
+            return redirect(reverse("buyer-checkout"))
+
+        # If any book is already marked as bought, alert the user and stop checkout.
+        for item in updated_cart_items:
+            if item.book_listing.bought:
+                messages.error(
+                    request,
+                    "One or more books in your cart have already been purchased by another user. Please review your cart.",
+                )
+                return redirect(reverse("buyer-checkout"))
 
         # Create a new order with the address details included
         order = Order.objects.create(
