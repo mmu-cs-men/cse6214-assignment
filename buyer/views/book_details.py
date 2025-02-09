@@ -8,10 +8,12 @@ from core.models import (
     CartItem,
     User,
     Review,
-)  # Ensure User is imported
+)
+from core.utils.decorators import allowed_roles
 
 
 @login_required
+@allowed_roles(["buyer"])
 def book_details_page(request, book_id):
     """
     View function to display the book details page. This function manages the display of book

@@ -3,15 +3,17 @@ from django.shortcuts import render, redirect, get_object_or_404
 
 from core.models.cart import Cart
 from core.models.cart_item import CartItem
+from core.utils.decorators import allowed_roles
 
 
 @login_required
+@allowed_roles(["buyer"])
 def cart_page(request):
     """
     Displays the buyer's shopping cart and handles updates and deletions.
     **Handles:**
         - Displays the cart.
-        - Removes items from the cart.
+        - Removes items from the cart if they have been bought.
     **Context Variables:**
         - ``cart_items``: A queryset of the user's cart items.
         - ``total_price``: The total cost of all items in the cart.
@@ -26,6 +28,13 @@ def cart_page(request):
         cart_items = CartItem.objects.filter(cart=cart).select_related("book_listing")
     except Cart.DoesNotExist:
         cart = None
+        cart_items = []
+
+    # **NEW: Remove books that have already been bought**
+    cart_items = cart_items.exclude(book_listing__bought=True)
+
+    # If cart is empty after filtering, set it to an empty list
+    if not cart_items.exists():
         cart_items = []
 
     # Calculate total price
