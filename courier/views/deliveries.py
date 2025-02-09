@@ -143,5 +143,15 @@ def report_issue(request, assignment_id):
         messages.success(request, "Issue reported successfully!")
         return redirect(reverse("courier-deliveries"))
 
-    context = {"assignment": assignment}
+    # Try to get existing delivery issue
+    try:
+        delivery_issue = DeliveryIssue.objects.get(order_assignment=assignment)
+        existing_description = delivery_issue.issue_description
+    except DeliveryIssue.DoesNotExist:
+        existing_description = ""
+
+    context = {
+        "assignment": assignment,
+        "existing_description": existing_description
+    }
     return render(request, "courier/report_issue.html", context)
