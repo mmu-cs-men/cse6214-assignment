@@ -11,6 +11,10 @@ from core.models.upgrade_request import UpgradeRequest
 
 def _redirect_based_on_role(custom_user):
     """Helper function to redirect users based on their role."""
+    # If user is unassigned, they shouldn't be redirected
+    if custom_user.role == "unassigned":
+        raise Http404("Your application is still pending approval")
+
     role_to_url = {
         "buyer": "buyer-landing",
         "seller": "seller-dashboard",
@@ -31,6 +35,10 @@ def login_view(request):
     if request.user.is_authenticated:
         try:
             custom_user = CustomUser.objects.get(email=request.user.email)
+            if custom_user.role == "unassigned":
+                messages.info(request, "Your application is still pending approval. Please check back later.")
+                logout(request)
+                return render(request, "login.html")
             return _redirect_based_on_role(custom_user)
         except CustomUser.DoesNotExist:
             messages.error(
@@ -46,8 +54,11 @@ def login_view(request):
             auth_user = User.objects.get(email=email)
             user = authenticate(request, username=auth_user.username, password=password)
             if user is not None:
-                login(request, user)
                 custom_user = CustomUser.objects.get(email=email)
+                if custom_user.role == "unassigned":
+                    messages.info(request, "Your application is still pending approval. Please check back later.")
+                    return render(request, "login.html")
+                login(request, user)
                 return _redirect_based_on_role(custom_user)
             else:
                 messages.error(request, "Invalid password")
