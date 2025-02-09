@@ -1,5 +1,5 @@
 from django.contrib.auth.decorators import login_required
-from django.db.models import Sum
+from django.db.models import Sum, F, DecimalField
 from django.shortcuts import render
 
 from core.models.order import Order
@@ -7,17 +7,18 @@ from core.models.order_item import (
     OrderItem,
 )  # Assuming this model tracks books in orders
 
-
+#fix
 @login_required
 def seller_dashboard(request):
     """
     Renders the seller dashboard with statistics and recent orders.
     """
     total_orders = Order.objects.count()
+    # Calculate revenue as 80% of total price
     total_revenue = (
-        Order.objects.filter(status="completed").aggregate(Sum("total_price"))[
-            "total_price__sum"
-        ]
+        Order.objects.filter(status="completed").aggregate(
+            revenue=Sum(F("total_price") * 0.8, output_field=DecimalField(max_digits=10, decimal_places=2))
+        )["revenue"]
         or 0
     )
     pending_orders = Order.objects.filter(status="pending").count()
