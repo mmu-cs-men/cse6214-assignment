@@ -51,8 +51,6 @@ def accept_order(request, order_id):
     Handles accepting an order. Creates an OrderAssignment for the order
     and updates its status to 'ready_to_ship'.
     """
-    from core.models.user import User  # Ensure the correct User model is imported
-
     order = get_object_or_404(
         Order, id=order_id, status="pending", order_assignment__isnull=True
     )
