@@ -51,7 +51,7 @@
                                     <td>{{ order.address }}, {{ order.city }}, {{ order.postal_code }}, {{ order.country }}</td>
                                     <td>RM {{ order.total_price }}</td>
                                     <td>
-                                        <form method="POST" action="{% url 'mark_order_ready' order.id %}">
+                                        <form method="POST" action="{% url 'mark-order-ready' order.id %}">
                                             {% csrf_token %}
                                             {% if order.id in assigned_orders %}
                                                 <button type="submit" class="btn btn-sm btn-secondary" disabled>
