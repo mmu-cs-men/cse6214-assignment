@@ -32,7 +32,7 @@ def order_details_page(request, order_id):
     order = get_object_or_404(Order, id=order_id, user=current_user)
 
     items = OrderItem.objects.filter(order=order)
-    
+
     # Subtotal, tax, etc.
     subtotal = sum(item.purchase_price * item.quantity for item in items)
     tax_rate = Decimal("0.06")
