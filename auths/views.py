@@ -11,10 +11,6 @@ from core.models.upgrade_request import UpgradeRequest
 
 def _redirect_based_on_role(custom_user):
     """Helper function to redirect users based on their role."""
-    # If user is unassigned, they shouldn't be redirected
-    if custom_user.role == "unassigned":
-        raise Http404("Your application is still pending approval")
-
     role_to_url = {
         "buyer": "buyer-landing",
         "seller": "seller-dashboard",
@@ -30,18 +26,39 @@ def _redirect_based_on_role(custom_user):
     return redirect(reverse(role_to_url[custom_user.role]))
 
 
+def _check_courier_approval(request, custom_user):
+    """Helper function to check if a courier's upgrade request is approved.
+    Returns True if the user is approved or not a courier, False otherwise."""
+    if custom_user.role == "courier":
+        try:
+            upgrade_request = UpgradeRequest.objects.get(
+                user=custom_user, target_role="courier"
+            )
+            if not upgrade_request.approved:
+                messages.info(
+                    request,
+                    "Your courier application is still pending approval. Please check back later.",
+                )
+                return False
+        except UpgradeRequest.DoesNotExist:
+            messages.warning(
+                request,
+                "Somehow, you are a courier but don't have an upgrade request. Find your nearest developer.",
+            )
+            return False
+    return True
+
+
 def login_view(request):
     # If user is already authenticated, redirect them to their appropriate page
     if request.user.is_authenticated:
         try:
             custom_user = CustomUser.objects.get(email=request.user.email)
-            if custom_user.role == "unassigned":
-                messages.info(
-                    request,
-                    "Your application is still pending approval. Please check back later.",
-                )
+
+            if not _check_courier_approval(request, custom_user):
                 logout(request)
                 return render(request, "login.html")
+
             return _redirect_based_on_role(custom_user)
         except CustomUser.DoesNotExist:
             messages.error(
@@ -58,12 +75,10 @@ def login_view(request):
             user = authenticate(request, username=auth_user.username, password=password)
             if user is not None:
                 custom_user = CustomUser.objects.get(email=email)
-                if custom_user.role == "unassigned":
-                    messages.info(
-                        request,
-                        "Your application is still pending approval. Please check back later.",
-                    )
+
+                if not _check_courier_approval(request, custom_user):
                     return render(request, "login.html")
+
                 login(request, user)
                 return _redirect_based_on_role(custom_user)
             else:
@@ -110,15 +125,13 @@ def register_view(request):
             )
 
             # Create custom user with role
-            # If registering as courier, set role as unassigned and create upgrade request
-            initial_role = "unassigned" if role == "courier" else role
-            custom_user = CustomUser.objects.create(
-                email=email, name=name, role=initial_role
-            )
+            custom_user = CustomUser.objects.create(email=email, name=name, role=role)
 
-            # Create upgrade request for courier
+            # Create upgrade request for courier with approved=False
             if role == "courier":
-                UpgradeRequest.objects.create(user=custom_user, target_role="courier")
+                UpgradeRequest.objects.create(
+                    user=custom_user, target_role="courier", approved=False
+                )
                 messages.info(
                     request,
                     "Your courier account request has been submitted for review. Please check periodically for approval by signing in.",

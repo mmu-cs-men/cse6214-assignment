@@ -305,6 +305,8 @@ class UpgradeRequestModelTest(TestCase):
     - Validation to ensure an upgrade request has a valid target role.
     - Constraint enforcement to ensure that deleting a user also deletes their upgrade requests (CASCADE).
     - Verification that an upgrade request's timestamp is correctly set upon creation.
+    - Verification that an upgrade request's approved field defaults to False.
+    - Verification that an upgrade request's approved field can be updated.
     """
 
     def setUp(self):
@@ -319,6 +321,7 @@ class UpgradeRequestModelTest(TestCase):
         self.assertEqual(request.user, self.user)
         self.assertEqual(request.target_role, "seller")
         self.assertIsNotNone(request.requested_at)  # Ensure timestamp is set
+        self.assertFalse(request.approved)  # Ensure approved defaults to False
 
     def test_upgrade_request_must_have_user(self):
         """Test that an upgrade request must be linked to a user."""
@@ -341,6 +344,28 @@ class UpgradeRequestModelTest(TestCase):
             UpgradeRequest.DoesNotExist
         ):  # The request should be gone
             UpgradeRequest.objects.get(id=request.id)
+
+    def test_upgrade_request_approval(self):
+        """Test that an upgrade request can be approved."""
+        request = UpgradeRequest.objects.create(user=self.user, target_role="seller")
+        self.assertFalse(request.approved)  # Initially not approved
+
+        # Approve the request
+        request.approved = True
+        request.save()
+
+        # Refresh from database and verify
+        request.refresh_from_db()
+        self.assertTrue(request.approved)
+
+    def test_upgrade_request_default_not_approved(self):
+        """Test that a new upgrade request is not approved by default."""
+        request = UpgradeRequest.objects.create(user=self.user, target_role="seller")
+        self.assertFalse(request.approved)
+
+        # Verify even after refresh
+        request.refresh_from_db()
+        self.assertFalse(request.approved)
 
 
 class BookListingModelTest(TestCase):
