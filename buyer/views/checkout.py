@@ -19,7 +19,7 @@ from core.utils.decorators import allowed_roles
 
 
 @login_required
-@allowed_roles(["buyer"])
+@allowed_roles(["buyer", "seller"])
 def checkout_page(request):
     """
     Renders a checkout page and handles order creation upon form submission.

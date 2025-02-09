@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% load static %}
+{% block nav %}{% include "buyer/nav.html" %}{% endblock %}
+{% block title %}Upgrade to Seller{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 text-center">
+            <h1 class="mb-4">Upgrade to Seller</h1>
+            <div class="card">
+                <div class="card-body">
+                    <p class="fs-5 fw-normal mb-4">Would you like to upgrade your account to become a seller? This will allow you to list and sell books on our platform. Your request will be reviewed by an administrator.</p>
+                    <div class="d-flex justify-content-center gap-3">
+                        <a href="{% url 'buyer-landing' %}" class="btn btn-secondary btn-lg">No</a>
+                        <form method="post" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-primary btn-lg">Yes</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

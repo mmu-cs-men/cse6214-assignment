@@ -10,3 +10,4 @@ from .order_details import order_details_page
 from .orders import orders_page
 from .profile import profile_page
 from .review import submit_review
+from .upgrade_to_seller import upgrade_to_seller

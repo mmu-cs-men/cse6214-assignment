@@ -7,7 +7,7 @@ from core.utils.decorators import allowed_roles
 
 
 @login_required
-@allowed_roles(["buyer"])
+@allowed_roles(["buyer", "seller"])
 def cart_page(request):
     """
     Displays the buyer's shopping cart and handles updates and deletions.
@@ -31,7 +31,8 @@ def cart_page(request):
         cart_items = []
 
     # **NEW: Remove books that have already been bought**
-    cart_items = cart_items.exclude(book_listing__bought=True)
+    if not cart_items:
+        cart_items = cart_items.exclude(book_listing__bought=True)
 
     # If cart is empty after filtering, set it to an empty list
     if not cart_items.exists():
