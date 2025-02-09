@@ -6,10 +6,15 @@ from django.shortcuts import reverse
 from core.models.user import User as CustomUser
 from django.http import Http404
 from django.contrib.auth.decorators import login_required
+from core.models.upgrade_request import UpgradeRequest
 
 
 def _redirect_based_on_role(custom_user):
     """Helper function to redirect users based on their role."""
+    # If user is unassigned, they shouldn't be redirected
+    if custom_user.role == "unassigned":
+        raise Http404("Your application is still pending approval")
+
     role_to_url = {
         "buyer": "buyer-landing",
         "seller": "seller-dashboard",
@@ -30,6 +35,13 @@ def login_view(request):
     if request.user.is_authenticated:
         try:
             custom_user = CustomUser.objects.get(email=request.user.email)
+            if custom_user.role == "unassigned":
+                messages.info(
+                    request,
+                    "Your application is still pending approval. Please check back later.",
+                )
+                logout(request)
+                return render(request, "login.html")
             return _redirect_based_on_role(custom_user)
         except CustomUser.DoesNotExist:
             messages.error(
@@ -45,8 +57,14 @@ def login_view(request):
             auth_user = User.objects.get(email=email)
             user = authenticate(request, username=auth_user.username, password=password)
             if user is not None:
-                login(request, user)
                 custom_user = CustomUser.objects.get(email=email)
+                if custom_user.role == "unassigned":
+                    messages.info(
+                        request,
+                        "Your application is still pending approval. Please check back later.",
+                    )
+                    return render(request, "login.html")
+                login(request, user)
                 return _redirect_based_on_role(custom_user)
             else:
                 messages.error(request, "Invalid password")
@@ -91,8 +109,21 @@ def register_view(request):
                 username=username, email=email, password=password
             )
 
-            # Create custom user
-            custom_user = CustomUser.objects.create(email=email, name=name, role=role)
+            # Create custom user with role
+            # If registering as courier, set role as unassigned and create upgrade request
+            initial_role = "unassigned" if role == "courier" else role
+            custom_user = CustomUser.objects.create(
+                email=email, name=name, role=initial_role
+            )
+
+            # Create upgrade request for courier
+            if role == "courier":
+                UpgradeRequest.objects.create(user=custom_user, target_role="courier")
+                messages.info(
+                    request,
+                    "Your courier account request has been submitted for review. Please check periodically for approval by signing in.",
+                )
+                return redirect(reverse("login"))
 
             user = authenticate(request, username=auth_user.username, password=password)
             if user is not None:
@@ -100,8 +131,6 @@ def register_view(request):
 
                 if role == "buyer":
                     return redirect(reverse("buyer-landing"))
-                elif role == "courier":
-                    return redirect(reverse("courier-deliveries"))
 
             return redirect(reverse("login"))
 
