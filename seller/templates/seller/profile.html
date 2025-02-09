@@ -1,6 +1,8 @@
 {% extends "profile.html" %}
 
-<!-- TODO: Include seller nav when done -->
+{% block nav %}
+    {% include "seller/nav.html" %}
+{% endblock %}
 
 {% block user_info %}
     <div class="card mb-4">
