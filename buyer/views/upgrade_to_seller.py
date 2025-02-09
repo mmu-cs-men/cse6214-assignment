@@ -5,6 +5,7 @@ from django.shortcuts import render, reverse
 from core.models.upgrade_request import UpgradeRequest
 from core.models.user import User as CustomUser
 from core.utils.decorators import allowed_roles
+from core.models.shop import Shop
 
 
 def _handle_seller_upgrade_request(request, custom_user):
@@ -47,6 +48,14 @@ def upgrade_to_seller(request):
                 # Update user role to seller if request is approved
                 custom_user.role = "seller"
                 custom_user.save()
+                
+                # Create a default shop for the new seller
+                shop_name = f"{custom_user.name}'s Shop"
+                Shop.objects.create(
+                    name=shop_name,
+                    user=custom_user
+                )
+                
                 messages.success(
                     request,
                     "Congratulations! Your seller application has been approved. You are now a seller.",
