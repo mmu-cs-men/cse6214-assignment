@@ -2,7 +2,9 @@
 {% load custom_filters %}
 {% block title %}All Orders - Seller{% endblock %}
 
-<!-- TODO: Include seller nav when done -->
+{% block nav %}
+    {% include "seller/nav.html" %}
+{% endblock %}
 
 {% block content %}
     <div class="container mt-5">
@@ -49,7 +51,7 @@
                                     <td>{{ order.address }}, {{ order.city }}, {{ order.postal_code }}, {{ order.country }}</td>
                                     <td>RM {{ order.total_price }}</td>
                                     <td>
-                                        <form method="POST" action="{% url 'mark_order_ready' order.id %}">
+                                        <form method="POST" action="{% url 'mark-order-ready' order.id %}">
                                             {% csrf_token %}
                                             {% if order.id in assigned_orders %}
                                                 <button type="submit" class="btn btn-sm btn-secondary" disabled>

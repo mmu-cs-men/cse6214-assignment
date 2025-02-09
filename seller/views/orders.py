@@ -27,7 +27,7 @@ def mark_order_ready(request, order_id):
 
         # Prevent modification if courier has already accepted
         if OrderAssignment.objects.filter(order=order).exists():
-            return redirect("seller_orders")
+            return redirect("seller-orders")
 
         # Toggle logic: 'Pending' → 'Ready to Ship', 'Ready to Ship' → 'Pending'
         if order.status == "pending":
@@ -36,6 +36,6 @@ def mark_order_ready(request, order_id):
             order.status = "pending"
 
         order.save()
-        return redirect("seller_orders")
+        return redirect("seller-orders")
 
-    return redirect("seller_orders")
+    return redirect("seller-orders")

@@ -49,27 +49,24 @@
                                 <span class="badge bg-primary">{{ order.get_status_display }}</span>
                             {% elif order.status == "completed" %}
                                 <span class="badge bg-success">{{ order.get_status_display }}</span>
-                            {% elif order.status == "issue_reported" %}
-                                <span class="badge bg-danger">Issue Reported</span>
                             {% else %}
                                 <span class="badge bg-secondary">{{ order.get_status_display }}</span>
+                            {% endif %}
+                            {% if assignment.delivery_issue %}
+                                <span class="badge bg-danger ms-1">Issue Reported</span>
                             {% endif %}
                         {% endwith %}
                     </td>
                     <td>{{ assignment.assigned_at }}</td>
                     <td>{{ assignment.updated_at }}</td>
                     <td>
-                        {% if assignment.order.status == "pending" or assignment.order.status == "ready_to_ship" %}
+                        {% if assignment.order.status == "shipped" %}
                             <form method="POST" action="{% url 'courier-update-assignment' assignment.id %}"
                                   style="display: inline-block;">
                                 {% csrf_token %}
                                 <select name="action" class="form-select" style="width: auto; display: inline-block;">
-                                    {% if assignment.order.status == "pending" %}
-                                        <option value="accept" selected>Accept Order</option>
-                                    {% elif assignment.order.status == "ready_to_ship" %}
-                                        <option value="unaccept">Unaccept Order</option>
-                                        <option value="complete">Mark as Completed</option>
-                                    {% endif %}
+                                    <option value="unaccept">Unaccept Order</option>
+                                    <option value="complete">Mark as Completed</option>
                                 </select>
                                 <button type="submit" class="btn btn-primary btn-sm">Update</button>
                             </form>
@@ -78,7 +75,7 @@
                             <button class="btn btn-secondary btn-sm" disabled>Report Issue</button>
                         {% else %}
                             <a href="{% url 'courier-report-issue' assignment.id %}" class="btn btn-danger btn-sm">
-                                Report Issue
+                                {% if assignment.delivery_issue %}Update Issue{% else %}Report Issue{% endif %}
                             </a>
                         {% endif %}
                     </td>
