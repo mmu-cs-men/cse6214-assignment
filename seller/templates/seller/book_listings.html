@@ -6,6 +6,28 @@
 {% block title %}My Book Listings{% endblock %}
 
 {% block content %}
+
+    <!-- Message Alerts at the Top, Color-Coded by Message Tag -->
+    {% if messages %}
+        <div class="alert-container">
+        {% for message in messages %}
+            {% if message.tags == "error" %}
+                <div class="alert alert-danger alert-dismissible fade show alert-flash" role="alert">
+            {% elif message.tags == "success" %}
+                <div class="alert alert-success alert-dismissible fade show alert-flash" role="alert">
+            {% elif message.tags == "warning" %}
+                <div class="alert alert-warning alert-dismissible fade show alert-flash" role="alert">
+            {% else %}
+                <!-- default to info -->
+                <div class="alert alert-info alert-dismissible fade show alert-flash" role="alert">
+            {% endif %}
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
     <style>
         /* ALERT STYLING: simple "flash" animation (its kinda necessary) */
         .alert-container {
@@ -79,27 +101,6 @@
             color: #28a745;
         }
     </style>
-
-    <!-- Display any message alerts at the top, inside a container. -->
-    {% if messages %}
-        <div class="alert-container">
-        {% for message in messages %}
-            {% if message.tags == "error" %}
-                <div class="alert alert-danger alert-dismissible fade show alert-flash" role="alert">
-            {% elif message.tags == "success" %}
-                <div class="alert alert-success alert-dismissible fade show alert-flash" role="alert">
-            {% elif message.tags == "warning" %}
-                <div class="alert alert-warning alert-dismissible fade show alert-flash" role="alert">
-            {% else %}
-                <!-- default to info -->
-                <div class="alert alert-info alert-dismissible fade show alert-flash" role="alert">
-            {% endif %}
-        {{ message }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-        {% endfor %}
-    </div>
-    {% endif %}
 
     <div class="container mt-5">
         <!-- Common Top Header -->
