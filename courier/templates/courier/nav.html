@@ -3,19 +3,15 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container">
         <a class="navbar-brand" href="{% url 'courier-deliveries' %}">
-            <img src="{% static 'logo.png' %}" alt="BooksLab Logo" height="40"> BooksLab📚
+            <img src="{% static 'logo.png' %}" alt="booklab logo" height="40">
         </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ms-auto">
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'courier-deliveries' %}">Deliveries Page</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Manage Profile</a>
+                    <a class="nav-link" href="{% url 'courier-profile' %}">Manage Profile</a>
                 </li>
                 <li class="nav-item">
                     <!-- Using the logout URL as defined elsewhere (e.g., in your login or core base) -->
