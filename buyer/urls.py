@@ -17,7 +17,7 @@ urlpatterns = [
     path("cart/", cart_page, name="buyer-cart"),
     path("landing/", landing_page, name="buyer-landing"),
     path("orders/<int:order_id>/", order_details_page, name="buyer-order-details"),
-    path("buyer/book/<int:book_id>/", book_details_page, name="buyer-book-details"),
+    path("book/<int:book_id>/", book_details_page, name="buyer-book-details"),
     path("profile/", profile_page, name="buyer-profile"),
     path("review/<int:shop_id>/", submit_review, name="buyer-review"),
 ]
