@@ -54,11 +54,11 @@ def login_view(request):
     if request.user.is_authenticated:
         try:
             custom_user = CustomUser.objects.get(email=request.user.email)
-            
+
             if not _check_courier_approval(request, custom_user):
                 logout(request)
                 return render(request, "login.html")
-                    
+
             return _redirect_based_on_role(custom_user)
         except CustomUser.DoesNotExist:
             messages.error(
@@ -75,10 +75,10 @@ def login_view(request):
             user = authenticate(request, username=auth_user.username, password=password)
             if user is not None:
                 custom_user = CustomUser.objects.get(email=email)
-                
+
                 if not _check_courier_approval(request, custom_user):
                     return render(request, "login.html")
-                
+
                 login(request, user)
                 return _redirect_based_on_role(custom_user)
             else:
@@ -125,16 +125,12 @@ def register_view(request):
             )
 
             # Create custom user with role
-            custom_user = CustomUser.objects.create(
-                email=email, name=name, role=role
-            )
+            custom_user = CustomUser.objects.create(email=email, name=name, role=role)
 
             # Create upgrade request for courier with approved=False
             if role == "courier":
                 UpgradeRequest.objects.create(
-                    user=custom_user, 
-                    target_role="courier",
-                    approved=False
+                    user=custom_user, target_role="courier", approved=False
                 )
                 messages.info(
                     request,

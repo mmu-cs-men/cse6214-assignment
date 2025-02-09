@@ -22,9 +22,7 @@ def _handle_seller_upgrade_request(request, custom_user):
     except UpgradeRequest.DoesNotExist:
         # Create new upgrade request
         UpgradeRequest.objects.create(
-            user=custom_user, 
-            target_role="seller",
-            approved=False
+            user=custom_user, target_role="seller", approved=False
         )
         messages.success(
             request,
@@ -41,21 +39,17 @@ def upgrade_to_seller(request):
     if request.method == "GET":
         try:
             upgrade_request = UpgradeRequest.objects.get(
-                user=custom_user, 
-                target_role="seller"
+                user=custom_user, target_role="seller"
             )
             if upgrade_request.approved:
                 # Update user role to seller if request is approved
                 custom_user.role = "seller"
                 custom_user.save()
-                
+
                 # Create a default shop for the new seller
                 shop_name = f"{custom_user.name}'s Shop"
-                Shop.objects.create(
-                    name=shop_name,
-                    user=custom_user
-                )
-                
+                Shop.objects.create(name=shop_name, user=custom_user)
+
                 messages.success(
                     request,
                     "Congratulations! Your seller application has been approved. You are now a seller.",

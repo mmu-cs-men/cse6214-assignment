@@ -349,11 +349,11 @@ class UpgradeRequestModelTest(TestCase):
         """Test that an upgrade request can be approved."""
         request = UpgradeRequest.objects.create(user=self.user, target_role="seller")
         self.assertFalse(request.approved)  # Initially not approved
-        
+
         # Approve the request
         request.approved = True
         request.save()
-        
+
         # Refresh from database and verify
         request.refresh_from_db()
         self.assertTrue(request.approved)
@@ -362,7 +362,7 @@ class UpgradeRequestModelTest(TestCase):
         """Test that a new upgrade request is not approved by default."""
         request = UpgradeRequest.objects.create(user=self.user, target_role="seller")
         self.assertFalse(request.approved)
-        
+
         # Verify even after refresh
         request.refresh_from_db()
         self.assertFalse(request.approved)
