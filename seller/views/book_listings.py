@@ -1,11 +1,22 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
+import os
 
 from core.constants import CONDITION_CHOICES
 from core.models.book_listing import BookListing
 from core.models.shop import Shop
 from core.utils.decorators import allowed_roles
+
+
+def is_valid_image(image):
+    """Helper function to validate image file type."""
+    if not image:
+        return True  # Image is optional
+    
+    valid_extensions = ['.jpg', '.jpeg', '.png']
+    ext = os.path.splitext(image.name)[1].lower()
+    return ext in valid_extensions
 
 
 @allowed_roles(["seller"])
@@ -60,6 +71,8 @@ def add_book_listing(request):
 
         if not (title and author and condition and price):
             messages.error(request, "Please fill in all required fields.")
+        elif image and not is_valid_image(image):
+            messages.warning(request, "Please upload only JPG or PNG image files.")
         else:
             try:
                 BookListing.objects.create(
@@ -125,6 +138,8 @@ def edit_book_listing(request, listing_id):
 
         if not (title and author and condition and price):
             messages.error(request, "Please fill in all required fields.")
+        elif image and not is_valid_image(image):
+            messages.warning(request, "Please upload only JPG or PNG image files.")
         else:
             try:
                 listing.title = title
