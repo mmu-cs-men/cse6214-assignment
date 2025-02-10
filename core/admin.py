@@ -71,7 +71,7 @@ class OrderItemAdmin(AdminChartMixin, admin.ModelAdmin):
         for month in months_between_dates(earliest, timezone.now()):
             labels.append(month.strftime("%b %Y"))
             monthly_revenue = sum(
-                oi.purchase_price * oi.quantity
+                (oi.purchase_price * oi.quantity * 0.20)  # we only take 20% revenue we're so nice
                 for oi in queryset
                 if oi.order.placed_at.year == month.year
                 and oi.order.placed_at.month == month.month
