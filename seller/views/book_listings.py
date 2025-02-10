@@ -115,9 +115,9 @@ def add_book_listing(request):
                         )
                         messages.success(request, "Book listing added successfully!")
                         return redirect("seller-book-listings")
-                    except Exception:
+                    except Exception as e:
                         messages.warning(
-                            request, "Failed to add book listing. Please try again."
+                            request, "Failed to add book listing. Please try again. " + str(e)
                         )
 
     # On GET, render the add book listing page.
