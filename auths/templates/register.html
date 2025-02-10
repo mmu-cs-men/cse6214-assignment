@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
+{% load core_extras %}
 {% block title %}booklab - Register{% endblock %}
 
 {% block content %}
@@ -8,11 +9,12 @@
         <div class="card-body">
 
             <div class="text-center m-5">
-                <img src="{% static 'images/logo_black.png' %}" alt="booklab logo" class="img-fluid" style="max-height: 150px;">
+                <img src="{% static 'images/logo_black.png' %}" alt="booklab logo" class="img-fluid"
+                    style="max-height: 150px;">
             </div>
             {% if messages %}
             {% for message in messages %}
-            <div class="alert alert-danger">
+            <div class="alert {{ message.tags|bootstrap_alert_class }}">
                 {{ message }}
             </div>
             {% endfor %}
@@ -28,21 +30,24 @@
                     <label for="email">Email address</label>
                 </div>
                 <div class="form-floating mb-3">
-                    <input type="password" class="form-control" id="password" name="password" placeholder=""
-                        required>
+                    <input type="password" class="form-control" id="password" name="password" placeholder="" required>
                     <label for="password">Password</label>
                     <div id="password-strength-container" style="display: none;">
                         <div class="progress mt-2" style="height: 5px;">
-                            <div id="password-strength" class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                            <div id="password-strength" class="progress-bar" role="progressbar" style="width: 0%;"
+                                aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
                         </div>
                         <div id="password-strength-text" class="form-text"></div>
                         <div class="password-criteria mt-2">
                             <div class="form-text">Password must contain:</div>
                             <div class="form-text"><i id="length-check" class="bi"></i> At least 8 characters</div>
-                            <div class="form-text"><i id="uppercase-check" class="bi"></i> At least one uppercase letter</div>
-                            <div class="form-text"><i id="lowercase-check" class="bi"></i> At least one lowercase letter</div>
+                            <div class="form-text"><i id="uppercase-check" class="bi"></i> At least one uppercase letter
+                            </div>
+                            <div class="form-text"><i id="lowercase-check" class="bi"></i> At least one lowercase letter
+                            </div>
                             <div class="form-text"><i id="number-check" class="bi"></i> At least one number</div>
-                            <div class="form-text"><i id="special-check" class="bi"></i> At least one special character</div>
+                            <div class="form-text"><i id="special-check" class="bi"></i> At least one special character
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -57,8 +62,8 @@
                         <input class="form-check-input" type="radio" name="role" id="buyer" value="buyer" checked>
                         <label class="form-check-label" for="buyer">
                             Buyer/Seller
-                            <i class="bi bi-info-circle ms-1" data-bs-toggle="tooltip" data-bs-placement="right" 
-                               title="If you wish to be a seller, you must put in a request after registration."></i>
+                            <i class="bi bi-info-circle ms-1" data-bs-toggle="tooltip" data-bs-placement="right"
+                                title="If you wish to be a seller, you must put in a request after registration."></i>
                         </label>
                     </div>
                     <div class="form-check">
@@ -105,7 +110,7 @@
     const numberCheck = document.getElementById('number-check');
     const specialCheck = document.getElementById('special-check');
 
-    passwordInput.addEventListener('input', function() {
+    passwordInput.addEventListener('input', function () {
         // Show the strength container when user starts typing
         if (this.value.length > 0) {
             strengthContainer.style.display = 'block';
@@ -164,7 +169,7 @@
 
         // Update strength bar
         strengthBar.style.width = strength + '%';
-        
+
         // Update color based on strength
         if (strength <= 40) {
             strengthBar.className = 'progress-bar bg-danger';
@@ -182,7 +187,7 @@
     });
 
     // Initialize tooltips when DOM is loaded
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
         const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
     });
