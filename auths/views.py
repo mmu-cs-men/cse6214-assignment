@@ -52,6 +52,10 @@ def _check_courier_approval(request, custom_user):
 def login_view(request):
     # If user is already authenticated, redirect them to their appropriate page
     if request.user.is_authenticated:
+        # Check if user is staff/superuser first
+        if request.user.is_staff or request.user.is_superuser:
+            return redirect('/admin/')
+            
         try:
             custom_user = CustomUser.objects.get(email=request.user.email)
 
@@ -74,6 +78,11 @@ def login_view(request):
             auth_user = User.objects.get(email=email)
             user = authenticate(request, username=auth_user.username, password=password)
             if user is not None:
+                # Check if user is staff/superuser first
+                if user.is_staff or user.is_superuser:
+                    login(request, user)
+                    return redirect('/admin/')
+                    
                 custom_user = CustomUser.objects.get(email=email)
 
                 if not _check_courier_approval(request, custom_user):
@@ -86,10 +95,20 @@ def login_view(request):
         except User.DoesNotExist:
             messages.error(request, "No account found with this email")
         except CustomUser.DoesNotExist:
-            messages.error(
-                request,
-                "Custom user does not exist. This is a logic error and shouldn't have happened. Find your nearest developer",
-            )
+            # Check if the user might be a staff/admin user without a CustomUser
+            try:
+                auth_user = User.objects.get(email=email)
+                if auth_user.is_staff or auth_user.is_superuser:
+                    user = authenticate(request, username=auth_user.username, password=password)
+                    if user is not None:
+                        login(request, user)
+                        return redirect('/admin/')
+                messages.error(request, "Invalid credentials")
+            except User.DoesNotExist:
+                messages.error(
+                    request,
+                    "No account found with this email",
+                )
 
     return render(request, "login.html")
 
