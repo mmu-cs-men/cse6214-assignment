@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
+{% load core_extras %}
 {% block title %}booklab - Login{% endblock %}
 
 {% block content %}
@@ -8,11 +9,12 @@
 
         <div class="card-body">
             <div class="text-center m-5">
-                <img src="{% static 'images/logo_black.png' %}" alt="booklab logo" class="img-fluid" style="max-height: 150px;">
+                <img src="{% static 'images/logo_black.png' %}" alt="booklab logo" class="img-fluid"
+                    style="max-height: 150px;">
             </div>
             {% if messages %}
             {% for message in messages %}
-            <div class="alert alert-{{ message.tags }}">
+            <div class="alert {{ message.tags|bootstrap_alert_class }}">
                 {{ message }}
             </div>
             {% endfor %}
@@ -24,8 +26,7 @@
                     <label for="email">Email address</label>
                 </div>
                 <div class="form-floating mb-3">
-                    <input type="password" class="form-control" id="password" name="password" placeholder=""
-                        required>
+                    <input type="password" class="form-control" id="password" name="password" placeholder="" required>
                     <label for="password">Password</label>
                 </div>
                 <div class="form-check mb-5">
