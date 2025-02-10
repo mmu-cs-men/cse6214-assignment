@@ -96,10 +96,8 @@ def add_book_listing(request):
                         if image:
                             # Reset file pointer to beginning
                             image.seek(0)
-                            # Read the entire file into memory
-                            file_data = image.read()
                             uploaded_img = imagekit.upload_file(
-                                file=file_data,
+                                file=image,
                                 file_name=image.name,
                                 options=UploadFileRequestOptions(
                                     use_unique_file_name=True,
@@ -197,9 +195,8 @@ def edit_book_listing(request, listing_id):
                             # Reset file pointer to beginning
                             image.seek(0)
                             # Read the entire file into memory
-                            file_data = image.read()
                             uploaded_img = imagekit.upload_file(
-                                file=file_data,
+                                file=image,
                                 file_name=image.name,
                                 options=UploadFileRequestOptions(
                                     use_unique_file_name=True,
