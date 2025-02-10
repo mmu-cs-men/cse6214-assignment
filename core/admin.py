@@ -2,6 +2,7 @@ from django.contrib import admin
 from django.utils import timezone
 from admincharts.admin import AdminChartMixin
 from admincharts.utils import months_between_dates
+from decimal import Decimal
 from core.models import *
 
 # Change admin site title
@@ -71,7 +72,7 @@ class OrderItemAdmin(AdminChartMixin, admin.ModelAdmin):
         for month in months_between_dates(earliest, timezone.now()):
             labels.append(month.strftime("%b %Y"))
             monthly_revenue = sum(
-                (oi.purchase_price * oi.quantity * 0.20)  # we only take 20% revenue we're so nice
+                (oi.purchase_price * oi.quantity * Decimal('0.20'))  # Taking 20% of the total purchase price
                 for oi in queryset
                 if oi.order.placed_at.year == month.year
                 and oi.order.placed_at.month == month.month
