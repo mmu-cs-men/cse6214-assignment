@@ -3,8 +3,6 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 import os
 import base64
-from io import BytesIO
-
 from core.constants import CONDITION_CHOICES
 from core.models.book_listing import BookListing
 from core.models.shop import Shop
@@ -90,10 +88,8 @@ def add_book_listing(request):
                         uploaded_image_url = None
                         uploaded_image_id = None
                         if image:
-                            # Convert image to base64
                             image_data = image.read()
                             base64_image = base64.b64encode(image_data).decode("utf-8")
-
                             uploaded_img = imagekit.upload_file(
                                 file=base64_image,
                                 file_name=image.name,
@@ -184,10 +180,8 @@ def edit_book_listing(request, listing_id):
                 else:
                     try:
                         if image:
-                            # Convert image to base64
                             image_data = image.read()
                             base64_image = base64.b64encode(image_data).decode("utf-8")
-
                             uploaded_img = imagekit.upload_file(
                                 file=base64_image,
                                 file_name=image.name,
