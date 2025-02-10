@@ -4,129 +4,136 @@
 {% block nav %}{% include "buyer/nav.html" %}{% endblock %}
 
 {% block content %}
-    <style>
-        .cart-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 10px 0;
-        }
+<style>
+    .cart-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 0;
+    }
 
-        .book-info {
-            padding-left: 25px; /* Move text slightly to the right */
-        }
+    .book-info {
+        padding-left: 25px;
+        /* Move text slightly to the right */
+    }
 
-        .price-container {
-            display: flex;
-            align-items: center;
-            justify-content: flex-end;
-            width: 120px; /* Consistent width */
-        }
+    .price-container {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        width: 120px;
+        /* Consistent width */
+    }
 
-        .price {
-            font-size: 1.5rem; /* Large Price */
-            font-weight: bold;
-            color: #000;
-            margin: 0;
-        }
+    .price {
+        font-size: 1.5rem;
+        /* Large Price */
+        font-weight: bold;
+        color: #000;
+        margin: 0;
+    }
 
-        .remove-btn {
-            border: none;
-            background: none;
-            color: red;
-            font-size: 1.5rem;
-            cursor: pointer;
-            margin-left: 15px; /* Adjusted for better alignment */
-            display: flex;
-            align-items: center;
-        }
+    .remove-btn {
+        border: none;
+        background: none;
+        color: red;
+        font-size: 1.5rem;
+        cursor: pointer;
+        margin-left: 15px;
+        /* Adjusted for better alignment */
+        display: flex;
+        align-items: center;
+    }
 
-        .remove-btn:hover {
-            color: darkred;
-        }
+    .remove-btn:hover {
+        color: darkred;
+    }
 
-        .book-image {
-            width: 100%; /* Set a maximum width */
-            height: 250px; /* Set a maximum height */
-            object-fit: contain; /* Scale the image to fit within the container without cropping */
-        }
+    .book-image {
+        width: 100%;
+        /* Set a maximum width */
+        height: 250px;
+        /* Set a maximum height */
+        object-fit: contain;
+        /* Scale the image to fit within the container without cropping */
+    }
 
-        .btn-success {
-            padding: 10px;
-            width: 200px;
-            border-radius: 10px;
-        }
+    .btn-success {
+        padding: 10px;
+        width: 200px;
+        border-radius: 10px;
+    }
 
-        .btn-success:active {
-            transform: scale(0.95);
-        }
+    .btn-success:active {
+        transform: scale(0.95);
+    }
 
-        .btn-primary {
-            padding: 10px;
-            width: 200px;
-            border-radius: 10px;
-        }
+    .btn-primary {
+        padding: 10px;
+        width: 200px;
+        border-radius: 10px;
+    }
 
-        .btn-primary:active {
-            transform: scale(0.95);
-        }
-    </style>
+    .btn-primary:active {
+        transform: scale(0.95);
+    }
+</style>
 
-    <div class="container py-5">
-        <h1 class="mb-5">🛒 Your Shopping Cart</h1>
-        <div class="row">
-            <div class="col-lg-8">
+<div class="container py-5">
+    <h1 class="mb-5">🛒 Your Shopping Cart</h1>
+    <div class="row">
+        <div class="col-lg-8">
 
-                {% if cart_items %}
-                    {% for item in cart_items %}
-                        <div class="row cart-item mb-3 align-items-center">
-                            <div class="col-md-3">
-                                {% if item.book_listing.image and item.book_listing.image.url %}
-                                    <a href="{{ item.book_listing.image.url }}" target="_blank">
-                                        <img src="{{ item.book_listing.image.url }}" alt="{{ item.book_listing.title }}"
-                                             class="img-fluid rounded book-image">
-                                    </a>
-                                {% else %}
-                                    <a href="{% static "images/placeholder.jpg" %}" target="_blank">
-                                        <img src="{% static "images/placeholder.jpg" %}" alt="No image for this book"
-                                             class="img-fluid rounded book-image">
-                                    </a>
-                                {% endif %}
-                            </div>
-                            <div class="col-md-5 book-info">
-                                <h5 class="card-title">{{ item.book_listing.title }}</h5>
-                                <p class="text-muted">Author: {{ item.book_listing.author }}</p>
-                            </div>
-                            <div class="col-md-2 price-container">
-                                <p class="price">RM{{ item.book_listing.price|floatformat:2 }}</p>
-                            </div>
-                            <div class="col-md-2 text-end">
-                                <form method="POST" action="{% url 'buyer-cart' %}">
-                                    {% csrf_token %}
-                                    <input type="hidden" name="item_id" value="{{ item.id }}">
-                                    <input type="hidden" name="action" value="remove">
-                                    <button class="remove-btn">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                </form>
-                            </div>
-                        </div>
-                        <hr>
-                    {% endfor %}
-                {% else %}
-                    <!-- If no items are in the cart, show alert -->
-                    <div class="alert alert-info">
-                        You have no items in your cart.
-                    </div>
-                {% endif %}
-
-
-                <!-- Continue Shopping & Proceed to Checkout Buttons -->
-                <div class="d-flex justify-content-start gap-3 mb-4">
-                    <a href="{% url "buyer-landing" %}" class="btn btn-primary">Continue Shopping</a>
-                    <a href="{% url 'buyer-checkout' %}" class="btn btn-success">Proceed to Checkout</a>
+            {% if cart_items %}
+            {% for item in cart_items %}
+            <div class="row cart-item mb-3 align-items-center">
+                <div class="col-md-3">
+                    {% if item.book_listing.image and item.book_listing.image.url %}
+                    <a href="{{ item.book_listing.image.url }}" target="_blank">
+                        <img src="{{ item.book_listing.image.url }}" alt="{{ item.book_listing.title }}"
+                            class="img-fluid rounded book-image">
+                    </a>
+                    {% else %}
+                    <a href="{% static " images/placeholder.jpg" %}" target="_blank">
+                        <img src="{% static " images/placeholder.jpg" %}" alt="No image for this book"
+                            class="img-fluid rounded book-image">
+                    </a>
+                    {% endif %}
                 </div>
+                <div class="col-md-5 book-info">
+                    <h5 class="card-title">{{ item.book_listing.title }}</h5>
+                    <p class="text-muted">Author: {{ item.book_listing.author }}</p>
+                </div>
+                <div class="col-md-2 price-container">
+                    <p class="price">RM{{ item.book_listing.price|floatformat:2 }}</p>
+                </div>
+                <div class="col-md-2 text-end">
+                    <form method="POST" action="{% url 'buyer-cart' %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="item_id" value="{{ item.id }}">
+                        <input type="hidden" name="action" value="remove">
+                        <button class="remove-btn">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+            <hr>
+            {% endfor %}
+            {% else %}
+            <!-- If no items are in the cart, show alert -->
+            <div class="alert alert-info">
+                You have no items in your cart.
+            </div>
+            {% endif %}
+
+
+            <!-- Continue Shopping & Proceed to Checkout Buttons -->
+            <div class="d-flex justify-content-start gap-3 mb-4">
+                <a href="{% url " buyer-landing" %}" class="btn btn-primary">Continue Shopping</a>
+                <a href="{% url 'buyer-checkout' %}" class="btn btn-success">Proceed to Checkout</a>
             </div>
         </div>
     </div>
+</div>
 {% endblock %}
