@@ -19,8 +19,8 @@ def is_valid_image(image):
     return ext in valid_extensions
 
 
-@allowed_roles(["seller"])
 @login_required
+@allowed_roles(["seller"])
 def book_listings_page(request):
     """
     Displays all book listings (that are not bought) for the logged-in seller.
@@ -47,8 +47,8 @@ def book_listings_page(request):
     return render(request, "seller/book_listings.html", context)
 
 
-@allowed_roles(["seller"])
 @login_required
+@allowed_roles(["seller"])
 def add_book_listing(request):
     """
     Displays a form for adding a new book listing. On POST, creates a new listing
@@ -103,8 +103,8 @@ def add_book_listing(request):
     return render(request, "seller/add_book_listing.html", context)
 
 
-@allowed_roles(["seller"])
 @login_required
+@allowed_roles(["seller"])
 def delete_book_listing(request, listing_id):
     """
     Deletes a book listing for the seller after confirmation.
@@ -120,8 +120,8 @@ def delete_book_listing(request, listing_id):
     return redirect("seller-book-listings")
 
 
-@allowed_roles(["seller"])
 @login_required
+@allowed_roles(["seller"])
 def edit_book_listing(request, listing_id):
     """
     Displays a form pre-populated with the details of the specified book listing.
