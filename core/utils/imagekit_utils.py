@@ -12,13 +12,13 @@ def upload_file_to_imagekit(file, filename):
     """
     Upload a file to ImageKit CDN.
 
-    Args:
-        file: The file object from request.FILES
-        filename: Name to use for the uploaded file
-
-    Returns:
-        str: The URL of the uploaded file
-        str: The file ID from ImageKit
+    :param file: The file object from request.FILES
+    :type file: django.core.files.uploadedfile.UploadedFile
+    :param filename: Name to use for the uploaded file
+    :type filename: str
+    :returns: A tuple containing the URL of the uploaded file and the file ID from ImageKit
+    :rtype: tuple[str, str]
+    :raises Exception: If file upload fails
     """
     try:
         options = UploadFileRequestOptions(
@@ -41,11 +41,11 @@ def delete_file_from_imagekit(file_id):
     """
     Delete a file from ImageKit CDN.
 
-    Args:
-        file_id: The ImageKit file ID to delete
-
-    Returns:
-        bool: True if deletion was successful
+    :param file_id: The ImageKit file ID to delete
+    :type file_id: str
+    :returns: True if deletion was successful
+    :rtype: bool
+    :raises Exception: If file deletion fails
     """
     try:
         imagekit.delete_file(file_id=file_id)
