@@ -1,3 +1,4 @@
+import base64
 from imagekitio.models.UploadFileRequestOptions import UploadFileRequestOptions
 from imagekitio import ImageKit
 
@@ -21,20 +22,25 @@ def upload_file_to_imagekit(file, filename):
     :raises Exception: If file upload fails
     """
     try:
+        # Read the file and convert to base64
+        file_content = file.read()
+        base64_file = base64.b64encode(file_content).decode('utf-8')
+        
         options = UploadFileRequestOptions(
             use_unique_file_name=True,
             folder="/book_images/",
-            is_private_file=False,
         )
 
-        # Upload the file using its binary content
+        # Upload the file using base64 content
         result = imagekit.upload_file(
-            file=file.read(), file_name=filename, options=options
+            file=base64_file,
+            file_name=filename,
+            options=options,
         )
 
         return result.url, result.file_id
     except Exception as e:
-        raise Exception(f"Failed to upload file to ImageKit: {str(e)}")
+        raise Exception(f"Failed to upload file: {str(e)}")
 
 
 def delete_file_from_imagekit(file_id):
@@ -51,4 +57,4 @@ def delete_file_from_imagekit(file_id):
         imagekit.delete_file(file_id=file_id)
         return True
     except Exception as e:
-        raise Exception(f"Failed to delete file from ImageKit: {str(e)}")
+        raise Exception(f"Failed to delete file: {str(e)}")
