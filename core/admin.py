@@ -4,6 +4,11 @@ from admincharts.admin import AdminChartMixin
 from admincharts.utils import months_between_dates
 from core.models import *
 
+# Change admin site title
+admin.site.site_header = "booklab administration"
+admin.site.site_title = "booklab administration"
+admin.site.index_title = "booklab administration"
+
 admin.site.register(UpgradeRequest)
 admin.site.register(User)
 admin.site.register(OrderAssignment)
