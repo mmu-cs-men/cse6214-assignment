@@ -7,6 +7,7 @@ from core.models.user import User as CustomUser
 from django.http import Http404
 from django.contrib.auth.decorators import login_required
 from core.models.upgrade_request import UpgradeRequest
+import re
 
 
 def _redirect_based_on_role(custom_user):
@@ -46,6 +47,28 @@ def _check_courier_approval(request, custom_user):
                 "Somehow, you are a courier but don't have an upgrade request. Find your nearest developer.",
             )
             return False
+    return True
+
+
+def validate_password_strength(password):
+    """
+    Validate that password meets strength requirements:
+    - At least 8 characters long
+    - Contains at least one uppercase letter
+    - Contains at least one lowercase letter
+    - Contains at least one number
+    - Contains at least one special character
+    """
+    if len(password) < 8:
+        return False
+    if not re.search(r'[A-Z]', password):
+        return False
+    if not re.search(r'[a-z]', password):
+        return False
+    if not re.search(r'\d', password):
+        return False
+    if not re.search(r'[!@#$%^&*(),.?":{}|<>]', password):
+        return False
     return True
 
 
@@ -125,6 +148,10 @@ def register_view(request):
 
         if password != confirm_password:
             messages.error(request, "Passwords do not match")
+            return render(request, "register.html")
+
+        if not validate_password_strength(password):
+            messages.error(request, "Password does not meet strength requirements")
             return render(request, "register.html")
 
         if User.objects.filter(email=email).exists():
