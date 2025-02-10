@@ -124,15 +124,17 @@ def delete_book_listing(request, listing_id):
     current_user = request.user
     shop = Shop.objects.filter(user__email=current_user.email).first()
     listing = get_object_or_404(BookListing, id=listing_id, shop=shop)
-    
+
     if request.method == "POST":
         # Delete the image from ImageKit if it exists
         if listing.image_id:
             try:
                 delete_file_from_imagekit(listing.image_id)
             except Exception as e:
-                messages.warning(request, f"Warning: Failed to delete image from CDN: {str(e)}")
-        
+                messages.warning(
+                    request, f"Warning: Failed to delete image from CDN: {str(e)}"
+                )
+
         listing.delete()
         messages.success(request, "Book listing deleted successfully!")
     else:
@@ -185,8 +187,11 @@ def edit_book_listing(request, listing_id):
                                 try:
                                     delete_file_from_imagekit(listing.image_id)
                                 except Exception as e:
-                                    messages.warning(request, f"Warning: Failed to delete old image: {str(e)}")
-                            
+                                    messages.warning(
+                                        request,
+                                        f"Warning: Failed to delete old image: {str(e)}",
+                                    )
+
                             # Upload new image
                             image_url, image_id = upload_file_to_imagekit(
                                 image, f"{title}_{shop.id}.jpg"
