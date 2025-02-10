@@ -75,18 +75,26 @@ def add_book_listing(request):
             messages.warning(request, "Please upload only JPG or PNG image files.")
         else:
             try:
-                BookListing.objects.create(
-                    shop=shop,
-                    title=title,
-                    author=author,
-                    condition=condition,
-                    price=price,
-                    image=image,  # image is optional
-                )
-                messages.success(request, "Book listing added successfully!")
-                return redirect("seller-book-listings")
-            except Exception:
-                messages.error(request, "Failed to add book listing. Please try again.")
+                price_val = float(price)
+            except ValueError:
+                messages.warning(request, "Price must be a valid number.")
+            else:
+                if price_val < 0:
+                    messages.warning(request, "Price cannot be negative.")
+                else:
+                    try:
+                        BookListing.objects.create(
+                            shop=shop,
+                            title=title,
+                            author=author,
+                            condition=condition,
+                            price=price_val,
+                            image=image,  # image is optional
+                        )
+                        messages.success(request, "Book listing added successfully!")
+                        return redirect("seller-book-listings")
+                    except Exception:
+                        messages.warning(request, "Failed to add book listing. Please try again.")
 
     # On GET, render the add book listing page.
     context = {
@@ -142,19 +150,25 @@ def edit_book_listing(request, listing_id):
             messages.warning(request, "Please upload only JPG or PNG image files.")
         else:
             try:
-                listing.title = title
-                listing.author = author
-                listing.condition = condition
-                listing.price = price
-                if image:
-                    listing.image = image  # update image only if a new one is provided
-                listing.save()
-                messages.success(request, "Book listing updated successfully!")
-                return redirect("seller-book-listings")
-            except Exception:
-                messages.error(
-                    request, "Failed to update book listing. Please try again."
-                )
+                price_val = float(price)
+            except ValueError:
+                messages.error(request, "Price must be a valid number.")
+            else:
+                if price_val < 0:
+                    messages.error(request, "Price cannot be negative.")
+                else:
+                    try:
+                        listing.title = title
+                        listing.author = author
+                        listing.condition = condition
+                        listing.price = price_val
+                        if image:
+                            listing.image = image  # update image only if a new one is provided
+                        listing.save()
+                        messages.success(request, "Book listing updated successfully!")
+                        return redirect("seller-book-listings")
+                    except Exception:
+                        messages.error(request, "Failed to update book listing. Please try again.")
 
     context = {
         "listing": listing,
