@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block title %}Checkout{% endblock %}
 {% block nav %}{% include "buyer/nav.html" %}{% endblock %}
-
+{% load static %}
 {% block content %}
 
     <style>
@@ -23,6 +23,25 @@
 
         .btn-primary:active {
             transform: scale(0.95);
+        }
+
+        /* Add styles for card input container */
+        .card-input-container {
+            position: relative;
+        }
+
+        .card-logo {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 40px;
+            height: auto;
+            display: none;
+        }
+
+        #card_number {
+            padding-right: 55px;
         }
     </style>
 
@@ -107,8 +126,13 @@
                             <div class="card-body">
                                 <div class="mb-3">
                                     <label for="card_number" class="form-label">Card Number</label>
-                                    <input type="text" class="form-control" id="card_number" name="card_number"
-                                           placeholder="**** **** **** ****" required>
+                                    <div class="card-input-container">
+                                        <input type="text" class="form-control" id="card_number" name="card_number"
+                                               placeholder="**** **** **** ****" required>
+                                        <img src={% static 'images/visa.png' %} class="card-logo" id="visa-logo" alt="Visa">
+                                        <img src={% static 'images/mastercard.png' %} class="card-logo" id="mastercard-logo" alt="Mastercard">
+                                        <img src={% static 'images/amex.png' %} class="card-logo" id="amex-logo" alt="American Express">
+                                    </div>
                                 </div>
                                 <div class="row">
                                     <div class="col-md-6">
@@ -168,4 +192,85 @@
             </div>
         {% endif %}
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const cardInput = document.getElementById('card_number');
+            const expiryInput = document.getElementById('expiry_date');
+            const cvvInput = document.getElementById('cvv');
+            const visaLogo = document.getElementById('visa-logo');
+            const mastercardLogo = document.getElementById('mastercard-logo');
+            const amexLogo = document.getElementById('amex-logo');
+
+            function hideAllLogos() {
+                visaLogo.style.display = 'none';
+                mastercardLogo.style.display = 'none';
+                amexLogo.style.display = 'none';
+            }
+
+            // CVV formatting
+            cvvInput.addEventListener('input', function(e) {
+                // Remove any non-digit characters
+                let value = this.value.replace(/\D/g, '');
+                
+                // Limit to 3 digits
+                if (value.length > 3) {
+                    value = value.substring(0, 3);
+                }
+
+                this.value = value;
+            });
+
+            // Expiry date formatting
+            expiryInput.addEventListener('input', function(e) {
+                // Remove any non-digit characters
+                let value = this.value.replace(/\D/g, '');
+                
+                // Limit to 4 digits
+                if (value.length > 4) {
+                    value = value.substring(0, 4);
+                }
+
+                // Add slash after first 2 digits if we have more than 2 digits
+                if (value.length > 2) {
+                    value = value.substring(0, 2) + '/' + value.substring(2);
+                }
+
+                this.value = value;
+            });
+
+            cardInput.addEventListener('input', function(e) {
+                // Remove any non-digit characters
+                let value = this.value.replace(/\D/g, '');
+                
+                // Format the card number with spaces
+                if (value.length > 0) {
+                    value = value.match(/.{1,4}/g).join(' ');
+                }
+                this.value = value;
+
+                // Get the first digit for basic card detection
+                const firstDigit = value.charAt(0);
+                const firstTwoDigits = parseInt(value.substring(0, 2));
+
+                hideAllLogos();
+
+                // Show logo based on card number pattern
+                if (value.length > 0) {
+                    if (firstDigit === '4') {
+                        visaLogo.style.display = 'block';
+                    } else if (firstTwoDigits >= 51 && firstTwoDigits <= 55) {
+                        mastercardLogo.style.display = 'block';
+                    } else if (firstTwoDigits === 34 || firstTwoDigits === 37) {
+                        amexLogo.style.display = 'block';
+                    }
+                }
+
+                // Limit the length of the card number
+                if (value.length > 19) {
+                    this.value = value.substring(0, 19);
+                }
+            });
+        });
+    </script>
 {% endblock %}
