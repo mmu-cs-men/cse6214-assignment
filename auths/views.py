@@ -61,11 +61,11 @@ def validate_password_strength(password):
     """
     if len(password) < 8:
         return False
-    if not re.search(r'[A-Z]', password):
+    if not re.search(r"[A-Z]", password):
         return False
-    if not re.search(r'[a-z]', password):
+    if not re.search(r"[a-z]", password):
         return False
-    if not re.search(r'\d', password):
+    if not re.search(r"\d", password):
         return False
     if not re.search(r'[!@#$%^&*(),.?":{}|<>]', password):
         return False
