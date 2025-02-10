@@ -81,9 +81,9 @@
                     {% for item in cart_items %}
                         <div class="row cart-item mb-3 align-items-center">
                             <div class="col-md-3">
-                                {% if item.book_listing.image and item.book_listing.image.url %}
-                                    <a href="{{ item.book_listing.image.url }}" target="_blank">
-                                        <img src="{{ item.book_listing.image.url }}" alt="{{ item.book_listing.title }}"
+                                {% if item.book_listing.image_url %}
+                                    <a href="{{ item.book_listing.image_url }}" target="_blank">
+                                        <img src="{{ item.book_listing.image_url }}" alt="{{ item.book_listing.title }}"
                                              class="img-fluid rounded book-image">
                                     </a>
                                 {% else %}

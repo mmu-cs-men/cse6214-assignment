@@ -109,8 +109,8 @@
                                             <div class="row align-items-center">
                                                 <div class="col-md-3">
                                                     <div class="book-image-container">
-                                                        {% if item.book_listing.image and item.book_listing.image.url %}
-                                                            <img src="{{ item.book_listing.image.url }}"
+                                                        {% if item.book_listing.image_url %}
+                                                            <img src="{{ item.book_listing.image_url }}"
                                                                  alt="{{ item.book_listing.title }}"
                                                                  class="img-fluid rounded book-image">
                                                         {% else %}

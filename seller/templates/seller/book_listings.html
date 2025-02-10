@@ -128,8 +128,8 @@
                 <div class="col-md-3 mb-4">
                     <div class="card h-100 shadow-sm">
                         <div class="book-image-container">
-                            {% if book.image %}
-                                <img src="{{ book.image.url }}" class="book-img" alt="{{ book.title }}">
+                            {% if book.image_url %}
+                                <img src="{{ book.image_url }}" class="book-img" alt="{{ book.title }}">
                             {% else %}
                                 <img src="{% static 'images/placeholder.jpg' %}" class="book-img" alt="No Image">
                             {% endif %}

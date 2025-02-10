@@ -68,10 +68,10 @@
             <a href="{% url 'buyer-book-details' book.id %}" class="text-decoration-none text-dark">
                 <div class="card book-card shadow-sm rounded-3">
                     <div class="book-img-container rounded-top">
-                        {% if book.image %}
-                        <img src="{{ book.image.url }}" class="book-img" alt="{{ book.title }}">
+                        {% if book.image_url %}
+                        <img src="{{ book.image_url }}" class="book-img" alt="{{ book.title }}">
                         {% else %}
-                        <img src="{% static " images/placeholder.jpg" %}" class="book-img" alt="No image for this book">
+                        <img src="{% static 'images/placeholder.jpg' %}" class="book-img" alt="No image for this book">
                         {% endif %}
                     </div>
                     <div class="card-body d-flex flex-column">

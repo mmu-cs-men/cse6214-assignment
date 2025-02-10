@@ -7,6 +7,7 @@ from core.constants import CONDITION_CHOICES
 from core.models.book_listing import BookListing
 from core.models.shop import Shop
 from core.utils.decorators import allowed_roles
+from core.utils.imagekit_utils import upload_file_to_imagekit, delete_file_from_imagekit
 
 
 def is_valid_image(image):
@@ -83,22 +84,30 @@ def add_book_listing(request):
                     messages.warning(request, "Price cannot be negative.")
                 else:
                     try:
+                        # Upload image to ImageKit if provided
+                        image_url = None
+                        image_id = None
+                        if image:
+                            image_url, image_id = upload_file_to_imagekit(
+                                image, f"{title}_{shop.id}.jpg"
+                            )
+
                         BookListing.objects.create(
                             shop=shop,
                             title=title,
                             author=author,
                             condition=condition,
                             price=price_val,
-                            image=image,  # image is optional
+                            image_url=image_url,
+                            image_id=image_id,
                         )
                         messages.success(request, "Book listing added successfully!")
                         return redirect("seller-book-listings")
-                    except Exception:
+                    except Exception as e:
                         messages.warning(
-                            request, "Failed to add book listing. Please try again."
+                            request, f"Failed to add book listing: {str(e)}"
                         )
 
-    # On GET, render the add book listing page.
     context = {
         "CONDITION_CHOICES": CONDITION_CHOICES,
     }
@@ -110,11 +119,20 @@ def add_book_listing(request):
 def delete_book_listing(request, listing_id):
     """
     Deletes a book listing for the seller after confirmation.
+    Also deletes the associated image from ImageKit if it exists.
     """
     current_user = request.user
     shop = Shop.objects.filter(user__email=current_user.email).first()
     listing = get_object_or_404(BookListing, id=listing_id, shop=shop)
+    
     if request.method == "POST":
+        # Delete the image from ImageKit if it exists
+        if listing.image_id:
+            try:
+                delete_file_from_imagekit(listing.image_id)
+            except Exception as e:
+                messages.warning(request, f"Warning: Failed to delete image from CDN: {str(e)}")
+        
         listing.delete()
         messages.success(request, "Book listing deleted successfully!")
     else:
@@ -160,20 +178,32 @@ def edit_book_listing(request, listing_id):
                     messages.error(request, "Price cannot be negative.")
                 else:
                     try:
+                        # Update image in ImageKit if provided
+                        if image:
+                            # Delete old image if it exists
+                            if listing.image_id:
+                                try:
+                                    delete_file_from_imagekit(listing.image_id)
+                                except Exception as e:
+                                    messages.warning(request, f"Warning: Failed to delete old image: {str(e)}")
+                            
+                            # Upload new image
+                            image_url, image_id = upload_file_to_imagekit(
+                                image, f"{title}_{shop.id}.jpg"
+                            )
+                            listing.image_url = image_url
+                            listing.image_id = image_id
+
                         listing.title = title
                         listing.author = author
                         listing.condition = condition
                         listing.price = price_val
-                        if image:
-                            listing.image = (
-                                image  # update image only if a new one is provided
-                            )
                         listing.save()
                         messages.success(request, "Book listing updated successfully!")
                         return redirect("seller-book-listings")
-                    except Exception:
+                    except Exception as e:
                         messages.error(
-                            request, "Failed to update book listing. Please try again."
+                            request, f"Failed to update book listing: {str(e)}"
                         )
 
     context = {

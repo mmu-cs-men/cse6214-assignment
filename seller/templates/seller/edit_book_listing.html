@@ -55,9 +55,9 @@
                        value="{{ listing.price }}" required>
             </div>
             <div class="mb-3">
-                {% if listing.image and listing.image.url %}
+                {% if listing.image_url %}
                     <div class="mb-2">
-                        Current Image: <img src="{{ listing.image.url }}" alt="{{ listing.title }}"
+                        Current Image: <img src="{{ listing.image_url }}" alt="{{ listing.title }}"
                                             style="max-width:100px;">
                     </div>
                 {% endif %}
