@@ -210,7 +210,7 @@
 
             // CVV formatting
             cvvInput.addEventListener('input', function(e) {
-                // Remove any non-digit characters
+                // Remove any non-digit characters (including spaces)
                 let value = this.value.replace(/\D/g, '');
                 
                 // Limit to 3 digits
@@ -218,6 +218,14 @@
                     value = value.substring(0, 3);
                 }
 
+                this.value = value;
+            });
+
+            // Add postal code formatting
+            const postalCodeInput = document.getElementById('postal_code');
+            postalCodeInput.addEventListener('input', function(e) {
+                // Remove any non-digit characters (including spaces)
+                let value = this.value.replace(/\D/g, '');
                 this.value = value;
             });
 
@@ -243,6 +251,11 @@
                 // Remove any non-digit characters
                 let value = this.value.replace(/\D/g, '');
                 
+                // Limit to exactly 16 digits before formatting
+                if (value.length > 16) {
+                    value = value.substring(0, 16);
+                }
+                
                 // Format the card number with spaces
                 if (value.length > 0) {
                     value = value.match(/.{1,4}/g).join(' ');
@@ -264,11 +277,6 @@
                     } else if (firstTwoDigits === 34 || firstTwoDigits === 37) {
                         amexLogo.style.display = 'block';
                     }
-                }
-
-                // Limit the length of the card number
-                if (value.length > 19) {
-                    this.value = value.substring(0, 19);
                 }
             });
         });

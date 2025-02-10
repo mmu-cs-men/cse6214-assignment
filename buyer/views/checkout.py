@@ -93,7 +93,7 @@ def checkout_page(request):
             return render(request, "buyer/checkout.html", error_context)
 
         # Validate Payment Details
-        if not card_number.isdigit() or len(card_number) != 16:
+        if not card_number.replace(" ", "").isdigit() or len(card_number.replace(" ", "")) != 16:
             messages.error(request, "Card number must be 16 digits.")
             return render(request, "buyer/checkout.html", error_context)
 
