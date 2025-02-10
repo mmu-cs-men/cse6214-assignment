@@ -94,11 +94,16 @@ def add_book_listing(request):
                         uploaded_image_url = None
                         uploaded_image_id = None
                         if image:
+                            # Reset file pointer to beginning
+                            image.seek(0)
+                            # Read the entire file into memory
+                            file_data = image.read()
                             uploaded_img = imagekit.upload_file(
-                                file=image.read(),
+                                file=file_data,
                                 file_name=image.name,
                                 options=UploadFileRequestOptions(
-                                    use_unique_file_name=True
+                                    use_unique_file_name=True,
+                                    is_private_file=False,
                                 ),
                             )
                             uploaded_image_url = uploaded_img.url
@@ -117,7 +122,7 @@ def add_book_listing(request):
                         return redirect("seller-book-listings")
                     except Exception as e:
                         messages.warning(
-                            request, "Failed to add book listing. Please try again. " + str(e)
+                            request, f"Failed to add book listing. Error: {str(e)}"
                         )
 
     # On GET, render the add book listing page.
@@ -189,15 +194,28 @@ def edit_book_listing(request, listing_id):
                 else:
                     try:
                         if image:
+                            # Reset file pointer to beginning
+                            image.seek(0)
+                            # Read the entire file into memory
+                            file_data = image.read()
                             uploaded_img = imagekit.upload_file(
-                                file=image.read(),
+                                file=file_data,
                                 file_name=image.name,
                                 options=UploadFileRequestOptions(
-                                    use_unique_file_name=True
+                                    use_unique_file_name=True,
+                                    is_private_file=False,
                                 ),
                             )
+                            
+                            # Only delete old image if new upload was successful
+                            if listing.image_id:
+                                try:
+                                    imagekit.delete_image(listing.image_id)
+                                except Exception:
+                                    # If deletion fails, just log it but continue with update
+                                    print(f"Failed to delete old image {listing.image_id}")
+                                    
                             listing.image_url = uploaded_img.url
-                            imagekit.delete_image(listing.image_id)
                             listing.image_id = uploaded_img.file_id
 
                         listing.title = title
@@ -207,9 +225,9 @@ def edit_book_listing(request, listing_id):
                         listing.save()
                         messages.success(request, "Book listing updated successfully!")
                         return redirect("seller-book-listings")
-                    except Exception:
+                    except Exception as e:
                         messages.error(
-                            request, "Failed to update book listing. Please try again."
+                            request, f"Failed to update book listing. Error: {str(e)}"
                         )
 
     context = {
