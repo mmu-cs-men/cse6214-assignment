@@ -31,6 +31,10 @@
                     <input type="text" name="author" id="author" class="form-control" required>
                 </div>
                 <div class="mb-3">
+                    <label for="descriptions" class="form-label">Description:</label>
+                    <textarea name="descriptions" id="descriptions" class="form-control" rows="4"></textarea>
+                </div>
+                <div class="mb-3">
                     <label for="condition" class="form-label">Condition:</label>
                     <select name="condition" id="condition" class="form-select" required>
                         {% for key, value in CONDITION_CHOICES %}

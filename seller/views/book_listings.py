@@ -100,6 +100,7 @@ def add_book_listing(request):
                             price=price_val,
                             image_url=image_url,
                             image_id=image_id,
+                            descriptions=request.POST.get("descriptions", "").strip(),
                         )
                         messages.success(request, "Book listing added successfully!")
                         return redirect("seller-book-listings")
@@ -203,6 +204,7 @@ def edit_book_listing(request, listing_id):
                         listing.author = author
                         listing.condition = condition
                         listing.price = price_val
+                        listing.descriptions = request.POST.get("descriptions", "").strip()
                         listing.save()
                         messages.success(request, "Book listing updated successfully!")
                         return redirect("seller-book-listings")
