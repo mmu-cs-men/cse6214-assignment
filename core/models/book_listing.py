@@ -13,8 +13,7 @@ class BookListing(models.Model):
     :ivar author: Author of the book.
     :ivar condition: Condition of the book (NEW, GOOD, FAIR).
     :ivar price: Price of the book listing.
-    :ivar image_url: URL of the image stored in ImageKit CDN.
-    :ivar image_id: ImageKit file ID for managing the image.
+    :ivar image: ImageField for storing raw image files.
     :ivar bought: Boolean indicating whether the book has been purchased.
     """
 
@@ -25,8 +24,7 @@ class BookListing(models.Model):
     author = models.CharField(max_length=255)
     condition = models.CharField(max_length=50, choices=CONDITION_CHOICES)
     price = models.DecimalField(max_digits=10, decimal_places=2)
-    image_url = models.URLField(max_length=500, null=True, blank=True)
-    image_id = models.CharField(max_length=100, null=True, blank=True)
+    image = models.ImageField(upload_to="book_images/", null=True, blank=True)
     bought = models.BooleanField(default=False)
     descriptions = models.TextField(blank=True, null=True)
 
