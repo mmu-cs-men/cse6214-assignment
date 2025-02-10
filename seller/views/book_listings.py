@@ -94,7 +94,7 @@ def add_book_listing(request):
                         uploaded_image_url = None
                         uploaded_image_id = None
                         if image:
-                            uploaded_img = imagekit.upload_image(
+                            uploaded_img = imagekit.upload_file(
                                 file=image.read(),
                                 file_name=image.name,
                                 options=UploadFileRequestOptions(
@@ -189,7 +189,7 @@ def edit_book_listing(request, listing_id):
                 else:
                     try:
                         if image:
-                            uploaded_img = imagekit.upload_image(
+                            uploaded_img = imagekit.upload_file(
                                 file=image.read(),
                                 file_name=image.name,
                                 options=UploadFileRequestOptions(
