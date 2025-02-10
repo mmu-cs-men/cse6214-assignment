@@ -107,6 +107,9 @@
         <header class="mb-4 text-start">
             <h1 class="fw-medium">📖 Book Listings</h1>
         </header>
+        {% if not listings %}
+            <div class="alert alert-info">No book listings found.</div>
+        {% endif %}
         <!-- Section: Existing Book Listings (with Add Book Card as first element) -->
         <div class="row">
             <!-- Add Book Card as the first element -->
@@ -151,10 +154,6 @@
                             </form>
                         </div>
                     </div>
-                </div>
-            {% empty %}
-                <div class="col-12 text-center">
-                    <div class="alert alert-info">No book listings found.</div>
                 </div>
             {% endfor %}
         </div>

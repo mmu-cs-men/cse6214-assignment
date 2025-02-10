@@ -4,9 +4,21 @@
 {% block content %}
 <div class="container py-5">
     <div class="row">
-        <div class="col-md-8 mx-auto">
+        <div class="col-12">
             {% block page_header %}
-            <h2 class="mb-4">Profile Information</h2>
+            <h1 class="mb-4">Profile Information</h1>
+            {% endblock %}
+
+            {% block messages %}
+            {% if messages %}
+            <div class="mt-4">
+                {% for message in messages %}
+                    <div class="alert alert-info" role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+            {% endif %}
             {% endblock %}
             
             {% block user_info %}
@@ -82,18 +94,6 @@
 
             {% block extra_content %}
             <!-- Specific profile settings go here -->
-            {% endblock %}
-
-            {% block messages %}
-            {% if messages %}
-            <div class="mt-4">
-                {% for message in messages %}
-                    <div class="alert alert-info" role="alert">
-                        {{ message }}
-                    </div>
-                {% endfor %}
-            </div>
-            {% endif %}
             {% endblock %}
         </div>
     </div>
