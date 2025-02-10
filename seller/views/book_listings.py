@@ -2,13 +2,15 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 import os
+import base64
+from io import BytesIO
 
 from core.constants import CONDITION_CHOICES
 from core.models.book_listing import BookListing
 from core.models.shop import Shop
 from core.utils.decorators import allowed_roles
-from imagekitio.file import UploadFileRequestOptions
-from imagekitio import ImageKit
+from core.utils.cdn import imagekit
+from imagekitio.models.UploadFileRequestOptions import UploadFileRequestOptions
 
 
 def is_valid_image(image):
@@ -56,12 +58,6 @@ def add_book_listing(request):
     Displays a form for adding a new book listing. On POST, creates a new listing
     and redirects back to the book listings page with a success message.
     """
-    imagekit = ImageKit(
-        private_key="private_+kRnJCZfoiTkm6WmQmwXlxrx4ew=",
-        public_key="public_k1uw6aQxX2FvkMWGqe/yFK4g1fU=",
-        url_endpoint="https://ik.imagekit.io/softwareengbookstore",
-    )
-
     current_user = request.user
     shop = Shop.objects.filter(user__email=current_user.email).first()
     if not shop:
@@ -94,10 +90,12 @@ def add_book_listing(request):
                         uploaded_image_url = None
                         uploaded_image_id = None
                         if image:
-                            # Reset file pointer to beginning
-                            image.seek(0)
+                            # Convert image to base64
+                            image_data = image.read()
+                            base64_image = base64.b64encode(image_data).decode("utf-8")
+
                             uploaded_img = imagekit.upload_file(
-                                file=image,
+                                file=base64_image,
                                 file_name=image.name,
                                 options=UploadFileRequestOptions(
                                     use_unique_file_name=True,
@@ -154,12 +152,6 @@ def edit_book_listing(request, listing_id):
     Displays a form pre-populated with the details of the specified book listing.
     On POST, updates the book listing in the database.
     """
-    imagekit = ImageKit(
-        private_key="private_+kRnJCZfoiTkm6WmQmwXlxrx4ew=",
-        public_key="public_k1uw6aQxX2FvkMWGqe/yFK4g1fU=",
-        url_endpoint="https://ik.imagekit.io/softwareengbookstore",
-    )
-
     current_user = request.user
     shop = Shop.objects.filter(user__email=current_user.email).first()
     if not shop:
@@ -192,26 +184,29 @@ def edit_book_listing(request, listing_id):
                 else:
                     try:
                         if image:
-                            # Reset file pointer to beginning
-                            image.seek(0)
-                            # Read the entire file into memory
+                            # Convert image to base64
+                            image_data = image.read()
+                            base64_image = base64.b64encode(image_data).decode("utf-8")
+
                             uploaded_img = imagekit.upload_file(
-                                file=image,
+                                file=base64_image,
                                 file_name=image.name,
                                 options=UploadFileRequestOptions(
                                     use_unique_file_name=True,
                                     is_private_file=False,
                                 ),
                             )
-                            
+
                             # Only delete old image if new upload was successful
                             if listing.image_id:
                                 try:
-                                    imagekit.delete_image(listing.image_id)
+                                    imagekit.delete_file(listing.image_id)
                                 except Exception:
                                     # If deletion fails, just log it but continue with update
-                                    print(f"Failed to delete old image {listing.image_id}")
-                                    
+                                    print(
+                                        f"Failed to delete old image {listing.image_id}"
+                                    )
+
                             listing.image_url = uploaded_img.url
                             listing.image_id = uploaded_img.file_id
 
