@@ -54,8 +54,8 @@ def login_view(request):
     if request.user.is_authenticated:
         # Check if user is staff/superuser first
         if request.user.is_staff or request.user.is_superuser:
-            return redirect('/admin/')
-            
+            return redirect("/admin/")
+
         try:
             custom_user = CustomUser.objects.get(email=request.user.email)
 
@@ -81,8 +81,8 @@ def login_view(request):
                 # Check if user is staff/superuser first
                 if user.is_staff or user.is_superuser:
                     login(request, user)
-                    return redirect('/admin/')
-                    
+                    return redirect("/admin/")
+
                 custom_user = CustomUser.objects.get(email=email)
 
                 if not _check_courier_approval(request, custom_user):
@@ -99,10 +99,12 @@ def login_view(request):
             try:
                 auth_user = User.objects.get(email=email)
                 if auth_user.is_staff or auth_user.is_superuser:
-                    user = authenticate(request, username=auth_user.username, password=password)
+                    user = authenticate(
+                        request, username=auth_user.username, password=password
+                    )
                     if user is not None:
                         login(request, user)
-                        return redirect('/admin/')
+                        return redirect("/admin/")
                 messages.error(request, "Invalid credentials")
             except User.DoesNotExist:
                 messages.error(

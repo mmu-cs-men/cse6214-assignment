@@ -55,14 +55,13 @@
                        value="{{ listing.price }}" required>
             </div>
             <div class="mb-3">
-                <label for="image" class="form-label">Book Image:</label>
                 {% if listing.image and listing.image.url %}
                     <div class="mb-2">
                         Current Image: <img src="{{ listing.image.url }}" alt="{{ listing.title }}"
                                             style="max-width:100px;">
                     </div>
                 {% endif %}
-                <input type="file" name="image" id="image" class="form-control">
+                <input type="file" name="image" id="image" class="form-control mt-4">
                 <small class="form-text text-muted">Leave blank to keep current image.</small>
             </div>
             <div class="d-flex gap-2">

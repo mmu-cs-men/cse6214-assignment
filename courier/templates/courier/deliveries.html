@@ -19,12 +19,11 @@
     {% endif %}
     <div class="container mt-5">
         <!-- Enhanced Deliveries Header -->
-        <div class="py-3 mb-4 border-bottom">
-            <h1 class="fw-bold">Deliveries</h1>
+        <div class="mb-4">
+            <h1 class="fw-medium">🚚 Deliveries</h1>
         </div>
 
         <!-- Section: My Deliveries -->
-        <h2>My Deliveries</h2>
         <table class="table table-bordered table-hover">
             <thead class="table-light">
             <tr>
@@ -89,39 +88,35 @@
         </table>
 
         <!-- Section: Available Orders -->
-        <h2 class="mt-5">Available Orders</h2>
-        {% if pending_orders %}
-            <table class="table table-bordered table-hover">
-                <thead class="table-light">
+        <h2 class="mt-5 mb-4">Available Orders</h2>
+        <table class="table table-bordered table-hover">
+            <thead class="table-light">
+            <tr>
+                <th>Order ID</th>
+                <th>Placed At</th>
+                <th>Total Price</th>
+                <th>Action</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for order in pending_orders %}
                 <tr>
-                    <th>Order ID</th>
-                    <th>Placed At</th>
-                    <th>Total Price</th>
-                    <th>Action</th>
+                    <td>{{ order.id }}</td>
+                    <td>{{ order.placed_at }}</td>
+                    <td>RM{{ order.total_price }}</td>
+                    <td>
+                        <form method="POST" action="{% url 'courier-accept-order' order.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-success btn-sm">Accept Order</button>
+                        </form>
+                    </td>
                 </tr>
-                </thead>
-                <tbody>
-                {% for order in pending_orders %}
-                    <tr>
-                        <td>{{ order.id }}</td>
-                        <td>{{ order.placed_at }}</td>
-                        <td>RM{{ order.total_price }}</td>
-                        <td>
-                            <form method="POST" action="{% url 'courier-accept-order' order.id %}">
-                                {% csrf_token %}
-                                <button type="submit" class="btn btn-success btn-sm">Accept Order</button>
-                            </form>
-                        </td>
-                    </tr>
-                {% empty %}
-                    <tr>
-                        <td colspan="4" class="text-center">No available orders at this time.</td>
-                    </tr>
-                {% endfor %}
-                </tbody>
-            </table>
-        {% else %}
-            <p>No available orders at this time.</p>
-        {% endif %}
+            {% empty %}
+                <tr>
+                    <td colspan="4" class="text-center">No available orders at this time.</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
     </div>
 {% endblock %}
