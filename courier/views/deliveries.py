@@ -10,9 +10,11 @@ from core.models.delivery_issue import DeliveryIssue
 from core.models.order import Order
 from core.models.order_assignment import OrderAssignment
 from core.models.user import User
+from core.utils.decorators import allowed_roles
 
 
 @login_required
+@allowed_roles(["courier"])
 def deliveries_page(request):
     """
     Renders a page showing available orders (ready to ship with no assignment)
@@ -45,6 +47,7 @@ def deliveries_page(request):
 
 
 @login_required
+@allowed_roles(["courier"])
 def accept_order(request, order_id):
     """
     Handles accepting an order. Creates an OrderAssignment for the order
@@ -68,6 +71,7 @@ def accept_order(request, order_id):
 
 
 @login_required
+@allowed_roles(["courier"])
 def update_assignment(request, assignment_id):
     """
     Handles updating an existing assignment.
@@ -101,6 +105,7 @@ def update_assignment(request, assignment_id):
 
 
 @login_required
+@allowed_roles(["courier"])
 def report_issue(request, assignment_id):
     """
     Renders a form for a courier to report an issue with an order assignment.
