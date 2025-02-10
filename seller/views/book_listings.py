@@ -13,8 +13,8 @@ def is_valid_image(image):
     """Helper function to validate image file type."""
     if not image:
         return True  # Image is optional
-    
-    valid_extensions = ['.jpg', '.jpeg', '.png']
+
+    valid_extensions = [".jpg", ".jpeg", ".png"]
     ext = os.path.splitext(image.name)[1].lower()
     return ext in valid_extensions
 
@@ -94,7 +94,9 @@ def add_book_listing(request):
                         messages.success(request, "Book listing added successfully!")
                         return redirect("seller-book-listings")
                     except Exception:
-                        messages.warning(request, "Failed to add book listing. Please try again.")
+                        messages.warning(
+                            request, "Failed to add book listing. Please try again."
+                        )
 
     # On GET, render the add book listing page.
     context = {
@@ -163,12 +165,16 @@ def edit_book_listing(request, listing_id):
                         listing.condition = condition
                         listing.price = price_val
                         if image:
-                            listing.image = image  # update image only if a new one is provided
+                            listing.image = (
+                                image  # update image only if a new one is provided
+                            )
                         listing.save()
                         messages.success(request, "Book listing updated successfully!")
                         return redirect("seller-book-listings")
                     except Exception:
-                        messages.error(request, "Failed to update book listing. Please try again.")
+                        messages.error(
+                            request, "Failed to update book listing. Please try again."
+                        )
 
     context = {
         "listing": listing,
