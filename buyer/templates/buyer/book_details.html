@@ -175,8 +175,8 @@
                             <!-- Book Image -->
                             <div class="col-md-4 d-flex justify-content-center">
                                 <div class="book-image-container">
-                                    {% if book.image and book.image.url %}
-                                    <img src="{{ book.image.url }}" class="book-image" alt="{{ book.title }}">
+                                    {% if book.image_url %}
+                                    <img src="{{ book.image_url }}" class="book-image" alt="{{ book.title }}">
                                     {% else %}
                                     <img src="{% static 'images/placeholder.jpg' %}" class="book-image"
                                         alt="No image for this book">
