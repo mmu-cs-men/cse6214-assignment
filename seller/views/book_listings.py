@@ -7,8 +7,8 @@ from core.constants import CONDITION_CHOICES
 from core.models.book_listing import BookListing
 from core.models.shop import Shop
 from core.utils.decorators import allowed_roles
-from core.utils import imagekit
 from imagekitio.file import UploadFileRequestOptions
+from imagekitio import ImageKit
 
 
 def is_valid_image(image):
@@ -56,6 +56,12 @@ def add_book_listing(request):
     Displays a form for adding a new book listing. On POST, creates a new listing
     and redirects back to the book listings page with a success message.
     """
+    imagekit = ImageKit(
+        private_key="private_+kRnJCZfoiTkm6WmQmwXlxrx4ew=",
+        public_key="public_k1uw6aQxX2FvkMWGqe/yFK4g1fU=",
+        url_endpoint="https://ik.imagekit.io/softwareengbookstore",
+    )
+
     current_user = request.user
     shop = Shop.objects.filter(user__email=current_user.email).first()
     if not shop:
@@ -91,7 +97,9 @@ def add_book_listing(request):
                             uploaded_img = imagekit.upload_image(
                                 file=image.read(),
                                 file_name=image.name,
-                                options=UploadFileRequestOptions(use_unique_file_name=True)
+                                options=UploadFileRequestOptions(
+                                    use_unique_file_name=True
+                                ),
                             )
                             uploaded_image_url = uploaded_img.url
                             uploaded_image_id = uploaded_img.file_id
@@ -143,6 +151,12 @@ def edit_book_listing(request, listing_id):
     Displays a form pre-populated with the details of the specified book listing.
     On POST, updates the book listing in the database.
     """
+    imagekit = ImageKit(
+        private_key="private_+kRnJCZfoiTkm6WmQmwXlxrx4ew=",
+        public_key="public_k1uw6aQxX2FvkMWGqe/yFK4g1fU=",
+        url_endpoint="https://ik.imagekit.io/softwareengbookstore",
+    )
+
     current_user = request.user
     shop = Shop.objects.filter(user__email=current_user.email).first()
     if not shop:
@@ -178,7 +192,9 @@ def edit_book_listing(request, listing_id):
                             uploaded_img = imagekit.upload_image(
                                 file=image.read(),
                                 file_name=image.name,
-                                options=UploadFileRequestOptions(use_unique_file_name=True)
+                                options=UploadFileRequestOptions(
+                                    use_unique_file_name=True
+                                ),
                             )
                             listing.image_url = uploaded_img.url
                             imagekit.delete_image(listing.image_id)
