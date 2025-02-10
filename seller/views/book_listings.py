@@ -2,6 +2,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 import os
+import uuid
 
 from core.constants import CONDITION_CHOICES
 from core.models.book_listing import BookListing
@@ -63,6 +64,17 @@ def add_book_listing(request):
         return redirect("seller-book-listings")
 
     if request.method == "POST":
+        # Verify the form token
+        form_token = request.POST.get('form_token')
+        session_token = request.session.get('add_book_form_token')
+        
+        if not form_token or not session_token or form_token != session_token:
+            # Silently ignore duplicate/invalid submissions
+            return redirect("seller-book-listings")
+        
+        # Clear the token to prevent reuse
+        request.session.pop('add_book_form_token', None)
+        
         title = request.POST.get("title", "").strip()
         author = request.POST.get("author", "").strip()
         condition = request.POST.get("condition")
@@ -100,9 +112,13 @@ def add_book_listing(request):
                             request, "Failed to add book listing. Please try again."
                         )
 
-    # On GET, render the add book listing page.
+    # Generate a new token for the form
+    form_token = str(uuid.uuid4())
+    request.session['add_book_form_token'] = form_token
+    
     context = {
         "CONDITION_CHOICES": CONDITION_CHOICES,
+        "form_token": form_token,
     }
     return render(request, "seller/add_book_listing.html", context)
 

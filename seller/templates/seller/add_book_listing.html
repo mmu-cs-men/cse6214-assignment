@@ -20,8 +20,9 @@
     {% endif %}
     <div class="card">
         <div class="card-body">
-            <form method="POST" enctype="multipart/form-data">
+            <form method="POST" enctype="multipart/form-data" id="addBookForm" onsubmit="handleSubmit(event)">
                 {% csrf_token %}
+                <input type="hidden" name="form_token" value="{{ form_token }}">
                 <div class="mb-3">
                     <label for="title" class="form-label">Title:</label>
                     <input type="text" name="title" id="title" class="form-control" required>
@@ -50,10 +51,32 @@
                     <label for="image" class="form-label">Book Image:</label>
                     <input type="file" name="image" id="image" class="form-control">
                 </div>
-                <button type="submit" class="btn btn-success">Add Book Listing</button>
+                <button type="submit" class="btn btn-success" id="submitBtn">Add Book Listing</button>
                 <a href="{% url 'seller-book-listings' %}" class="btn btn-secondary">Cancel</a>
             </form>
         </div>
     </div>
 </div>
+
+<script>
+function handleSubmit(event) {
+    // Get the submit button
+    const submitBtn = document.getElementById('submitBtn');
+    
+    // Disable the submit button
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = 'Adding Book...';
+    
+    // The form will submit normally
+    return true;
+}
+
+// Re-enable the button if the user navigates back
+window.onpageshow = function(event) {
+    if (event.persisted) {
+        document.getElementById('submitBtn').disabled = false;
+        document.getElementById('submitBtn').innerHTML = 'Add Book Listing';
+    }
+};
+</script>
 {% endblock %}
