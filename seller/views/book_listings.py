@@ -7,6 +7,8 @@ from core.constants import CONDITION_CHOICES
 from core.models.book_listing import BookListing
 from core.models.shop import Shop
 from core.utils.decorators import allowed_roles
+from core.utils import imagekit
+from imagekitio.file import UploadFileRequestOptions
 
 
 def is_valid_image(image):
@@ -83,13 +85,25 @@ def add_book_listing(request):
                     messages.warning(request, "Price cannot be negative.")
                 else:
                     try:
+                        uploaded_image_url = None
+                        uploaded_image_id = None
+                        if image:
+                            uploaded_img = imagekit.upload_image(
+                                file=image.read(),
+                                file_name=image.name,
+                                options=UploadFileRequestOptions(use_unique_file_name=True)
+                            )
+                            uploaded_image_url = uploaded_img.url
+                            uploaded_image_id = uploaded_img.file_id
+
                         BookListing.objects.create(
                             shop=shop,
                             title=title,
                             author=author,
                             condition=condition,
                             price=price_val,
-                            image=image,  # image is optional
+                            image_url=uploaded_image_url,  # image is optional
+                            image_id=uploaded_image_id,
                         )
                         messages.success(request, "Book listing added successfully!")
                         return redirect("seller-book-listings")
@@ -160,14 +174,20 @@ def edit_book_listing(request, listing_id):
                     messages.error(request, "Price cannot be negative.")
                 else:
                     try:
+                        if image:
+                            uploaded_img = imagekit.upload_image(
+                                file=image.read(),
+                                file_name=image.name,
+                                options=UploadFileRequestOptions(use_unique_file_name=True)
+                            )
+                            listing.image_url = uploaded_img.url
+                            imagekit.delete_image(listing.image_id)
+                            listing.image_id = uploaded_img.file_id
+
                         listing.title = title
                         listing.author = author
                         listing.condition = condition
                         listing.price = price_val
-                        if image:
-                            listing.image = (
-                                image  # update image only if a new one is provided
-                            )
                         listing.save()
                         messages.success(request, "Book listing updated successfully!")
                         return redirect("seller-book-listings")
