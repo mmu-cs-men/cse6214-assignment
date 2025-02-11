@@ -19,8 +19,9 @@
             </div>
             {% endfor %}
             {% endif %}
-            <form method="POST">
+            <form method="POST" id="registerForm" onsubmit="handleSubmit(event)">
                 {% csrf_token %}
+                <input type="hidden" name="form_token" value="{{ form_token }}">
                 <div class="form-floating mb-3">
                     <input type="text" class="form-control" id="name" name="name" placeholder="" required>
                     <label for="name">Full Name</label>
@@ -191,5 +192,26 @@
         const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
         const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
     });
+
+    function handleSubmit(event) {
+        // Get the submit button
+        const submitBtn = document.querySelector('#registerForm button[type="submit"]');
+        
+        // Disable the submit button
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = 'Creating Account...';
+        
+        // The form will submit normally
+        return true;
+    }
+
+    // Re-enable the button if the user navigates back
+    window.onpageshow = function(event) {
+        if (event.persisted) {
+            const submitBtn = document.querySelector('#registerForm button[type="submit"]');
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = 'Register';
+        }
+    };
 </script>
 {% endblock %}
