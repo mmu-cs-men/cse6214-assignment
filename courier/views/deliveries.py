@@ -11,6 +11,7 @@ from core.models.order import Order
 from core.models.order_assignment import OrderAssignment
 from core.models.user import User
 from core.utils.decorators import allowed_roles
+import uuid
 
 
 @login_required
@@ -39,9 +40,17 @@ def deliveries_page(request):
         "-updated_at"
     )
 
+    # Generate tokens for each assignment
+    assignment_tokens = {}
+    for assignment in my_assignments:
+        token = str(uuid.uuid4())
+        request.session[f'update_assignment_token_{assignment.id}'] = token
+        assignment_tokens[assignment.id] = token
+
     context = {
         "pending_orders": available_orders,  # Keep the template variable name for now
         "my_assignments": my_assignments,
+        "assignment_tokens": assignment_tokens,
     }
     return render(request, "courier/deliveries.html", context)
 
@@ -92,6 +101,17 @@ def update_assignment(request, assignment_id):
     )
 
     if request.method == "POST":
+        # Verify the form token
+        form_token = request.POST.get('form_token')
+        session_token = request.session.get(f'update_assignment_token_{assignment_id}')
+        
+        if not form_token or not session_token or form_token != session_token:
+            # Silently ignore duplicate/invalid submissions
+            return redirect("courier-deliveries")
+        
+        # Clear the token to prevent reuse
+        request.session.pop(f'update_assignment_token_{assignment_id}', None)
+        
         action = request.POST.get("action")
         order = assignment.order
         if action == "unaccept":
@@ -129,6 +149,17 @@ def report_issue(request, assignment_id):
     )
 
     if request.method == "POST":
+        # Verify the form token
+        form_token = request.POST.get('form_token')
+        session_token = request.session.get(f'report_issue_token_{assignment_id}')
+        
+        if not form_token or not session_token or form_token != session_token:
+            # Silently ignore duplicate/invalid submissions
+            return redirect("courier-deliveries")
+        
+        # Clear the token to prevent reuse
+        request.session.pop(f'report_issue_token_{assignment_id}', None)
+
         issue_description = request.POST.get("issue_description", "").strip()
         if not issue_description:
             messages.error(request, "Please provide a description for the issue.")
@@ -151,5 +182,13 @@ def report_issue(request, assignment_id):
     except DeliveryIssue.DoesNotExist:
         existing_description = ""
 
-    context = {"assignment": assignment, "existing_description": existing_description}
+    # Generate a new token for the form
+    form_token = str(uuid.uuid4())
+    request.session[f'report_issue_token_{assignment_id}'] = form_token
+
+    context = {
+        "assignment": assignment, 
+        "existing_description": existing_description,
+        "form_token": form_token,
+    }
     return render(request, "courier/report_issue.html", context)
