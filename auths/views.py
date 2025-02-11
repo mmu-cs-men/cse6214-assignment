@@ -8,6 +8,7 @@ from django.http import Http404
 from django.contrib.auth.decorators import login_required
 from core.models.upgrade_request import UpgradeRequest
 import re
+import uuid
 
 
 def _redirect_based_on_role(custom_user):
@@ -140,6 +141,17 @@ def login_view(request):
 
 def register_view(request):
     if request.method == "POST":
+        # Verify the form token
+        form_token = request.POST.get('form_token')
+        session_token = request.session.get('register_form_token')
+        
+        if not form_token or not session_token or form_token != session_token:
+            # Silently ignore duplicate/invalid submissions
+            return redirect("login")
+        
+        # Clear the token to prevent reuse
+        request.session.pop('register_form_token', None)
+        
         name = request.POST.get("name")
         email = request.POST.get("email")
         password = request.POST.get("password")
@@ -199,7 +211,11 @@ def register_view(request):
             messages.error(request, f"Registration failed: {str(e)}")
             return render(request, "register.html")
 
-    return render(request, "register.html")
+    # Generate a new token for the form
+    form_token = str(uuid.uuid4())
+    request.session['register_form_token'] = form_token
+    
+    return render(request, "register.html", {"form_token": form_token})
 
 
 def logout_view(request):
