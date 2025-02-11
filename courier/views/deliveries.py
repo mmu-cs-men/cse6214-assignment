@@ -40,17 +40,9 @@ def deliveries_page(request):
         "-updated_at"
     )
 
-    # Generate tokens for each assignment
-    assignment_tokens = {}
-    for assignment in my_assignments:
-        token = str(uuid.uuid4())
-        request.session[f'update_assignment_token_{assignment.id}'] = token
-        assignment_tokens[assignment.id] = token
-
     context = {
         "pending_orders": available_orders,  # Keep the template variable name for now
         "my_assignments": my_assignments,
-        "assignment_tokens": assignment_tokens,
     }
     return render(request, "courier/deliveries.html", context)
 
@@ -101,17 +93,6 @@ def update_assignment(request, assignment_id):
     )
 
     if request.method == "POST":
-        # Verify the form token
-        form_token = request.POST.get('form_token')
-        session_token = request.session.get(f'update_assignment_token_{assignment_id}')
-        
-        if not form_token or not session_token or form_token != session_token:
-            # Silently ignore duplicate/invalid submissions
-            return redirect("courier-deliveries")
-        
-        # Clear the token to prevent reuse
-        request.session.pop(f'update_assignment_token_{assignment_id}', None)
-        
         action = request.POST.get("action")
         order = assignment.order
         if action == "unaccept":
