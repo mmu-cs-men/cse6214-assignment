@@ -62,9 +62,10 @@
                 <td>{{ assignment.updated_at }}</td>
                 <td>
                     {% if assignment.order.status == "shipped" %}
-                    <form method="POST" action="{% url 'courier-update-assignment' assignment.id %}"
-                        style="display: inline-block;">
+                    <form method="POST" action="{% url 'courier-update-assignment' assignment.id %}" 
+                        style="display: inline-block;" id="updateForm{{ assignment.id }}" onsubmit="handleSubmit(event, {{ assignment.id }})">
                         {% csrf_token %}
+                        <input type="hidden" name="form_token" value="{{ assignment_tokens|get_item:assignment.id }}">
                         <select name="action" class="form-select" style="width: auto; display: inline-block;">
                             <option value="unaccept">Unaccept Order</option>
                             <option value="complete">Mark as Completed</option>
@@ -121,4 +122,31 @@
         </tbody>
     </table>
 </div>
+
+<script>
+function handleSubmit(event, assignmentId) {
+    // Get the submit button
+    const form = document.getElementById('updateForm' + assignmentId);
+    const submitBtn = form.querySelector('button[type="submit"]');
+    
+    // Disable the submit button
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = 'Updating...';
+    
+    // The form will submit normally
+    return true;
+}
+
+// Re-enable the button if the user navigates back
+window.onpageshow = function(event) {
+    if (event.persisted) {
+        const forms = document.querySelectorAll('form[id^="updateForm"]');
+        forms.forEach(form => {
+            const submitBtn = form.querySelector('button[type="submit"]');
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = 'Update';
+        });
+    }
+};
+</script>
 {% endblock %}

@@ -4,6 +4,7 @@ Orders view for the buyer application.
 
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, get_object_or_404
+import uuid
 
 from core.models.order import Order
 from core.utils.decorators import allowed_roles
@@ -31,7 +32,19 @@ def orders_page(request):
                 user=current_user, shop=shop
             ).exists()
 
-            seller_data.append({"shop": shop, "already_reviewed": already_reviewed})
+            # Generate a token for each unreviewed shop
+            if not already_reviewed:
+                token = str(uuid.uuid4())
+                request.session[f'review_token_{shop.id}'] = token
+                review_token = token
+            else:
+                review_token = None
+
+            seller_data.append({
+                "shop": shop, 
+                "already_reviewed": already_reviewed,
+                "review_token": review_token
+            })
 
         total_sellers = len(seller_data)
         reviewed_count = sum(s["already_reviewed"] for s in seller_data)

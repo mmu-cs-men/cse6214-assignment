@@ -109,8 +109,9 @@
                                     }
                                 </style>
                                 <!-- The form now only sends 'shop_id' to 'buyer-review' -->
-                                <form method="POST" action="{% url 'buyer-review' seller.shop.id %}">
+                                <form method="POST" action="{% url 'buyer-review' seller.shop.id %}" id="reviewForm{{ seller.shop.id }}" onsubmit="handleSubmit(event, {{ seller.shop.id }})">
                                     {% csrf_token %}
+                                    <input type="hidden" name="form_token" value="{{ seller.review_token }}">
                                     <div class="mb-3">
                                         <div class="star-rating">
                                             <input id="star5-{{ order.id }}-{{ seller.shop.id }}" type="radio"
@@ -131,14 +132,9 @@
                                         </div>
                                     </div>
                                     <div class="mb-3">
-                                        <label class="form-label"
-                                            for="comment-{{ order.id }}-{{ seller.shop.id }}">Comment:</label>
-                                        <textarea class="form-control" name="comment"
-                                            id="comment-{{ order.id }}-{{ seller.shop.id }}" rows="3"
-                                            placeholder="Enter your feedback here..."></textarea>
+                                        <textarea name="comment" class="form-control" rows="3" placeholder="Write your review here..." required></textarea>
                                     </div>
-                                    <button type="submit" class="btn btn-success">Submit Review
-                                    </button>
+                                    <button type="submit" class="btn btn-primary btn-sm">Submit Review</button>
                                 </form>
                             </div>
                         </div>
@@ -157,4 +153,31 @@
     </div>
     {% endif %}
 </div>
+
+<script>
+function handleSubmit(event, shopId) {
+    // Get the submit button
+    const form = document.getElementById('reviewForm' + shopId);
+    const submitBtn = form.querySelector('button[type="submit"]');
+    
+    // Disable the submit button
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = 'Submitting...';
+    
+    // The form will submit normally
+    return true;
+}
+
+// Re-enable the button if the user navigates back
+window.onpageshow = function(event) {
+    if (event.persisted) {
+        const forms = document.querySelectorAll('form[id^="reviewForm"]');
+        forms.forEach(form => {
+            const submitBtn = form.querySelector('button[type="submit"]');
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = 'Submit Review';
+        });
+    }
+};
+</script>
 {% endblock %}

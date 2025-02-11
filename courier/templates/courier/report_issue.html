@@ -9,15 +9,39 @@
 {% block content %}
     <div class="container mt-5">
         <h1 class="mb-4">Report Issue for Order #{{ assignment.order.id }}</h1>
-        <form method="POST">
+        <form method="POST" id="reportForm" onsubmit="handleSubmit(event)">
             {% csrf_token %}
+            <input type="hidden" name="form_token" value="{{ form_token }}">
             <div class="mb-3">
                 <label for="issue_description" class="form-label">Issue Description</label>
                 <textarea id="issue_description" name="issue_description" class="form-control" rows="4"
                           required>{{ existing_description }}</textarea>
             </div>
-            <button type="submit" class="btn btn-danger">Submit Issue Report</button>
+            <button type="submit" class="btn btn-danger" id="submitBtn">Submit Issue Report</button>
             <a href="{% url 'courier-deliveries' %}" class="btn btn-secondary">Cancel</a>
         </form>
     </div>
+
+<script>
+function handleSubmit(event) {
+    // Get the submit button
+    const submitBtn = document.getElementById('submitBtn');
+    
+    // Disable the submit button
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = 'Submitting...';
+    
+    // The form will submit normally
+    return true;
+}
+
+// Re-enable the button if the user navigates back
+window.onpageshow = function(event) {
+    if (event.persisted) {
+        const submitBtn = document.getElementById('submitBtn');
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = 'Submit Issue Report';
+    }
+};
+</script>
 {% endblock %}

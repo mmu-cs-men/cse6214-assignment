@@ -17,13 +17,23 @@ from core.utils.decorators import allowed_roles
 @allowed_roles(["buyer", "seller"])
 def submit_review(request, shop_id):
     """
-
     Creates a Review for (user + shop) if none exists.
     We also verify that the user has at least one COMPLETED order referencing this shop.
     """
     if request.method != "POST":
         messages.error(request, "Invalid request method.")
         return redirect("buyer-orders")
+
+    # Verify the form token
+    form_token = request.POST.get('form_token')
+    session_token = request.session.get(f'review_token_{shop_id}')
+    
+    if not form_token or not session_token or form_token != session_token:
+        # Silently ignore duplicate/invalid submissions
+        return redirect("buyer-orders")
+    
+    # Clear the token to prevent reuse
+    request.session.pop(f'review_token_{shop_id}', None)
 
     # Convert the Django auth user to your custom user
     current_user = get_object_or_404(User, email=request.user.email)
