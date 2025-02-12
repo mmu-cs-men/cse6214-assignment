@@ -25,15 +25,15 @@ def submit_review(request, shop_id):
         return redirect("buyer-orders")
 
     # Verify the form token
-    form_token = request.POST.get('form_token')
-    session_token = request.session.get(f'review_token_{shop_id}')
-    
+    form_token = request.POST.get("form_token")
+    session_token = request.session.get(f"review_token_{shop_id}")
+
     if not form_token or not session_token or form_token != session_token:
         # Silently ignore duplicate/invalid submissions
         return redirect("buyer-orders")
-    
+
     # Clear the token to prevent reuse
-    request.session.pop(f'review_token_{shop_id}', None)
+    request.session.pop(f"review_token_{shop_id}", None)
 
     # Convert the Django auth user to your custom user
     current_user = get_object_or_404(User, email=request.user.email)

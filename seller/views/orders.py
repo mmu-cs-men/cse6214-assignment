@@ -18,9 +18,11 @@ def orders_page(request):
         return render(request, "seller/orders.html", context)
 
     # Get orders that have items from this seller's shop
-    orders_with_my_books = Order.objects.filter(
-        order_items__book_listing__shop=shop
-    ).distinct().order_by("-placed_at")
+    orders_with_my_books = (
+        Order.objects.filter(order_items__book_listing__shop=shop)
+        .distinct()
+        .order_by("-placed_at")
+    )
 
     assigned_orders = OrderAssignment.objects.values_list(
         "order_id", flat=True

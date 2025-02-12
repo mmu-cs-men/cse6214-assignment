@@ -65,16 +65,16 @@ def add_book_listing(request):
 
     if request.method == "POST":
         # Verify the form token
-        form_token = request.POST.get('form_token')
-        session_token = request.session.get('add_book_form_token')
-        
+        form_token = request.POST.get("form_token")
+        session_token = request.session.get("add_book_form_token")
+
         if not form_token or not session_token or form_token != session_token:
             # Silently ignore duplicate/invalid submissions
             return redirect("seller-book-listings")
-        
+
         # Clear the token to prevent reuse
-        request.session.pop('add_book_form_token', None)
-        
+        request.session.pop("add_book_form_token", None)
+
         title = request.POST.get("title", "").strip()
         author = request.POST.get("author", "").strip()
         condition = request.POST.get("condition")
@@ -101,8 +101,7 @@ def add_book_listing(request):
                             author=author,
                             condition=condition,
                             price=price_val,
-                            image_url=image_url,
-                            image_id=image_id,
+                            image=image,
                             descriptions=request.POST.get("descriptions", "").strip(),
                         )
                         messages.success(request, "Book listing added successfully!")
@@ -114,8 +113,8 @@ def add_book_listing(request):
 
     # Generate a new token for the form
     form_token = str(uuid.uuid4())
-    request.session['add_book_form_token'] = form_token
-    
+    request.session["add_book_form_token"] = form_token
+
     context = {
         "CONDITION_CHOICES": CONDITION_CHOICES,
         "form_token": form_token,
@@ -159,16 +158,16 @@ def edit_book_listing(request, listing_id):
 
     if request.method == "POST":
         # Verify the form token
-        form_token = request.POST.get('form_token')
-        session_token = request.session.get('edit_book_form_token')
-        
+        form_token = request.POST.get("form_token")
+        session_token = request.session.get("edit_book_form_token")
+
         if not form_token or not session_token or form_token != session_token:
             # Silently ignore duplicate/invalid submissions
             return redirect("seller-book-listings")
-        
+
         # Clear the token to prevent reuse
-        request.session.pop('edit_book_form_token', None)
-        
+        request.session.pop("edit_book_form_token", None)
+
         title = request.POST.get("title", "").strip()
         author = request.POST.get("author", "").strip()
         condition = request.POST.get("condition")
@@ -193,7 +192,13 @@ def edit_book_listing(request, listing_id):
                         listing.author = author
                         listing.condition = condition
                         listing.price = price_val
-                        listing.descriptions = request.POST.get("descriptions", "").strip()
+                        if image:
+                            listing.image = (
+                                image  # update image only if a new one is provided
+                            )
+                        listing.descriptions = request.POST.get(
+                            "descriptions", ""
+                        ).strip()
                         listing.save()
                         messages.success(request, "Book listing updated successfully!")
                         return redirect("seller-book-listings")
@@ -204,8 +209,8 @@ def edit_book_listing(request, listing_id):
 
     # Generate a new token for the form
     form_token = str(uuid.uuid4())
-    request.session['edit_book_form_token'] = form_token
-    
+    request.session["edit_book_form_token"] = form_token
+
     context = {
         "listing": listing,
         "CONDITION_CHOICES": CONDITION_CHOICES,

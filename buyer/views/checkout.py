@@ -57,15 +57,15 @@ def checkout_page(request):
 
     if request.method == "POST":
         # Verify the form token
-        form_token = request.POST.get('form_token')
-        session_token = request.session.get('checkout_form_token')
-        
+        form_token = request.POST.get("form_token")
+        session_token = request.session.get("checkout_form_token")
+
         if not form_token or not session_token or form_token != session_token:
             # Silently ignore duplicate/invalid submissions
             return redirect("buyer-orders")
-        
+
         # Clear the token to prevent reuse
-        request.session.pop('checkout_form_token', None)
+        request.session.pop("checkout_form_token", None)
 
         # Retrieve the address details and payment fields from the POST data
         address = request.POST.get("address", "").strip()
@@ -173,8 +173,8 @@ def checkout_page(request):
 
     # Generate a new token for the form
     form_token = str(uuid.uuid4())
-    request.session['checkout_form_token'] = form_token
-    
+    request.session["checkout_form_token"] = form_token
+
     context = {
         "cart_items": cart_items,
         "subtotal": subtotal,

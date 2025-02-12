@@ -35,16 +35,18 @@ def orders_page(request):
             # Generate a token for each unreviewed shop
             if not already_reviewed:
                 token = str(uuid.uuid4())
-                request.session[f'review_token_{shop.id}'] = token
+                request.session[f"review_token_{shop.id}"] = token
                 review_token = token
             else:
                 review_token = None
 
-            seller_data.append({
-                "shop": shop, 
-                "already_reviewed": already_reviewed,
-                "review_token": review_token
-            })
+            seller_data.append(
+                {
+                    "shop": shop,
+                    "already_reviewed": already_reviewed,
+                    "review_token": review_token,
+                }
+            )
 
         total_sellers = len(seller_data)
         reviewed_count = sum(s["already_reviewed"] for s in seller_data)

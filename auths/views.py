@@ -62,11 +62,11 @@ def validate_password_strength(password):
     """
     if len(password) < 8:
         return False
-    if not re.search(r'[A-Z]', password):
+    if not re.search(r"[A-Z]", password):
         return False
-    if not re.search(r'[a-z]', password):
+    if not re.search(r"[a-z]", password):
         return False
-    if not re.search(r'\d', password):
+    if not re.search(r"\d", password):
         return False
     if not re.search(r'[!@#$%^&*(),.?":{}|<>]', password):
         return False
@@ -142,16 +142,16 @@ def login_view(request):
 def register_view(request):
     if request.method == "POST":
         # Verify the form token
-        form_token = request.POST.get('form_token')
-        session_token = request.session.get('register_form_token')
-        
+        form_token = request.POST.get("form_token")
+        session_token = request.session.get("register_form_token")
+
         if not form_token or not session_token or form_token != session_token:
             # Silently ignore duplicate/invalid submissions
             return redirect("login")
-        
+
         # Clear the token to prevent reuse
-        request.session.pop('register_form_token', None)
-        
+        request.session.pop("register_form_token", None)
+
         name = request.POST.get("name")
         email = request.POST.get("email")
         password = request.POST.get("password")
@@ -213,8 +213,8 @@ def register_view(request):
 
     # Generate a new token for the form
     form_token = str(uuid.uuid4())
-    request.session['register_form_token'] = form_token
-    
+    request.session["register_form_token"] = form_token
+
     return render(request, "register.html", {"form_token": form_token})
 
 

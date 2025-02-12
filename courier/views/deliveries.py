@@ -131,15 +131,15 @@ def report_issue(request, assignment_id):
 
     if request.method == "POST":
         # Verify the form token
-        form_token = request.POST.get('form_token')
-        session_token = request.session.get(f'report_issue_token_{assignment_id}')
-        
+        form_token = request.POST.get("form_token")
+        session_token = request.session.get(f"report_issue_token_{assignment_id}")
+
         if not form_token or not session_token or form_token != session_token:
             # Silently ignore duplicate/invalid submissions
             return redirect("courier-deliveries")
-        
+
         # Clear the token to prevent reuse
-        request.session.pop(f'report_issue_token_{assignment_id}', None)
+        request.session.pop(f"report_issue_token_{assignment_id}", None)
 
         issue_description = request.POST.get("issue_description", "").strip()
         if not issue_description:
@@ -165,10 +165,10 @@ def report_issue(request, assignment_id):
 
     # Generate a new token for the form
     form_token = str(uuid.uuid4())
-    request.session[f'report_issue_token_{assignment_id}'] = form_token
+    request.session[f"report_issue_token_{assignment_id}"] = form_token
 
     context = {
-        "assignment": assignment, 
+        "assignment": assignment,
         "existing_description": existing_description,
         "form_token": form_token,
     }
