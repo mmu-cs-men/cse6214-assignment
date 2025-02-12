@@ -2,19 +2,31 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 from core.models.order import Order
 from core.models.order_assignment import OrderAssignment
+from core.models.shop import Shop
 from core.utils.decorators import allowed_roles
 
 
 @login_required
 @allowed_roles(["seller"])
 def orders_page(request):
-    """Renders a page displaying all orders placed by buyers."""
-    all_orders = Order.objects.all().order_by("-placed_at")  # Fetch all orders
+    """Renders a page displaying orders containing books from the current seller's shop."""
+    current_user = request.user
+    shop = Shop.objects.filter(user__email=current_user.email).first()
+
+    if not shop:
+        context = {"orders": [], "assigned_orders": []}
+        return render(request, "seller/orders.html", context)
+
+    # Get orders that have items from this seller's shop
+    orders_with_my_books = Order.objects.filter(
+        order_items__book_listing__shop=shop
+    ).distinct().order_by("-placed_at")
+
     assigned_orders = OrderAssignment.objects.values_list(
         "order_id", flat=True
     )  # Get assigned orders
 
-    context = {"orders": all_orders, "assigned_orders": assigned_orders}
+    context = {"orders": orders_with_my_books, "assigned_orders": assigned_orders}
     return render(request, "seller/orders.html", context)
 
 
